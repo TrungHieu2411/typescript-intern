@@ -89,31 +89,44 @@ body,
   border-color: blue;
 }
 
+
+/* Điều chỉnh cho các menu item chưa được chọn */
 .ant-menu .ant-menu-item:hover {
-  background-color: #ff9138 !important;
-  color: white !important;
+  background-color: #FFF2E7 !important;
+  color: #FF9138 !important;
 }
 
+/* Điều chỉnh cho các menu item đã được chọn */
 .ant-menu .ant-menu-item-selected {
-  background-color: #ff7506 !important;
+  background-color: #FF7506 !important;
   color: white !important;
 }
 
+/* Điều chỉnh cho các menu item có class "menu-item" */
 .menu-item {
   text-decoration: none !important;
   display: flex !important;
 }
 
+/* Điều chỉnh màu chữ khi hover trên các liên kết a */
 a:hover {
-  color: white !important;
+  color: #FF9138  !important;
 }
 
+/* Điều chỉnh khi hover trên các menu item */
 .menu-item:hover {
-  background-color: #ff7506 !important;
-  color: white !important;
+  background-color: #FFF2E7 !important;
+  color: #FF9138 !important;
 }
 
+/* Điều chỉnh khi hover trên các submenu */
 .ant-menu-submenu-title:hover {
-  background-color: #ff7506 !important;
-  color: white !important;
+  background-color: #FFF2E7 !important;
+  color: #FF9138 !important;
+}
+
+/* Điều chỉnh màu chữ khi hover trên các submenu item */
+.ant-menu-submenu-popup .ant-menu-item:hover {
+  background-color: #FFF2E7 !important;
+  color: #FF9138 !important;
 }

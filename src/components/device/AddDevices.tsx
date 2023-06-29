@@ -9,7 +9,7 @@ import {
   Popover,
   Select,
 } from "antd";
-import Icon, { BellFilled } from "@ant-design/icons";
+import { BellFilled } from "@ant-design/icons";
 
 import "../css/style.css";
 import SlideMain from "../../containers/SlideMain";

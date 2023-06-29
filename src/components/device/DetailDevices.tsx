@@ -1,6 +1,6 @@
 import React from "react";
 import { Breadcrumb, Button, Card, Layout, Popover } from "antd";
-import Icon, { BellFilled, PlusSquareOutlined } from "@ant-design/icons";
+import { BellFilled } from "@ant-design/icons";
 
 import "../css/style.css";
 import SlideMain from "../../containers/SlideMain";
@@ -163,7 +163,7 @@ function DetailDevices() {
               <div className="col-2 mt-3">
                 <Link to={"/editDevice"}>
                   <Card className="fixed-card text-center">
-                    <PlusSquareOutlined className="fs-4" />
+                    <img src="./assets/image/edit-square.png" alt="" />
                     <p style={{fontSize: 10}} className="fw-bold p-0">Cập nhật thiết bị</p>
                   </Card>
                 </Link>

@@ -8,9 +8,8 @@ import {
   Layout,
   Popover,
 } from "antd";
-import Icon, {
+import {
   BellFilled,
-  BellOutlined,
   CameraOutlined,
 } from "@ant-design/icons";
 

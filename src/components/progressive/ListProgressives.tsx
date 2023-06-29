@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Badge,
   Breadcrumb,
@@ -13,9 +13,8 @@ import {
   Space,
   Table,
 } from "antd";
-import Icon, {
+import {
   BellFilled,
-  PlusSquareOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 
@@ -293,7 +292,7 @@ function ListProgressives() {
               <div className="col-1 mt-3">
                 <Link to={"/addProgressive"}>
                   <Card className="fixed-card text-center">
-                    <PlusSquareOutlined className="fs-4" />
+                    <img src="./assets/image/add-square.png" alt="" />
                     <p className="fw-bold" style={{ fontSize: 12 }}>
                       Cấp số mới
                     </p>

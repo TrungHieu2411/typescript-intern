@@ -16,6 +16,9 @@ import DetailServices from "./components/service/DetailServices";
 import AddProgressives from "./components/progressive/AddProgressives";
 import ListProgressives from "./components/progressive/ListProgressives";
 import DetailProgressives from "./components/progressive/DetailProgressives";
+import ListReport from "./components/report/ListReport";
+import RoleManagement from "./components/management/RoleManagements";
+import AddRoleManagements from "./components/management/AddRoleManagements";
 
 const Router = () => {
   return (
@@ -41,6 +44,11 @@ const Router = () => {
       <Route path="/progressive" element={<ListProgressives />} />
       <Route path="/addProgressive" element={<AddProgressives />} />
       <Route path="/detailProgressive" element={<DetailProgressives />} />
+
+      <Route path="/report" element={<ListReport />} />
+
+      <Route path="/roleManagement" element={<RoleManagement />} />
+      <Route path="/addRoleManagement" element={<AddRoleManagements />} />
     </Routes>
   );
 };

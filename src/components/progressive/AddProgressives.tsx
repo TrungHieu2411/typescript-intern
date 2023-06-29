@@ -4,12 +4,11 @@ import {
   Button,
   Card,
   Form,
-  Input,
   Layout,
   Popover,
   Select,
 } from "antd";
-import Icon, { BellFilled } from "@ant-design/icons";
+import { BellFilled } from "@ant-design/icons";
 
 import "../css/style.css";
 import SlideMain from "../../containers/SlideMain";
@@ -22,14 +21,6 @@ const popoverContent = (
     bordered={false}
     style={{ width: 270 }}
   ></Card>
-);
-
-const content = (
-  <div>
-    <p>Số 1: 100</p>
-    <p>Số 2: 200</p>
-    <p>Số 3: 300</p>
-  </div>
 );
 
 function AddProgressives() {
@@ -140,7 +131,7 @@ function AddProgressives() {
                         >
                           Hủy bỏ
                         </Button>
-                        <Popover content={content} title="Số">
+                       
                           <Button
                             type="link"
                             style={{
@@ -153,7 +144,6 @@ function AddProgressives() {
                           >
                             In số
                           </Button>
-                        </Popover>
                       </Form.Item>
                     </div>
                   </Form>

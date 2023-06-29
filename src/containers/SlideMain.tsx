@@ -53,10 +53,10 @@ function SlideMain() {
               icon={<FileOutlined />}
               className="menu-item a"
             >
-              <Link href='#'>Báo cáo</Link>
+              <Link href='/report'>Báo cáo</Link>
             </Menu.Item>
             <SubMenu icon={<SettingOutlined />} title="Cài đặt hệ thống" className='a'>
-              <Menu.Item key="role">Quản lý vai trò</Menu.Item>
+              <Menu.Item key="role"><Link href='/roleManagement'>Quản lý vai trò</Link></Menu.Item>
               <Menu.Item key="component">Quản lý thành phần</Menu.Item>
               <Menu.Item key="user-logs">Nhật ký người dùng</Menu.Item>
             </SubMenu>

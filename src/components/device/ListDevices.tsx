@@ -286,7 +286,7 @@ function ListDevices() {
               <div className="col-1 mt-3">
                 <Link to={"/addDevice"}>
                   <Card className="fixed-card text-center">
-                    <PlusSquareOutlined className="fs-4" />
+                    <img src="./assets/image/add-square.png" alt="" />
                     <p className="fw-bold" style={{fontSize: 12}}>Thêm thiết bị</p>
                   </Card>
                 </Link>

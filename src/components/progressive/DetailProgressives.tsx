@@ -1,6 +1,6 @@
 import React from "react";
 import { Breadcrumb, Button, Card, Layout, Popover } from "antd";
-import Icon, { BellFilled, PlusSquareOutlined } from "@ant-design/icons";
+import { BellFilled } from "@ant-design/icons";
 
 import "../css/style.css";
 import SlideMain from "../../containers/SlideMain";
@@ -186,9 +186,9 @@ function DetailProgressives() {
                 </Card>
               </div>
               <div className="col-2 mt-3">
-                <Link to={"/editDevice"}>
+                <Link to={"/progressive"}>
                   <Card className="fixed-card text-center">
-                    <PlusSquareOutlined className="fs-4" />
+                    <img src="./assets/image/back-square.png" alt="" />
                     <p style={{ fontSize: 12 }} className="fw-bold p-0">
                       Quay lại
                     </p>

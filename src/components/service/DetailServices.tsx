@@ -4,7 +4,6 @@ import {
   Breadcrumb,
   Button,
   Card,
-  Checkbox,
   DatePicker,
   Divider,
   Form,
@@ -16,9 +15,8 @@ import {
   Space,
   Table,
 } from "antd";
-import Icon, {
+import {
   BellFilled,
-  PlusSquareOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 
@@ -365,7 +363,7 @@ function DetailServices() {
                     className="text-decoration-none"
                     style={{ color: "#FF7506" }}
                   >
-                    <PlusSquareOutlined className="fs-4" />
+                    <img src="./assets/image/edit-square.png" alt="" />
                     <p className=" fw-bold" style={{ fontSize: 9 }}>
                       Cập nhật danh sách
                     </p>
@@ -376,7 +374,7 @@ function DetailServices() {
                     className="text-decoration-none"
                     style={{ color: "#FF7506" }}
                   >
-                    <PlusSquareOutlined className="fs-4" />
+                    <img src="./assets/image/back-square.png" alt="" />
                     <p className="fw-bold" style={{ fontSize: 9 }}>
                       Quay lại
                     </p>

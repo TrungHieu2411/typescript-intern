@@ -5,16 +5,13 @@ import {
   Button,
   Card,
   DatePicker,
-  Input,
   Layout,
   Pagination,
   Popover,
-  Select,
-  Space,
   Table,
 } from "antd";
 import {
-  BellFilled, SearchOutlined
+  BellFilled,
 } from "@ant-design/icons";
 
 import "../css/style.css";
@@ -33,65 +30,44 @@ const popoverContent = (
 );
 
 const data = [
-  {
-    id: 1,
-    name: "Thiết bị A",
-    ipAddress: "192.168.1.1",
-    isActive: true,
-
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 2,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: false,
-
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 2,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: false,
-
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 2,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: false,
-
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 2,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: false,
-
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 2,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: false,
-
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-
-  // ...Thêm dữ liệu của các thiết bị khác
-];
-
-function ListService() {
+    {
+      id: "1",
+      name: "Dịch vụ A",
+      ipAddress: "10/06/2023",
+      isActive: true,
+      service: "Nguồn A",
+    },
+    {
+      id: "2",
+      name: "Dịch vụ B",
+      ipAddress: "15/08/2023",
+      isActive: false,
+      service: "Nguồn B",
+    },
+    {
+      id: "3",
+      name: "Dịch vụ C",
+      ipAddress: "20/09/2023",
+      isActive: true,
+      service: "Nguồn C",
+    },
+    {
+      id: "4",
+      name: "Dịch vụ D",
+      ipAddress: "25/10/2023",
+      isActive: true,
+      service: "Nguồn D",
+    },
+    {
+      id: "5",
+      name: "Dịch vụ E",
+      ipAddress: "30/11/2023",
+      isActive: false,
+      service: "Nguồn E",
+    },
+  ];
+  
+function ListReport() {
   return (
     <Layout className="layout">
       <SlideMain />
@@ -101,9 +77,9 @@ function ListService() {
             <div className="row mt-2">
               <div className="col mt-2">
                 <Breadcrumb className="fs-6" separator=">">
-                  <Breadcrumb.Item>Dịch vụ</Breadcrumb.Item>
+                  <Breadcrumb.Item>Báo cáo</Breadcrumb.Item>
                   <Breadcrumb.Item className="fw-bold custom-color">
-                    Danh sách dịch vụ
+                    Lập báo cáo
                   </Breadcrumb.Item>
                 </Breadcrumb>
               </div>
@@ -143,28 +119,8 @@ function ListService() {
                 </span>
               </div>
             </div>
-            <div className="pt-5">
-              <h4 style={{ color: "#FF7506" }}>Quản lý dịch vụ</h4>
-            </div>
             <div className="row mt-3 justify-content-center">
-              <div className="col-3">
-                <div className="row">
-                  <div className="col-12">
-                    <label htmlFor="">Trạng thái hoạt động</label>
-                  </div>
-                  <div className="col-12">
-                    <Select defaultValue="all" style={{ width: 280 }}>
-                      <Select.Option value="all">Tất cả</Select.Option>
-                      <Select.Option value="active">Hoạt động</Select.Option>
-                      <Select.Option value="inactive">
-                        Ngưng hoạt động
-                      </Select.Option>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-5 text-start">
+              <div className="col text-start">
                 <div className="row">
                   <div className="col-12">
                     <label htmlFor="">Chọn thời gian</label>
@@ -174,34 +130,12 @@ function ListService() {
                   </div>
                 </div>
               </div>
-
-              <div className="col">
-                <div className="row">
-                  <div className="col-12">
-                    <label htmlFor="">Từ khóa</label>
-                  </div>
-                  <div className="col-12">
-                    <Input
-                      style={{ width: 280 }}
-                      placeholder="Nhập từ khóa"
-                      suffix={
-                        <Space>
-                          <SearchOutlined
-                            className="d-flex align-items-center justify-content-center"
-                            style={{ color: "#1890ff" }}
-                          />
-                        </Space>
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
             <div className="row">
               <div className="col-11 mt-3">
                 <Table dataSource={data} pagination={false} bordered className="mb-3">
                   <Column
-                    title={<span className="table-title">Mã dịch vụ</span>}
+                    title={<span className="table-title">Số thứ tự</span>}
                     dataIndex="id"
                     key="id"
                     render={(text: string) => <span>{text}</span>}
@@ -213,14 +147,14 @@ function ListService() {
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
-                    title={<span className="table-title">Mô tả</span>}
+                    title={<span className="table-title">Thời gian cấp</span>}
                     dataIndex="ipAddress"
                     key="ipAddress"
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
                     title={
-                      <span className="table-title">Trạng thái hoạt động</span>
+                      <span className="table-title">Tình trạng</span>
                     }
                     dataIndex="isActive"
                     key="isActive"
@@ -231,21 +165,11 @@ function ListService() {
                       />
                     )}
                   />
-                  <Column
-                    title=""
-                    dataIndex="ct"
-                    key="ct"
-                    render={(text: string) => (
-                      <Link to={"/detailService"}>{text}</Link>
-                    )}
-                  />
-                  <Column
-                    title=""
-                    dataIndex="cn"
-                    key="cn"
-                    render={(text: string) => (
-                      <Link to={"/editService"}>{text}</Link>
-                    )}
+                   <Column
+                    title={<span className="table-title">Nguồn cấp</span>}
+                    dataIndex="service"
+                    key="service"
+                    render={(text: string) => <span>{text}</span>}
                   />
                 </Table>
                 <Pagination
@@ -255,10 +179,10 @@ function ListService() {
                   />
               </div>
               <div className="col-1 mt-3">
-                <Link to={"/addService"}>
+                <Link to={"#"}>
                   <Card className="fixed-card text-center">
-                    <img src="./assets/image/add-square.png" alt="" />
-                    <p className="fw-bold" style={{fontSize: 12}}>Thêm dịch vụ</p>
+                    <img src="./assets/image/document-download.png" alt="" />
+                    <p className="fw-bold" style={{fontSize: 12}}>Tải về</p>
                   </Card>
                 </Link>
               </div>
@@ -270,4 +194,4 @@ function ListService() {
   );
 }
 
-export default ListService;
+export default ListReport;
