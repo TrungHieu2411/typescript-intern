@@ -7,9 +7,8 @@ import {
   Layout,
   Popover,
   Select,
-  Upload,
 } from "antd";
-import { BellFilled, LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { BellFilled } from "@ant-design/icons";
 
 import SlideMain from "../../../containers/SlideMain";
 import Account from "../../../components/User/Account";
@@ -42,7 +41,6 @@ interface AuthManagementData {
 
   userName: string;
   password: string;
-  image: string;
 }
 function AddAuthManagements() {
   const [newAuthManagement, setNewAuthManagement] =
@@ -55,28 +53,7 @@ function AddAuthManagements() {
       isActive: "",
       userName: "",
       password: "",
-      image: "",
     });
-
-  const [loadingImage, setLoadingImage] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<any>(null);
-  const handleImageUpload = async (file: any) => {
-    setLoadingImage(true);
-    setImageFile(file);
-
-    try {
-      const storageRef = firebase.storage().ref();
-      const imageRef = storageRef.child(`authManagements/${file.name}`);
-      const uploadTaskSnapshot = await imageRef.put(file);
-      const downloadUrl = await uploadTaskSnapshot.ref.getDownloadURL();
-
-      setImageUrl(downloadUrl);
-      setLoadingImage(false);
-    } catch (error) {
-      setLoadingImage(false);
-    }
-  };
 
   const handleAddAuthManagement = async () => {
     try {
@@ -84,29 +61,28 @@ function AddAuthManagements() {
 
       // Create user with email and password
       const userCredential = await firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password);
-    
-    // Get the user's ID
-    const userId = userCredential.user?.uid;
-    
-    // Save the user's information in Firestore
-    if (userId) {
-      const authManagementCollection = firebase
-        .firestore()
-        .collection("authManagements");
-    
-      await authManagementCollection.doc(userId).set({
-        fullName: newAuthManagement.fullName,
-        phone: newAuthManagement.phone,
-        email: newAuthManagement.email,
-        role: newAuthManagement.role,
-        isActive: newAuthManagement.isActive,
-        image: imageUrl,
-        userName: newAuthManagement.userName,
-        password: newAuthManagement.password,
-      });
-    }
+        .auth()
+        .createUserWithEmailAndPassword(email, password);
+
+      // Get the user's ID
+      const userId = userCredential.user?.uid;
+
+      // Save the user's information in Firestore
+      if (userId) {
+        const authManagementCollection = firebase
+          .firestore()
+          .collection("authManagements");
+
+        await authManagementCollection.doc(userId).set({
+          fullName: newAuthManagement.fullName,
+          phone: newAuthManagement.phone,
+          email: newAuthManagement.email,
+          role: newAuthManagement.role,
+          isActive: newAuthManagement.isActive,
+          userName: newAuthManagement.userName,
+          password: newAuthManagement.password,
+        });
+      }
 
       setNewAuthManagement({
         id: "",
@@ -115,7 +91,6 @@ function AddAuthManagements() {
         email: "",
         role: "",
         isActive: "",
-        image: "",
         userName: "",
         password: "",
       });
@@ -125,7 +100,7 @@ function AddAuthManagements() {
       console.error(error);
     }
   };
-  
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -246,30 +221,6 @@ function AddAuthManagements() {
                               placeholder="Khám tim mạch"
                             />
                           </Form.Item>
-                          <Upload
-                            name="avatar"
-                            listType="picture-card"
-                            className="avatar-uploader"
-                            showUploadList={false}
-                            beforeUpload={handleImageUpload}
-                          >
-                            {imageUrl ? (
-                              <img
-                                src={imageUrl}
-                                alt="Product"
-                                style={{ width: "100%" }}
-                              />
-                            ) : (
-                              <div>
-                                {loadingImage ? (
-                                  <LoadingOutlined />
-                                ) : (
-                                  <PlusOutlined />
-                                )}
-                                <div style={{ marginTop: 8 }}>Upload</div>
-                              </div>
-                            )}
-                          </Upload>
                         </div>
                       </div>
 
@@ -286,15 +237,16 @@ function AddAuthManagements() {
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Input 
-                            value={newAuthManagement.userName}
-                            onChange={(e) =>
-                              setNewAuthManagement({
-                                ...newAuthManagement,
-                                userName: e.target.value,
-                              })
-                            }
-                            placeholder="203" />
+                            <Input
+                              value={newAuthManagement.userName}
+                              onChange={(e) =>
+                                setNewAuthManagement({
+                                  ...newAuthManagement,
+                                  userName: e.target.value,
+                                })
+                              }
+                              placeholder="203"
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-12">
@@ -304,14 +256,15 @@ function AddAuthManagements() {
                           </label>
                           <Form.Item className="">
                             <Input.Password
-                             value={newAuthManagement.password}
-                             onChange={(e) =>
-                               setNewAuthManagement({
-                                 ...newAuthManagement,
-                                 password: e.target.value,
-                               })
-                             }
-                            placeholder="Khám tim mạch" />
+                              value={newAuthManagement.password}
+                              onChange={(e) =>
+                                setNewAuthManagement({
+                                  ...newAuthManagement,
+                                  password: e.target.value,
+                                })
+                              }
+                              placeholder="Khám tim mạch"
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-12">
@@ -320,15 +273,16 @@ function AddAuthManagements() {
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Input.Password 
-                             value={newAuthManagement.password}
-                             onChange={(e) =>
-                               setNewAuthManagement({
-                                 ...newAuthManagement,
-                                 password: e.target.value,
-                               })
-                             }
-                            placeholder="Khám tim mạch" />
+                            <Input.Password
+                              value={newAuthManagement.password}
+                              onChange={(e) =>
+                                setNewAuthManagement({
+                                  ...newAuthManagement,
+                                  password: e.target.value,
+                                })
+                              }
+                              placeholder="Khám tim mạch"
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-12">

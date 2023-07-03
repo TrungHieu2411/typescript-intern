@@ -7,9 +7,8 @@ import {
   Layout,
   Popover,
   Select,
-  Upload,
 } from "antd";
-import { BellFilled, LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { BellFilled} from "@ant-design/icons";
 
 import SlideMain from "../../../containers/SlideMain";
 import Account from "../../../components/User/Account";
@@ -39,7 +38,6 @@ interface AuthManagementData {
   role: string;
   isActive: string;
   
-  image: string;
   userName: string;
   password: string;
 }
@@ -51,8 +49,6 @@ function UpdateAuthManagements() {
     email: "",
     role: "",
     isActive: "",
-
-    image: "",
     userName: "",
     password: "",
   });
@@ -68,8 +64,6 @@ function UpdateAuthManagements() {
         const authManagementData =
           authManagementSnapshot.data() as AuthManagementData;
         setAuthManagement(authManagementData);
-        //quan trong
-        setImageUrl(authManagementData.image);
       }
     };
     fetchAuthManagement();
@@ -87,7 +81,7 @@ function UpdateAuthManagements() {
       role: authManagement.role,
       isActive: authManagement.isActive,
 
-      image: imageUrl || authManagement.image,
+     
       userName: authManagement.userName,
       password: authManagement.password,
     };
@@ -103,26 +97,6 @@ function UpdateAuthManagements() {
       });
   };
 
-  const [loadingImage, setLoadingImage] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<any>(null);
-
-  const handleImageUpload = async (file: any) => {
-    setLoadingImage(true);
-    setImageFile(file);
-
-    try {
-      const storageRef = firebase.storage().ref();
-      const imageRef = storageRef.child(`authManagements/${file.name}`);
-      const uploadTaskSnapshot = await imageRef.put(file);
-      const imageUrl = await uploadTaskSnapshot.ref.getDownloadURL();
-
-      setImageUrl(imageUrl);
-      setLoadingImage(false);
-    } catch (error) {
-      setLoadingImage(false);
-    }
-  };
 
   return (
     <Layout className="layout">
@@ -330,32 +304,7 @@ function UpdateAuthManagements() {
                               </Select.Option>
                             </Select>
                           </Form.Item>
-                          <Form.Item>
-                            <Upload
-                              name="avatar"
-                              listType="picture-card"
-                              className="avatar-uploader"
-                              showUploadList={false}
-                              beforeUpload={handleImageUpload}
-                            >
-                              {imageUrl ? (
-                                <img
-                                  src={imageUrl}
-                                  alt="Product"
-                                  style={{ width: "100%" }}
-                                />
-                              ) : (
-                                <div>
-                                  {loadingImage ? (
-                                    <LoadingOutlined />
-                                  ) : (
-                                    <PlusOutlined />
-                                  )}
-                                  <div style={{ marginTop: 8 }}>Upload</div>
-                                </div>
-                              )}
-                            </Upload>
-                          </Form.Item>
+                          
                         </div>
                       </div>
                     </div>

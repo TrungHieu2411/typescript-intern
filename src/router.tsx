@@ -43,6 +43,7 @@ const Router = () => {
       <Route path="/xacnhanmatkhau" element={<ConfilmPassword />} />
 
       <Route path="/admin" element={<Admin />} />
+      <Route path="/admin/:id" element={<Admin />} />
       <Route path="/dashboard" element={<Dashboard />} />
 
       <Route path="/device" element={<ListDevices />} />

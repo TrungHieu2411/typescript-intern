@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -7,34 +7,119 @@ import {
   Input,
   Layout,
   Popover,
+  Upload,
 } from "antd";
-import { BellFilled, CameraOutlined } from "@ant-design/icons";
-
-import "../assets/css/style.css";
+import {
+  BellFilled,
+  CameraOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import SlideMain from "./SlideMain";
-//firebase
-//------
+import "../assets/css/style.css";
+import firebase from "firebase/compat/app";
+import { useParams } from "react-router-dom";
+
 const { Content } = Layout;
 
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
+const popoverContent = <h4>dadasd</h4>;
+
 interface UserData {
-  hoTen: string;
-  soDienThoai: string;
+  fullName: string;
+  phone: string;
   email: string;
-  vaiTro: string;
-  tinhTrang: string;
+  role: string;
+  isActive: string;
+  image: string;
   userName: string;
   password: string;
 }
 
 function Admin() {
+  const { id } = useParams<{ id: string }>();
+  const [user, setUser] = useState<UserData>({
+    fullName: "",
+    phone: "",
+    email: "",
+    role: "",
+    isActive: "",
+    image: "",
+    userName: "",
+    password: "",
+  });
+
+  const [loadingImage, setLoadingImage] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<any>(null);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleUpdateAuthManagement = () => {
+    const userRef = firebase.firestore().collection("authManagements").doc(id);
+    const updatedUser = {
+      fullName: user.fullName,
+      phone: user.phone,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      image: imageUrl || user.image,
+      userName: user.userName,
+      password: user.password,
+    };
+
+    userRef
+      .update(updatedUser)
+      .then(() => {
+        console.log("AuthManagement updated successfully!");
+      })
+      .catch((error) => {
+        console.error("Error updating AuthManagement:", error);
+      });
+  };
+
+  const handleImageUpload = async (file: any) => {
+    setLoadingImage(true);
+    setImageFile(file);
+
+    try {
+      const storageRef = firebase.storage().ref();
+      const imageRef = storageRef.child(`authManagements/${file.name}`);
+      const uploadTaskSnapshot = await imageRef.put(file);
+      const imageUrl = await uploadTaskSnapshot.ref.getDownloadURL();
+
+      setImageUrl(imageUrl);
+      setLoadingImage(false);
+    } catch (error) {
+      setLoadingImage(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userRef = firebase
+        .firestore()
+        .collection("authManagements")
+        .doc(id);
+      const userSnapshot = await userRef.get();
+
+      if (userSnapshot.exists) {
+        const userData = userSnapshot.data() as UserData;
+        setUser(userData);
+        setImageUrl(userData.image);
+      }
+    };
+
+    fetchUser();
+  }, [id]);
+
+  useEffect(() => {
+    const updateAuthManagement = () => {
+      if (imageUrl) {
+        handleUpdateAuthManagement();
+      }
+    };
+
+    updateAuthManagement();
+  }, [handleUpdateAuthManagement, imageUrl]);
 
   return (
     <Layout className="layout">
@@ -76,13 +161,13 @@ function Admin() {
                       marginLeft: 10,
                       borderRadius: "50%",
                     }}
-                    src="../assets/image/logo.jpg"
+                    src={imageUrl || "../assets/image/logo.jpg"}
                     alt=""
                   />
 
                   <span className="ms-2 mb-5 me-4">
                     <p className="mb-0">Xin chào</p>
-                    <p className="mb-0 fw-bold">Thạch Lê Trung Hiếu</p>
+                    <p className="mb-0 fw-bold">{user.userName}</p>
                   </span>
                 </span>
               </div>
@@ -94,12 +179,14 @@ function Admin() {
                     <div className="row text-center">
                       <div className="col-12" style={{ position: "relative" }}>
                         <Image
-                          src="../assets/image/logo.jpg"
-                          className="h-75"
+                          src={imageUrl || "../assets/image/logo.jpg"}
                           preview={false}
-                          style={{ borderRadius: "50%" }}
+                          style={{
+                            borderRadius: "50%",
+                            width: 285,
+                            height: 285,
+                          }}
                         />
-
                         <div
                           style={{
                             position: "absolute",
@@ -109,16 +196,29 @@ function Admin() {
                           }}
                         >
                           <Button
-                            style={{ background: "#FF7506", color: "white" }}
+                            style={{
+                              background: "#FF7506",
+                              color: "white",
+                              width: 40,
+                              height: 40,
+                            }}
                             shape="circle"
                             icon={
-                              <CameraOutlined className="d-flex align-items-center fs-5" />
+                              <Upload
+                                beforeUpload={handleImageUpload}
+                                showUploadList={false}
+                              >
+                                <CameraOutlined
+                                  className="d-flex align-items-center"
+                                  style={{ fontSize: 28, color: "white" }}
+                                />
+                              </Upload>
                             }
                           />
                         </div>
                       </div>
-                      <div className="col mt-5">
-                        <h4>Thạch Lê Trung Hiếu</h4>
+                      <div className="col mt-4">
+                        <h4>{user.userName}</h4>
                       </div>
                     </div>
                   </div>
@@ -130,7 +230,15 @@ function Admin() {
                             Tên người dùng:
                           </label>
                           <Form.Item className="">
-                            <Input />
+                            <Input
+                              value={user.userName}
+                              onChange={(e) =>
+                                setUser({
+                                  ...user,
+                                  userName: e.target.value,
+                                })
+                              }
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-6">
@@ -138,7 +246,15 @@ function Admin() {
                             Tên đăng nhập:
                           </label>
                           <Form.Item className="">
-                            <Input />
+                            <Input
+                              value={user.fullName}
+                              onChange={(e) =>
+                                setUser({
+                                  ...user,
+                                  fullName: e.target.value,
+                                })
+                              }
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-6">
@@ -146,7 +262,15 @@ function Admin() {
                             Số điện thoại:
                           </label>
                           <Form.Item className="">
-                            <Input  />
+                            <Input
+                              value={user.phone}
+                              onChange={(e) =>
+                                setUser({
+                                  ...user,
+                                  phone: e.target.value,
+                                })
+                              }
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-6">
@@ -154,7 +278,15 @@ function Admin() {
                             Mật khẩu:
                           </label>
                           <Form.Item className="">
-                            <Input />
+                            <Input
+                              value={user.password}
+                              onChange={(e) =>
+                                setUser({
+                                  ...user,
+                                  password: e.target.value,
+                                })
+                              }
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-6">
@@ -162,7 +294,15 @@ function Admin() {
                             Email:
                           </label>
                           <Form.Item className="">
-                            <Input />
+                            <Input
+                              value={user.email}
+                              onChange={(e) =>
+                                setUser({
+                                  ...user,
+                                  email: e.target.value,
+                                })
+                              }
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-6">
@@ -170,7 +310,15 @@ function Admin() {
                             Vai trò:
                           </label>
                           <Form.Item className="">
-                            <Input  />
+                            <Input
+                              value={user.role}
+                              onChange={(e) =>
+                                setUser({
+                                  ...user,
+                                  role: e.target.value,
+                                })
+                              }
+                            />
                           </Form.Item>
                         </div>
                       </div>

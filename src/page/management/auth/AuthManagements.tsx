@@ -59,7 +59,6 @@ interface AuthManagementData {
   email: string;
   role: string;
   isActive: string;
-  image: string;
 }
 function AuthManagements() {
   const [authManagementData, setAuthManagementData] = useState<AuthManagementData[]>([]);
@@ -220,17 +219,7 @@ function AuthManagements() {
                       </>
                     )}
                   />
-                   <Column
-                    title=""
-                    dataIndex="image"
-                    key="image"
-                    render={(_: any, record: {image: string}) => (
-                      <>
-                      {/* <Image width={220} height={280} src={record.image} /> */}
-                       <img src={record.image} alt="" style={{ width: "50px" }} />
-                      </>
-                    )}
-                  />
+                 
                 </Table>
                 <Pagination
                   total={100}

@@ -15,25 +15,39 @@ const Login: React.FC = () => {
 
   const onFinish = (values: any) => {
     const { username, password } = values;
+
     firebase
       .auth()
       .signInWithEmailAndPassword(username, password)
       .then((userCredential) => {
-        // Đăng nhập thành công, thực hiện các hành động tiếp theo
-        console.log("Đăng nhập thành công:", userCredential.user);
-        setShowError(false); // Đặt lại trạng thái lỗi
-        setShowForgotPassword(false); // Đặt lại trạng thái quên mật khẩu
-        window.location.href = "/admin"; // Chuyển đến trang /admin
+        const user = userCredential.user;
+        if (user) {
+          // Đăng nhập thành công, thực hiện các hành động tiếp theo
+          console.log("Đăng nhập thành công:", user);
+
+          setShowError(false); // Đặt lại trạng thái lỗi
+          setShowForgotPassword(false); // Đặt lại trạng thái quên mật khẩu
+
+          // Thực hiện các hành động tiếp theo sau khi đăng nhập thành công
+          // Ví dụ: chuyển đến trang admin
+          const userId = user.uid;
+          const adminURL = `/admin/${userId}`;
+          window.location.href = adminURL;
+        } else {
+          // Xảy ra lỗi không có thông tin người dùng
+          console.log("Lỗi đăng nhập: không có thông tin người dùng");
+          setShowError(true);
+          setShowForgotPassword(false);
+        }
       })
       .catch((error) => {
         // Xảy ra lỗi trong quá trình đăng nhập
         console.log("Lỗi đăng nhập:", error);
         setShowError(true);
         setShowForgotPassword(false);
-      
       });
   };
-
+  
   const onFinishFailed = (errorInfo: any) => {
     setShowError(true);
     setShowForgotPassword(false);
