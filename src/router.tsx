@@ -1,29 +1,44 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import ForgotPassword from "./components/auth/ForgotPassword";
-import Login from "./components/auth/Login";
-import ConfilmPassword from "./components/auth/ConfilmPassword";
-import Admin from "./components/Admin";
-import Dashboard from "./components/Dashboard";
-import ListDevices from "./components/device/ListDevices";
-import AddDevices from "./components/device/AddDevices";
-import DetailDevices from "./components/device/DetailDevices";
-import UpdateDevices from "./components/device/UpdateDevices";
-import ListServices from "./components/service/ListServices";
-import AddServices from "./components/service/AddServices";
-import UpdateServices from "./components/service/UpdateServices";
-import DetailServices from "./components/service/DetailServices";
-import AddProgressives from "./components/progressive/AddProgressives";
-import ListProgressives from "./components/progressive/ListProgressives";
-import DetailProgressives from "./components/progressive/DetailProgressives";
-import ListReport from "./components/report/ListReport";
-import RoleManagement from "./components/management/RoleManagements";
-import AddRoleManagements from "./components/management/AddRoleManagements";
 
+//Xử lý Đăng nhập
+import ConfilmPassword from "./page/auth/ConfilmPassword";
+import ForgotPassword from "./page/auth/ForgotPassword";
+import Login from "./page/auth/Login";
+
+//Thiết bị
+import AddDevices from "./page/device/AddDevices";
+import DetailDevices from "./page/device/DetailDevices";
+import ListDevices from "./page/device/ListDevices";
+import UpdateDevices from "./page/device/UpdateDevices";
+//Dịch vụ
+import ListServices from "./page/service/ListServices";
+import AddServices from "./page/service/AddServices";
+import DetailServices from "./page/service/DetailServices";
+import UpdateServices from "./page/service/UpdateServices";
+//Cấp số
+import ListProgressives from "./page/progressive/ListProgressives";
+import AddProgressives from "./page/progressive/AddProgressives";
+import DetailProgressives from "./page/progressive/DetailProgressives";
+//Báo cáo
+import ListReport from "./page/report/ListReport";
+//Quản lý vai trò
+import RoleManagement from "./page/management/role/RoleManagements";
+import AddRoleManagements from "./page/management/role/AddRoleManagements";
+import UpdateRoleManagements from "./page/management/role/UpdateRoleManagements";
+//Quản lý tài khoản
+import AuthManagements from "./page/management/auth/AuthManagements";
+import AddAuthManagements from "./page/management/auth/AddAuthManagements";
+import UpdateAuthManagements from "./page/management/auth/UpdateAuthManagements";
+//Thông tin tài khoản
+import UserLogManagements from "./page/management/user/UserLogManagements";
+import Admin from "./containers/Admin";
+import Dashboard from "./containers/Dashboard";
 const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/quenmatkhau" element={<ForgotPassword />} />
       <Route path="/xacnhanmatkhau" element={<ConfilmPassword />} />
 
@@ -32,13 +47,13 @@ const Router = () => {
 
       <Route path="/device" element={<ListDevices />} />
       <Route path="/addDevice" element={<AddDevices />} />
-      <Route path="/detailDevice" element={<DetailDevices />} />
-      <Route path="/editDevice" element={<UpdateDevices />} />
+      <Route path="/detailDevice/:id" element={<DetailDevices />} />
+      <Route path="/editDevice/:id" element={<UpdateDevices />} />
 
       <Route path="/service" element={<ListServices />} />
       <Route path="/addService" element={<AddServices />} />
-      <Route path="/detailService" element={<DetailServices />} />
-      <Route path="/editService" element={<UpdateServices />} />
+      <Route path="/detailService/:id" element={<DetailServices />} />
+      <Route path="/editService/:id" element={<UpdateServices />} />
 
 
       <Route path="/progressive" element={<ListProgressives />} />
@@ -49,6 +64,14 @@ const Router = () => {
 
       <Route path="/roleManagement" element={<RoleManagement />} />
       <Route path="/addRoleManagement" element={<AddRoleManagements />} />
+      <Route path="/editRoleManagement/:id" element={<UpdateRoleManagements />} />
+
+
+      <Route path="/authManagement" element={<AuthManagements />} />
+      <Route path="/addAuthManagement" element={<AddAuthManagements />} />
+      <Route path="/editAuthManagement/:id" element={<UpdateAuthManagements />} />
+
+      <Route path="/userLogManagement" element={<UserLogManagements />} />
     </Routes>
   );
 };
