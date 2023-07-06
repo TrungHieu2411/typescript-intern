@@ -1,18 +1,15 @@
-import React from "react";
-import {
-  Button,
-  Card,
-  Form,
-  Layout,
-  Popover,
-  Select,
-} from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Card, Form, Layout, Popover, Select, Modal } from "antd";
 import { BellFilled } from "@ant-design/icons";
 
 import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import "../../assets/css/style.css";
+
+// firebase
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
 
 const { Content } = Layout;
 
@@ -24,7 +21,121 @@ const popoverContent = (
     style={{ width: 270 }}
   ></Card>
 );
+
 function AddProgressives() {
+
+  const [selectedService, setSelectedService] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    const fetchCounter = async () => {
+      const counterDoc = await firebase.firestore().collection("counters").doc("progressiveCounter").get();
+      const counterValue = counterDoc.data()?.value || 0;
+      setCounter(counterValue);
+    };
+
+    fetchCounter();
+  }, []);
+
+  const increaseCounter = async () => {
+    const updatedCounter = counter + 1;
+    setCounter(updatedCounter);
+
+    await firebase.firestore().collection("counters").doc("progressiveCounter").set({
+      value: updatedCounter,
+    });
+  };
+
+  const formatCounter = (counter: number) => {
+    return counter.toString().padStart(7, "0");
+  };
+
+  const handleServiceChange = (value: string) => {
+    setSelectedService(value);
+  };
+
+  const handlePrintButtonClick = () => {
+    setShowPopup(true);
+    increaseCounter();
+
+    handleAddProgressive();
+  };
+
+  const handlePopupClose = () => {
+    setShowPopup(false);
+  };
+
+  const getKhoaForCounter = (counter: number) => {
+    switch (counter) {
+      case 1:
+        return "Khám tim mạch";
+      case 2:
+        return "Khám sản - Phụ khoa";
+      case 3:
+        return "Khám răng hàm mặt";
+      case 4:
+        return "Khám tai mũi họng";
+      default:
+        return "Chọn dịch vụ";
+    }
+  };
+
+  const getCurrentTime = () => {
+    const currentDate = new Date();
+    const currentHour = currentDate.getHours();
+    const currentMinute = currentDate.getMinutes();
+    const currentDay = currentDate.getDate();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    return `${currentHour}:${currentMinute} ${currentDay}/${currentMonth}/${currentYear}`;
+  };
+
+  const getExpirationTime = () => {
+    const expirationHour = 17;
+    const expirationMinute = 30;
+    const currentDate = new Date();
+    let currentDay = currentDate.getDate();
+    let currentMonth = currentDate.getMonth() + 1;
+    let currentYear = currentDate.getFullYear();
+    
+    // Check if current time is past the expiration time
+    if (currentDate.getHours() > expirationHour || (currentDate.getHours() === expirationHour && currentDate.getMinutes() > expirationMinute)) {
+      // Increment the current day by 1
+      currentDay += 1;
+      
+      // Adjust the month and year if necessary
+      if (currentDay > 30) {
+        currentDay = 1;
+        currentMonth += 1;
+        if (currentMonth > 12) {
+          currentMonth = 1;
+          currentYear += 1;
+        }
+      }
+    }
+    
+    return `${expirationHour}:${expirationMinute} ${currentDay}/${currentMonth}/${currentYear}`;
+  };
+
+  const handleAddProgressive = async () => {
+    const progressiveCollection = firebase.firestore().collection("progressives");
+
+    try {
+      await progressiveCollection.add({
+        number: formatCounter(counter),
+        nameService: selectedService,
+        timeCreate: getCurrentTime(),
+        deadLineUsed: getExpirationTime(),
+      });
+
+      
+
+      window.location.href = "/addProgressive";
+    } catch (error) {
+      console.log(`Error adding document: ${error}`);
+    }
+  };
 
   return (
     <Layout className="layout">
@@ -34,7 +145,12 @@ function AddProgressives() {
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbThree text="Cấp số" text2=" Danh sách cấp số" href="roleManagement" text3="Cấp số mới" />
+                <BreadCrumbThree
+                  text="Cấp số"
+                  text2=" Danh sách cấp số"
+                  href="/progressive"
+                  text3="Cấp số mới"
+                />
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
@@ -54,7 +170,7 @@ function AddProgressives() {
                       />
                     </Popover>
                   </Button>
-                  <Account link="/admin" img="../assets/image/logo.jpg" hello="Xin chào" name="Thạch Lê Trung Hiếu"/>
+                  <Account />
                 </span>
               </div>
             </div>
@@ -62,7 +178,7 @@ function AddProgressives() {
               <h4 style={{ color: "#FF7506" }}>Quản lý cấp số</h4>
             </div>
             <div className="mt-3">
-              <Card style={{ width: 1140, height: 550 }}>
+              <Card style={{ width: 1180, height: 550 }}>
                 <h3 className="text-center mb-4" style={{ color: "#FF9138" }}>
                   CẤP SỐ MỚI
                 </h3>
@@ -76,18 +192,19 @@ function AddProgressives() {
                         defaultValue="all"
                         style={{ width: 300 }}
                         className="text-start"
+                        onChange={handleServiceChange}
                       >
                         <Select.Option value="all">Chọn dịch vụ</Select.Option>
-                        <Select.Option value="connected">
+                        <Select.Option value={getKhoaForCounter(1)}>
                           Khám tim mạch
                         </Select.Option>
-                        <Select.Option value="disconnected">
+                        <Select.Option value={getKhoaForCounter(2)}>
                           Khám sản - Phụ khoa
                         </Select.Option>
-                        <Select.Option value="disconnected">
+                        <Select.Option value={getKhoaForCounter(3)}>
                           Khám răng hàm mặt
                         </Select.Option>
-                        <Select.Option value="disconnected">
+                        <Select.Option value={getKhoaForCounter(4)}>
                           Khám tai mũi họng
                         </Select.Option>
                       </Select>
@@ -108,19 +225,61 @@ function AddProgressives() {
                         >
                           Hủy bỏ
                         </Button>
-                       
-                          <Button
-                            type="link"
-                            style={{
-                              background: "#FF9138",
-                              color: "white",
-                              height: 38,
-                              width: 115,
-                            }}
-                            className="mx-3 pt-2 mt-4 me-3"
-                          >
-                            In số
-                          </Button>
+                        <Button
+                          type="link"
+                          style={{
+                            background: "#FF9138",
+                            color: "white",
+                            height: 38,
+                            width: 115,
+                          }}
+                          className="mx-3 pt-2 mt-4 me-3"
+                          onClick={handlePrintButtonClick}
+                        >
+                          In số
+                        </Button>
+                        <Modal
+                          visible={showPopup}
+                          onCancel={handlePopupClose}
+                          style={{
+                            marginTop: 100,
+                          }}
+                          className="w-25"
+                          footer={
+                            <h6
+                              style={{ background: "#FF9138" }}
+                              className="py-2 text-center text-white"
+                            >
+                              Thời gian cấp: {getCurrentTime()}
+                              <br />
+                              Hạn sử dụng: {getExpirationTime()}
+                            </h6>
+                          }
+                        >
+                          <h4 className="text-center mt-4">
+                            Số thứ tự được cấp
+                          </h4>
+                          <h1 className="text-center my-4 fw-bold" style={{ color: "#FF9138" }}>
+                            {formatCounter(counter)}
+                          </h1>
+
+                          <p className="text-center">
+                            DV: {selectedService}{" "}
+                            <span className="fw-bold">
+                              (tại quầy số{" "}
+                              {selectedService === "Khám tim mạch"
+                                ? 1
+                                : selectedService === "Khám sản - Phụ khoa"
+                                ? 2
+                                : selectedService === "Khám răng hàm mặt"
+                                ? 3
+                                : selectedService === "Khám tai mũi họng"
+                                ? 4
+                                : ""}
+                              )
+                            </span>
+                          </p>
+                        </Modal>
                       </Form.Item>
                     </div>
                   </Form>

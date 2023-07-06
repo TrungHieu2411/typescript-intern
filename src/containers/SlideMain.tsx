@@ -11,7 +11,22 @@ import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import SubMenu from "antd/es/menu/SubMenu";
 import Link from "antd/es/typography/Link";
+import { useState } from "react";
+
 function SlideMain() {
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  const handleLogoutClick = () => {
+    // Xử lý sự kiện khi bấm nút "Đăng xuất"
+    console.log("Bấm nút Đăng xuất");
+
+    // Xóa id khỏi localStorage khi người dùng đăng xuất
+    localStorage.removeItem("userId");
+    // Cập nhật trạng thái đăng nhập
+    setIsLoggedIn(false);
+  };
+
   return (
     <div>
       <Sider className="slide" width={200}>
@@ -84,7 +99,9 @@ function SlideMain() {
               icon={<LogoutOutlined />}
               className="menu-item mb-4"
             >
-              <Link href="/">Đăng xuất</Link>
+              <Link href="/" onClick={handleLogoutClick}>
+                Đăng xuất
+              </Link>
             </Menu.Item>
           </Menu>
         </div>

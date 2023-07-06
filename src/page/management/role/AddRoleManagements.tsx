@@ -42,17 +42,14 @@ function AddRoleManagements() {
           nameRole: newRoleManagement.nameRole,
           description: newRoleManagement.description
         })
-        setNewRoleManagement({
-          id: "",
-          nameRole: "",
-          description: "",
-        })
+       
          // Thực hiện điều hướng đến trang danh sách sản phẩm
       window.location.href = "/roleManagement";
     } catch (error) {
       console.error(error);
     }
   };
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -86,12 +83,7 @@ function AddRoleManagements() {
                       />
                     </Popover>
                   </Button>
-                  <Account
-                    link="/admin"
-                    img="../assets/image/logo.jpg"
-                    hello="Xin chào"
-                    name="Thạch Lê Trung Hiếu"
-                  />
+                  <Account />
                 </span>
               </div>
             </div>
@@ -196,14 +188,14 @@ function AddRoleManagements() {
                             </td>
                           </tr>
                         </table>
-                        <h6 style={{ color: "#FF7506" }} className="mt-4">
+                        <h6 style={{ color: "#FF7506" }} className="mt-3">
                           Nhóm chức năng B
                         </h6>
                         <table>
                           <tr>
                             <td>
                               <Checkbox
-                                className="blue-checkbox"
+                                className="blue-checkbox mb-2"
                                 id="resetMoiNgay"
                               >
                                 Tất cả

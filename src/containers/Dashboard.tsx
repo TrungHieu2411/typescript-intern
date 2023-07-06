@@ -215,7 +215,7 @@ function Dashboard() {
                     />
                   </Popover>
                 </Button>
-                <Account link="/admin" img="../assets/image/logo.jpg" hello="Xin chào" name="Thạch Lê Trung Hiếu"/>
+                <Account />
               </span>
             </div>
             <div className="col mt-5 pt-3 pb-2 ms-3">

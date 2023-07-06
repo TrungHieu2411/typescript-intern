@@ -10,7 +10,6 @@ import "../../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
-
 import { useParams } from "react-router-dom";
 
 const { Content } = Layout;
@@ -105,12 +104,7 @@ function UpdateRoleManagements() {
                       />
                     </Popover>
                   </Button>
-                  <Account
-                    link="/admin"
-                    img="../assets/image/logo.jpg"
-                    hello="Xin chào"
-                    name="Thạch Lê Trung Hiếu"
-                  />
+                  <Account />
                 </span>
               </div>
             </div>

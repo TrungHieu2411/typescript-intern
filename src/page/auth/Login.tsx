@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Input, Typography, Form } from "antd";
 import { FormInstance } from "antd/lib/form";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
@@ -10,47 +10,48 @@ const { Link } = Typography;
 
 const Login: React.FC = () => {
   const formRef = React.useRef<FormInstance>(null);
-  const [showError, setShowError] = React.useState(false);
-  const [showForgotPassword, setShowForgotPassword] = React.useState(false);
+  const [showError, setShowError] = useState(false);
 
-  const onFinish = (values: any) => {
-    const { username, password } = values;
-
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(username, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        if (user) {
-          // Đăng nhập thành công, thực hiện các hành động tiếp theo
-          console.log("Đăng nhập thành công:", user);
-
-          setShowError(false); // Đặt lại trạng thái lỗi
-          setShowForgotPassword(false); // Đặt lại trạng thái quên mật khẩu
-
-          // Thực hiện các hành động tiếp theo sau khi đăng nhập thành công
-          // Ví dụ: chuyển đến trang admin
-          const userId = user.uid;
-          const adminURL = `/admin/${userId}`;
-          window.location.href = adminURL;
-        } else {
-          // Xảy ra lỗi không có thông tin người dùng
-          console.log("Lỗi đăng nhập: không có thông tin người dùng");
-          setShowError(true);
-          setShowForgotPassword(false);
-        }
-      })
-      .catch((error) => {
-        // Xảy ra lỗi trong quá trình đăng nhập
-        console.log("Lỗi đăng nhập:", error);
-        setShowError(true);
-        setShowForgotPassword(false);
-      });
-  };
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
-  const onFinishFailed = (errorInfo: any) => {
-    setShowError(true);
-    setShowForgotPassword(false);
+  const onFinish = async (values: any) => {
+    
+    const { email, password } = values;
+
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+
+      // Đăng nhập thành công, thực hiện các hành động tiếp theo
+      console.log("Đăng nhập thành công!");
+
+      // Đăng nhập thành công, cập nhật trạng thái đăng nhập
+      setIsLoggedIn(true);
+      setShowError(false); // Đặt lại trạng thái lỗi
+
+      // Thực hiện các hành động tiếp theo sau khi đăng nhập thành công
+      // Ví dụ: chuyển đến trang admin
+      const user = firebase.auth().currentUser;
+      if (user) {
+        const userId = user.uid;
+        const adminURL = `/admin/${userId}`;
+          
+        // Lưu trạng thái đăng nhập vào Local Storage
+        localStorage.setItem("isLoggedIn", "true");
+
+        window.location.href = adminURL;
+        localStorage.setItem('userId', userId);
+      }
+    } catch (error) {
+      // Xảy ra lỗi trong quá trình đăng nhập
+      console.log("Lỗi đăng nhập:", error);
+
+      setShowError(true); // Hiển thị thông báo lỗi
+    }
+  };
+
+  const handleForgotPasswordClick = () => {
+    // Xử lý sự kiện khi bấm nút "Quên mật khẩu"
+    console.log("Bấm nút Quên mật khẩu");
   };
 
   return (
@@ -71,7 +72,6 @@ const Login: React.FC = () => {
                 name="basic"
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
                 autoComplete="off"
                 ref={formRef}
               >
@@ -80,7 +80,7 @@ const Login: React.FC = () => {
                     Tên đăng nhập <span>*</span>
                   </label>
                   <Form.Item
-                    name="username"
+                    name="email"
                     rules={[
                       {
                         required: true,
@@ -97,30 +97,38 @@ const Login: React.FC = () => {
                   </label>
                   <Form.Item
                     name="password"
-                    validateStatus={showError ? "error" : ""}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng nhập mật khẩu!",
+                      },
+                    ]}
+                    validateStatus={
+                      showError &&
+                      formRef.current?.getFieldValue("email") &&
+                      formRef.current?.getFieldValue("password")
+                        ? "error"
+                        : ""
+                    }
                     help={
-                      showError ? (
+                      showError &&
+                      formRef.current?.getFieldValue("email") &&
+                      formRef.current?.getFieldValue("password") ? (
                         <div className="mb-4 mt-2 d-flex align-items-center">
                           <ExclamationCircleOutlined className="me-1 fs-5" />
                           <span>Sai mật khẩu hoặc tên đăng nhập</span>
+                         
                         </div>
-                      ) : null
+                      ) :  <Link
+                      onClick={handleForgotPasswordClick}
+                      href="/quenmatkhau"
+                      style={{ color: "#E73F3F", marginLeft: "auto" }}
+                    >
+                      Quên mật khẩu?
+                    </Link>
                     }
-                    rules={[
-                      { required: true, message: "Vui lòng nhập mật khẩu!" },
-                    ]}
                   >
                     <Input.Password />
-                    {!showError && !showForgotPassword && (
-                      <div className="mt-1">
-                        <Link
-                          href="/quenmatkhau"
-                          style={{ color: "#E73F3F" }}
-                        >
-                          Quên mật khẩu?
-                        </Link>
-                      </div>
-                    )}
                   </Form.Item>
                 </div>
                 <div className="col-12 text-center">
@@ -133,13 +141,16 @@ const Login: React.FC = () => {
                       Đăng nhập
                     </Button>
                   </Form.Item>
-                  {showError && !showForgotPassword && (
-                    <Link
-                      href="/quenmatkhau"
-                      style={{ color: "#E73F3F" }}
-                    >
-                      Quên mật khẩu?
-                    </Link>
+                  {showError && (
+                    <div className="mt-1">
+                      <Link
+                        onClick={handleForgotPasswordClick}
+                        href="/quenmatkhau"
+                        style={{ color: "#E73F3F" }}
+                      >
+                        Quên mật khẩu?
+                      </Link>
+                    </div>
                   )}
                 </div>
               </Form>

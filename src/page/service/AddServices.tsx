@@ -9,6 +9,7 @@ import "../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
+import Account from "../../components/User/Account";
 
 const { Content } = Layout;
 
@@ -91,21 +92,7 @@ function AddServices() {
                       />
                     </Popover>
                   </Button>
-                  <img
-                    style={{
-                      width: 40,
-                      height: 40,
-                      marginLeft: 10,
-                      borderRadius: "50%",
-                    }}
-                    src="../assets/image/logo.jpg"
-                    alt=""
-                  />
-
-                  <span className="ms-2">
-                    <p className="mb-0">Xin chào</p>
-                    <p className="mb-0 fw-bold">Thạch Lê Trung Hiếu</p>
-                  </span>
+                  <Account />
                 </span>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Breadcrumb, Button, Card, Layout, Popover } from "antd";
 import { BellFilled } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -6,6 +6,10 @@ import { Link } from "react-router-dom";
 import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import "../../assets/css/style.css";
+
+//firebase
+import firebase from "firebase/compat/app";
+import { useParams } from "react-router-dom";
 
 const { Content } = Layout;
 
@@ -18,7 +22,34 @@ const popoverContent = (
   ></Card>
 );
 
+
+interface ProgressiveData {
+  number: string;
+  nameService: string;
+  timeCreate: string;
+  deadLineUsed: string;
+}
+
 function DetailProgressives() {
+  const { id } = useParams<{ id: string }>();
+  const [progressive, setProgressive] = useState<ProgressiveData>({
+    number: "",
+  nameService: "",
+  timeCreate: "",
+  deadLineUsed: "",
+  })
+  useEffect(() => {
+    const fetchProgressive = async () => {
+      const progressiveRef = firebase.firestore().collection("progressives").doc(id);
+      const progressiveSnapshot = await progressiveRef.get();
+
+      if (progressiveSnapshot.exists) {
+        const progressiveData = progressiveSnapshot.data() as ProgressiveData;
+        setProgressive(progressiveData);
+      }
+    }
+    fetchProgressive();
+  }, [id])
   return (
     <Layout className="layout">
       <SlideMain />
@@ -58,7 +89,7 @@ function DetailProgressives() {
                       />
                     </Popover>
                   </Button>
-                  <Account link="/admin" img="../assets/image/logo.jpg" hello="Xin chào" name="Thạch Lê Trung Hiếu"/>
+                  <Account />
                 </span>
               </div>
             </div>
@@ -79,7 +110,7 @@ function DetailProgressives() {
                             </p>
                           </td>
                           <td>
-                            <p>KOI_02</p>
+                            <p></p>
                           </td>
                         </tr>
                         <tr>
@@ -92,7 +123,7 @@ function DetailProgressives() {
                           </td>
                           <td>
                             <p>
-                              <span>Kiosk</span>
+                              <span>{progressive.nameService}</span>
                             </p>
                           </td>
                         </tr>
@@ -104,7 +135,7 @@ function DetailProgressives() {
                           </td>
                           <td>
                             <p>
-                              <span>323.424.454.33</span>
+                              <span>{progressive.number}</span>
                             </p>
                           </td>
                         </tr>
@@ -116,7 +147,7 @@ function DetailProgressives() {
                           </td>
                           <td>
                             <p>
-                              <span>323.424.454.33</span>
+                              <span>{progressive.timeCreate}</span>
                             </p>
                           </td>
                         </tr>
@@ -128,7 +159,7 @@ function DetailProgressives() {
                           </td>
                           <td>
                             <p>
-                              <span>323.424.454.33</span>
+                              <span>{progressive.deadLineUsed}</span>
                             </p>
                           </td>
                         </tr>

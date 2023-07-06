@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 //Xử lý Đăng nhập
 import ConfilmPassword from "./page/auth/ConfilmPassword";
@@ -34,45 +34,73 @@ import UpdateAuthManagements from "./page/management/auth/UpdateAuthManagements"
 import UserLogManagements from "./page/management/user/UserLogManagements";
 import Admin from "./containers/Admin";
 import Dashboard from "./containers/Dashboard";
+
 const Router = () => {
+  // Hàm kiểm tra trạng thái đăng nhập
+  const isLoggedIn = () => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    return isLoggedIn === "true";
+  };
+
+  const allowAccess = isLoggedIn(); // Xác định trạng thái cho phép truy cập
+
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/quenmatkhau" element={<ForgotPassword />} />
-      <Route path="/xacnhanmatkhau" element={<ConfilmPassword />} />
+      {allowAccess ? (
+        <>
+          <Route path="/quenmatkhau" element={<ForgotPassword />} />
+          <Route path="/xacnhanmatkhau/*" element={<ConfilmPassword />} />
 
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/admin/:id" element={<Admin />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/:id" element={<Admin />} />
+          <Route path="/dashboard" element={<Dashboard />} />
 
-      <Route path="/device" element={<ListDevices />} />
-      <Route path="/addDevice" element={<AddDevices />} />
-      <Route path="/detailDevice/:id" element={<DetailDevices />} />
-      <Route path="/editDevice/:id" element={<UpdateDevices />} />
+          <Route path="/device" element={<ListDevices />} />
+          <Route path="/addDevice" element={<AddDevices />} />
+          <Route path="/detailDevice/:id" element={<DetailDevices />} />
+          <Route path="/editDevice/:id" element={<UpdateDevices />} />
 
-      <Route path="/service" element={<ListServices />} />
-      <Route path="/addService" element={<AddServices />} />
-      <Route path="/detailService/:id" element={<DetailServices />} />
-      <Route path="/editService/:id" element={<UpdateServices />} />
+          <Route path="/service" element={<ListServices />} />
+          <Route path="/addService" element={<AddServices />} />
+          <Route path="/detailService/:id" element={<DetailServices />} />
+          <Route path="/editService/:id" element={<UpdateServices />} />
 
+          <Route path="/progressive" element={<ListProgressives />} />
+          <Route path="/addProgressive" element={<AddProgressives />} />
+          <Route
+            path="/detailProgressive/:id"
+            element={<DetailProgressives />}
+          />
 
-      <Route path="/progressive" element={<ListProgressives />} />
-      <Route path="/addProgressive" element={<AddProgressives />} />
-      <Route path="/detailProgressive" element={<DetailProgressives />} />
+          <Route path="/report" element={<ListReport />} />
 
-      <Route path="/report" element={<ListReport />} />
+          <Route path="/roleManagement" element={<RoleManagement />} />
+          <Route path="/addRoleManagement" element={<AddRoleManagements />} />
+          <Route
+            path="/editRoleManagement/:id"
+            element={<UpdateRoleManagements />}
+          />
 
-      <Route path="/roleManagement" element={<RoleManagement />} />
-      <Route path="/addRoleManagement" element={<AddRoleManagements />} />
-      <Route path="/editRoleManagement/:id" element={<UpdateRoleManagements />} />
+          <Route path="/authManagement" element={<AuthManagements />} />
+          <Route path="/addAuthManagement" element={<AddAuthManagements />} />
+          <Route
+            path="/editAuthManagement/:id"
+            element={<UpdateAuthManagements />}
+          />
 
-
-      <Route path="/authManagement" element={<AuthManagements />} />
-      <Route path="/addAuthManagement" element={<AddAuthManagements />} />
-      <Route path="/editAuthManagement/:id" element={<UpdateAuthManagements />} />
-
-      <Route path="/userLogManagement" element={<UserLogManagements />} />
+          <Route path="/userLogManagement" element={<UserLogManagements />} />
+          {/* Các route khác cho phép truy cập khi đăng nhập */}
+        </>
+      ) : (
+        <>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="*"
+            element={<Navigate to="/login" replace />}
+          />
+        </>
+      )}
     </Routes>
   );
 };

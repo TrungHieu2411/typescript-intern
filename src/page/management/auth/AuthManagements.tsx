@@ -109,12 +109,7 @@ function AuthManagements() {
                       />
                     </Popover>
                   </Button>
-                  <Account
-                    link="/admin"
-                    img="../assets/image/logo.jpg"
-                    hello="Xin chào"
-                    name="Thạch Lê Trung Hiếu"
-                  />
+                  <Account />
                 </span>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Badge,
   Button,
@@ -21,6 +21,9 @@ import BreadCrumbTwo from "../../components/BreadCrumb/BreadCrumbTwo";
 import Account from "../../components/User/Account";
 import "../../assets/css/style.css";
 
+//firebase
+import firebase from "firebase/compat/app";
+
 const { Content } = Layout;
 
 const popoverContent = (
@@ -32,58 +35,58 @@ const popoverContent = (
   ></Card>
 );
 
-const data = [
-  {
-    id: 2010001,
-    nameCustomer: "Lê Huỳnh Ái Vân",
-    nameService: "Khám tổng quát",
-    time: "14:35 - 07/11/2021",
-    deadTime: "14:35 - 07/11/2021",
-    status: "Đã bỏ qua",
-    service: "Kiosk",
-    ct: "Chi tiết",
-  },
-  {
-    id: 2010002,
-    nameCustomer: "Nguyễn Văn A",
-    nameService: "Chụp X-quang",
-    time: "09:15 - 15/11/2021",
-    deadTime: "09:15 - 15/11/2021",
-    status: "Đã sử dụng",
-    service: "Hệ thống",
-    ct: "Chi tiết",
-  },
-  {
-    id: 2010003,
-    nameCustomer: "Trần Thị B",
-    nameService: "Siêu âm tim",
-    time: "10:30 - 20/11/2021",
-    deadTime: "10:30 - 20/11/2021",
-    status: "Đang chờ",
-    service: "Kiosk",
-    ct: "Chi tiết",
-  },
-  {
-    id: 2010004,
-    nameCustomer: "Phạm Văn C",
-    nameService: "Điều trị cận thị",
-    time: "13:45 - 25/11/2021",
-    deadTime: "13:45 - 25/11/2021",
-    status: "Đang chờ",
-    service: "Kiosk",
-    ct: "Chi tiết",
-  },
-  {
-    id: 2010005,
-    nameCustomer: "Nguyễn Thị D",
-    nameService: "Phẫu thuật thẩm mỹ",
-    time: "16:20 - 30/11/2021",
-    deadTime: "16:20 - 30/11/2021",
-    status: "Đã sử dụng",
-    service: "Hệ thống",
-    ct: "Chi tiết",
-  },
-];
+// const data = [
+//   {
+//     id: 2010001,
+//     nameCustomer: "Lê Huỳnh Ái Vân",
+//     nameService: "Khám tổng quát",
+//     time: "14:35 - 07/11/2021",
+//     deadTime: "14:35 - 07/11/2021",
+//     status: "Đã bỏ qua",
+//     service: "Kiosk",
+//     ct: "Chi tiết",
+//   },
+//   {
+//     id: 2010002,
+//     nameCustomer: "Nguyễn Văn A",
+//     nameService: "Chụp X-quang",
+//     time: "09:15 - 15/11/2021",
+//     deadTime: "09:15 - 15/11/2021",
+//     status: "Đã sử dụng",
+//     service: "Hệ thống",
+//     ct: "Chi tiết",
+//   },
+//   {
+//     id: 2010003,
+//     nameCustomer: "Trần Thị B",
+//     nameService: "Siêu âm tim",
+//     time: "10:30 - 20/11/2021",
+//     deadTime: "10:30 - 20/11/2021",
+//     status: "Đang chờ",
+//     service: "Kiosk",
+//     ct: "Chi tiết",
+//   },
+//   {
+//     id: 2010004,
+//     nameCustomer: "Phạm Văn C",
+//     nameService: "Điều trị cận thị",
+//     time: "13:45 - 25/11/2021",
+//     deadTime: "13:45 - 25/11/2021",
+//     status: "Đang chờ",
+//     service: "Kiosk",
+//     ct: "Chi tiết",
+//   },
+//   {
+//     id: 2010005,
+//     nameCustomer: "Nguyễn Thị D",
+//     nameService: "Phẫu thuật thẩm mỹ",
+//     time: "16:20 - 30/11/2021",
+//     deadTime: "16:20 - 30/11/2021",
+//     status: "Đã sử dụng",
+//     service: "Hệ thống",
+//     ct: "Chi tiết",
+//   },
+// ];
 const renderStatus = (status: string) => {
   let color = "";
   let text = "";
@@ -102,7 +105,32 @@ const renderStatus = (status: string) => {
   return <Badge color={color} text={text} />;
 };
 
+interface ProgressiveData {
+  id: string;
+  number: string;
+  nameService: string;
+  timeCreate: string;
+  deadLineUsed: string;
+}
 function ListProgressives() {
+  const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
+
+  useEffect(() => {
+    const fetchProgressive = async () => {
+      const progressiveRef = firebase.firestore().collection("progressives");
+      await progressiveRef.onSnapshot((snapshot) => {
+        const progressiveData: ProgressiveData[] = [];
+        snapshot.forEach((doc) => {
+          const progressive = doc.data() as ProgressiveData;
+          progressive.id = doc.id;
+          progressiveData.push(progressive)
+        })
+        setProgressiveData(progressiveData)
+      })
+    }
+    fetchProgressive();
+  })
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -131,12 +159,7 @@ function ListProgressives() {
                       />
                     </Popover>
                   </Button>
-                  <Account
-                    link="/admin"
-                    img="./assets/image/logo.jpg"
-                    hello="Xin chào"
-                    name="Thạch Lê Trung Hiếu"
-                  />
+                  <Account />
                 </span>
               </div>
             </div>
@@ -240,7 +263,7 @@ function ListProgressives() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={data}
+                  dataSource={progressiveData}
                   pagination={false}
                   bordered
                   rowClassName={() => "table-row"}
@@ -248,8 +271,8 @@ function ListProgressives() {
                 >
                   <Column
                     title={<span className="table-title">STT</span>}
-                    dataIndex="id"
-                    key="id"
+                    dataIndex="number"
+                    key="number"
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
@@ -266,14 +289,14 @@ function ListProgressives() {
                   />
                   <Column
                     title={<span className="table-title">Thời gian cấp</span>}
-                    dataIndex="time"
-                    key="time"
+                    dataIndex="timeCreate"
+                    key="timeCreate"
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
                     title={<span className="table-title">Hạn sử dụng</span>}
-                    dataIndex="deadTime"
-                    key="deadTime"
+                    dataIndex="deadLineUsed"
+                    key="deadLineUsed"
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
@@ -292,8 +315,10 @@ function ListProgressives() {
                     title=""
                     dataIndex="ct"
                     key="ct"
-                    render={(text: string) => (
-                      <Link to={"/detailProgressive"}>{text}</Link>
+                     render={(_: any, record: { id: string }) => (
+                      <>
+                        <Link to={`/detailProgressive/${record.id}`}>Chi tiết</Link>
+                      </>
                     )}
                   />
                 </Table>

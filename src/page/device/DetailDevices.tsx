@@ -25,6 +25,8 @@ interface DeviceData {
   isConnected: string;
   service: string;
   typeDevice: string;
+  userName: string; // Thêm thuộc tính userName
+  password: string; // Thêm thuộc tính password
 }
 function DetailDevices() {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +37,9 @@ function DetailDevices() {
     isActive: "",
     isConnected: "",
     service: "",
-    typeDevice: ""
+    typeDevice: "",
+    userName: "",
+    password: "",
   });
 
   useEffect(() => {
@@ -69,7 +73,7 @@ function DetailDevices() {
                       <BellFilled style={{ color: "#FF7506" }} className="fs-5 d-flex align-items-center justify-content-center" />
                     </Popover>
                   </Button>
-                  <Account link="/admin" img="../assets/image/logo.jpg" hello="Xin chào" name="Thạch Lê Trung Hiếu" />
+                  <Account />
                 </span>
               </div>
             </div>
@@ -135,7 +139,7 @@ function DetailDevices() {
                               <p className="me-5 fw-bold">Tên đăng nhập:</p>{" "}
                             </td>
                             <td>
-                              <p>{device.isActive}</p>
+                              <p>{device.userName}</p>
                             </td>
                           </tr>
                           <tr>
@@ -143,7 +147,7 @@ function DetailDevices() {
                               <p className="me-5 fw-bold">Mật khẩu:</p>
                             </td>
                             <td>
-                              <p>{device.isConnected}</p>
+                              <p>{device.password}</p>
                             </td>
                           </tr>
                         </tbody>

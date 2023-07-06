@@ -12,8 +12,6 @@ import {
 import {
   BellFilled,
   CameraOutlined,
-  LoadingOutlined,
-  PlusOutlined,
 } from "@ant-design/icons";
 import SlideMain from "./SlideMain";
 import "../assets/css/style.css";
@@ -93,23 +91,27 @@ function Admin() {
     }
   };
 
-  useEffect(() => {
+   // Lấy id từ localStorage
+   const storedUserId = localStorage.getItem('userId');
+   useEffect(() => {
     const fetchUser = async () => {
       const userRef = firebase
         .firestore()
         .collection("authManagements")
-        .doc(id);
+        .doc(storedUserId || id); // Sử dụng storedUserId nếu tồn tại, nếu không thì sử dụng id từ params
+
       const userSnapshot = await userRef.get();
 
       if (userSnapshot.exists) {
         const userData = userSnapshot.data() as UserData;
         setUser(userData);
+
         setImageUrl(userData.image);
       }
     };
 
     fetchUser();
-  }, [id]);
+  }, [storedUserId, id]);
 
   useEffect(() => {
     const updateAuthManagement = () => {
@@ -167,7 +169,7 @@ function Admin() {
 
                   <span className="ms-2 mb-5 me-4">
                     <p className="mb-0">Xin chào</p>
-                    <p className="mb-0 fw-bold">{user.userName}</p>
+                    <p className="mb-0 fw-bold">{user.fullName}</p>
                   </span>
                 </span>
               </div>
@@ -218,7 +220,7 @@ function Admin() {
                         </div>
                       </div>
                       <div className="col mt-4">
-                        <h4>{user.userName}</h4>
+                        <h4>{user.fullName}</h4>
                       </div>
                     </div>
                   </div>
@@ -231,11 +233,11 @@ function Admin() {
                           </label>
                           <Form.Item className="">
                             <Input
-                              value={user.userName}
+                              value={user.fullName}
                               onChange={(e) =>
                                 setUser({
                                   ...user,
-                                  userName: e.target.value,
+                                  fullName: e.target.value,
                                 })
                               }
                             />
@@ -247,11 +249,11 @@ function Admin() {
                           </label>
                           <Form.Item className="">
                             <Input
-                              value={user.fullName}
+                              value={user.userName}
                               onChange={(e) =>
                                 setUser({
                                   ...user,
-                                  fullName: e.target.value,
+                                  userName: e.target.value,
                                 })
                               }
                             />
