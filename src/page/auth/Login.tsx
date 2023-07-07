@@ -4,7 +4,6 @@ import { FormInstance } from "antd/lib/form";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
-import "firebase/compat/auth";
 
 const { Link } = Typography;
 
@@ -15,40 +14,44 @@ const Login: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   const onFinish = async (values: any) => {
-    
-    const { email, password } = values;
-
+    const { userName, password } = values;
     try {
-      await firebase.auth().signInWithEmailAndPassword(email, password);
-
-      // Đăng nhập thành công, thực hiện các hành động tiếp theo
-      console.log("Đăng nhập thành công!");
-
-      // Đăng nhập thành công, cập nhật trạng thái đăng nhập
-      setIsLoggedIn(true);
-      setShowError(false); // Đặt lại trạng thái lỗi
-
-      // Thực hiện các hành động tiếp theo sau khi đăng nhập thành công
-      // Ví dụ: chuyển đến trang admin
-      const user = firebase.auth().currentUser;
-      if (user) {
-        const userId = user.uid;
-        const adminURL = `/admin/${userId}`;
-          
+      const authManagementsCollection = firebase.firestore().collection("authManagements");
+      const querySnapshot = await authManagementsCollection
+        .where("userName", "==", userName)
+        .where("password", "==", password)
+        .get();
+  
+      if (!querySnapshot.empty) {
+        // Tìm thấy tài khoản hợp lệ
+        const userId = querySnapshot.docs[0].id;
+        console.log("Đăng nhập thành công!");
+        console.log("ID tài khoản:", userId);
+  
+        // Cập nhật trạng thái đăng nhập
+        setIsLoggedIn(true);
+        setShowError(false);
+        
         // Lưu trạng thái đăng nhập vào Local Storage
         localStorage.setItem("isLoggedIn", "true");
-
+        localStorage.setItem("userId", userId);
+  
+        // Thực hiện các hành động tiếp theo sau khi đăng nhập thành công
+        // Ví dụ: chuyển đến trang admin
+        const adminURL = `/admin/${userId}`;
         window.location.href = adminURL;
-        localStorage.setItem('userId', userId);
+      } else {
+        // Không tìm thấy tài khoản hợp lệ
+        console.log("Sai mật khẩu hoặc tên đăng nhập");
+        setShowError(true);
       }
     } catch (error) {
       // Xảy ra lỗi trong quá trình đăng nhập
       console.log("Lỗi đăng nhập:", error);
-
-      setShowError(true); // Hiển thị thông báo lỗi
+      setShowError(true);
     }
   };
-
+  
   const handleForgotPasswordClick = () => {
     // Xử lý sự kiện khi bấm nút "Quên mật khẩu"
     console.log("Bấm nút Quên mật khẩu");
@@ -80,7 +83,7 @@ const Login: React.FC = () => {
                     Tên đăng nhập <span>*</span>
                   </label>
                   <Form.Item
-                    name="email"
+                    name="userName"
                     rules={[
                       {
                         required: true,

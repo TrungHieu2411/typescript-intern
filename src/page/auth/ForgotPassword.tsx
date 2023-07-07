@@ -136,7 +136,7 @@ const ForgotPassword: React.FC = () => {
           <div className="col-7">
             <img
               className="img-fluid"
-              src="../assets/image/bg-main.jpg"
+              src="../assets/image/quenmatkhau.jpg"
               alt=""
             />
           </div>

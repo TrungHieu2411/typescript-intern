@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  Layout,
-  Popover,
-  Select,
-} from "antd";
-import { BellFilled} from "@ant-design/icons";
+import { Button, Card, Form, Input, Layout, Popover, Select } from "antd";
+import { BellFilled } from "@ant-design/icons";
 
 import SlideMain from "../../../containers/SlideMain";
 import Account from "../../../components/User/Account";
@@ -32,26 +24,31 @@ const popoverContent = (
 );
 
 interface AuthManagementData {
+  id: string;
   fullName: string;
   phone: string;
   email: string;
-  role: string;
+  role: firebase.firestore.DocumentReference | null; // Thay đổi kiểu dữ liệu của role thành DocumentReference
   isActive: string;
-  
+
   userName: string;
   password: string;
 }
 function UpdateAuthManagements() {
+  
   const { id } = useParams<{ id: string }>();
   const [authManagement, setAuthManagement] = useState<AuthManagementData>({
     fullName: "",
     phone: "",
     email: "",
-    role: "",
+    role: null,
     isActive: "",
     userName: "",
     password: "",
+    id: "",
   });
+
+
   useEffect(() => {
     const fetchAuthManagement = async () => {
       const authManagementRef = firebase
@@ -63,41 +60,89 @@ function UpdateAuthManagements() {
       if (authManagementSnapshot.exists) {
         const authManagementData =
           authManagementSnapshot.data() as AuthManagementData;
-        setAuthManagement(authManagementData);
+        setAuthManagement({
+          ...authManagementData,
+          role: authManagementData.role || null, // Lấy id của DocumentReference
+        });
       }
     };
     fetchAuthManagement();
   }, [id]);
 
   const handleUpdateAuthManagement = () => {
-    const authManagemenRef = firebase
-      .firestore()
-      .collection("authManagements")
-      .doc(id);
-    const updatedAuthManagement = {
-      fullName: authManagement.fullName,
-      phone: authManagement.phone,
-      email: authManagement.email,
-      role: authManagement.role,
-      isActive: authManagement.isActive,
-
-     
-      userName: authManagement.userName,
-      password: authManagement.password,
-    };
-
-    authManagemenRef
-      .update(updatedAuthManagement)
-      .then(() => {
-        console.log("AuthManagement updated successfully!");
-        window.location.href = "/authManagement";
-      })
-      .catch((error) => {
-        console.error("Error updating AuthManagement:", error);
-      });
+    const userRef = firebase.firestore().collection("authManagements").doc(id);
+  const updatedUser: AuthManagementData = {
+    fullName: authManagement.fullName,
+    phone: authManagement.phone,
+    email: authManagement.email,
+    role: authManagement.role,
+    isActive: authManagement.isActive,
+    userName: authManagement.userName,
+    password: authManagement.password,
+    id: authManagement.id,
   };
 
+  userRef
+    .update(updatedUser)
+    .then(() => {
+      console.log("AuthManagement updated successfully!");
+    })
+    .catch((error) => {
+      console.error("Error updating AuthManagement:", error);
+    });
+};
 
+  const [authManagementData, setAuthManagementData] = useState<AuthManagementData[]>([]);
+  const [roleValue, setRoleValue] = useState<string | null>(null);
+
+ useEffect(() => {
+    const fetchAuthManagement = async () => {
+      const authManagementRef = firebase.firestore().collection("authManagements");
+      const snapshot = await authManagementRef.get();
+      setAuthManagementData(await Promise.all(snapshot.docs.map(async (doc) => {
+        const authManagement = doc.data() as AuthManagementData;
+        authManagement.id = doc.id;
+
+        const roleRef = authManagement.role;
+
+        if (roleRef) {
+          const roleDoc = await roleRef.get();
+          if (roleDoc.exists) {
+            const roleData = roleDoc.data();
+            if (roleData && roleData.nameRole) {
+              const roleName = roleData.nameRole;
+              authManagement.role = roleName;
+            }
+          }
+        }
+        return authManagement;
+      })))
+    }
+    fetchAuthManagement();
+  }, []);
+
+  useEffect(() => {
+    const fetchRoleData = async () => {
+      if (authManagement.role) {
+        const roleRef = authManagement.role;
+        const roleSnapshot = await roleRef.get();
+        if (roleSnapshot.exists) {
+          const roleData = roleSnapshot.data();
+          if (roleData && roleData.nameRole) {
+            const roleName = roleData.nameRole;
+            setRoleValue(roleName);
+          }
+        }
+      }
+    };
+
+    fetchRoleData();
+  }, [authManagement]);
+
+  const handleRoleChange = (value: string) => {
+    setRoleValue(value);
+    // Update user.role here if necessary
+  };
   return (
     <Layout className="layout">
       <SlideMain />
@@ -202,16 +247,13 @@ function UpdateAuthManagements() {
                             Vai trò: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Input
-                              value={authManagement.role}
-                              onChange={(e) =>
-                                setAuthManagement({
-                                  ...authManagement,
-                                  role: e.target.value,
-                                })
-                              }
-                              placeholder="Khám tim mạch"
-                            />
+                            <Select value={roleValue} onChange={handleRoleChange}>
+                              {authManagementData.map((authManagement) => (
+                                <Select.Option key={authManagement.id} value={authManagement.role}>
+                                 
+                                </Select.Option>
+                              ))}
+                            </Select>
                           </Form.Item>
                         </div>
                       </div>
@@ -229,15 +271,16 @@ function UpdateAuthManagements() {
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Input 
-                             value={authManagement.userName}
-                             onChange={(e) =>
-                               setAuthManagement({
-                                 ...authManagement,
-                                 userName: e.target.value,
-                               })
-                             }
-                            placeholder="203" />
+                            <Input
+                              value={authManagement.userName}
+                              onChange={(e) =>
+                                setAuthManagement({
+                                  ...authManagement,
+                                  userName: e.target.value,
+                                })
+                              }
+                              placeholder="203"
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-12">
@@ -246,15 +289,16 @@ function UpdateAuthManagements() {
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Input.Password 
-                            value={authManagement.password}
-                            onChange={(e) =>
-                              setAuthManagement({
-                                ...authManagement,
-                                password: e.target.value,
-                              })
-                            }
-                            placeholder="Khám tim mạch" />
+                            <Input.Password
+                              value={authManagement.password}
+                              onChange={(e) =>
+                                setAuthManagement({
+                                  ...authManagement,
+                                  password: e.target.value,
+                                })
+                              }
+                              placeholder="Khám tim mạch"
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-12">
@@ -263,15 +307,16 @@ function UpdateAuthManagements() {
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Input.Password 
-                             value={authManagement.password}
-                             onChange={(e) =>
-                               setAuthManagement({
-                                 ...authManagement,
-                                 password: e.target.value,
-                               })
-                             }
-                            placeholder="Khám tim mạch" />
+                            <Input.Password
+                              value={authManagement.password}
+                              onChange={(e) =>
+                                setAuthManagement({
+                                  ...authManagement,
+                                  password: e.target.value,
+                                })
+                              }
+                              placeholder="Khám tim mạch"
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-12">
@@ -290,7 +335,6 @@ function UpdateAuthManagements() {
                                 })
                               }
                             >
-                              <Select.Option value="all">Tất cả</Select.Option>
                               <Select.Option value="active">
                                 Hoạt động
                               </Select.Option>
@@ -299,7 +343,6 @@ function UpdateAuthManagements() {
                               </Select.Option>
                             </Select>
                           </Form.Item>
-                          
                         </div>
                       </div>
                     </div>

@@ -5,7 +5,6 @@ import {
   Card,
   Input,
   Layout,
-  Pagination,
   Popover,
   Select,
   Space,
@@ -22,8 +21,6 @@ import "../../assets/css/style.css";
 //firebase
 import firebase from "firebase/compat/app";
 
-const { Content } = Layout;
-const { Column } = Table;
 
 const popoverContent = (
   <Card title="Thông báo" className="p-0 m-0" bordered={false} style={{ width: 270 }}></Card>
@@ -92,7 +89,7 @@ function ListDevices() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -173,27 +170,27 @@ function ListDevices() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={deviceData}
-                  pagination={false}
+                  pagination={{pageSize: 5}}
                   bordered
                   className="mb-3"
                   rowClassName={() => "table-row"}
                 >
-                  <Column title="Mã thiết bị" dataIndex="codeDevice" key="codeDevice" />
-                  <Column title="Tên thiết bị" dataIndex="nameDevice" key="nameDevice" />
-                  <Column title="Địa chỉ IP" dataIndex="ipAddress" key="ipAddress" />
-                  <Column
+                  <Table.Column title="Mã thiết bị" dataIndex="codeDevice" key="codeDevice" />
+                  <Table.Column title="Tên thiết bị" dataIndex="nameDevice" key="nameDevice" />
+                  <Table.Column title="Địa chỉ IP" dataIndex="ipAddress" key="ipAddress" />
+                  <Table.Column
                     title="Trạng thái hoạt động"
                     dataIndex="isActive"
                     key="isActive"
                     render={(isActive: string) => renderIsActive(isActive)}
                   />
-                  <Column
+                  <Table.Column
                     title="Trạng thái kết nối"
                     dataIndex="isConnected"
                     key="isConnected"
                     render={(isConnected: string) => renderIsConnected(isConnected)}
                   />
-                  <Column
+                  <Table.Column
                     title="Dịch vụ sử dụng"
                     dataIndex="service"
                     key="service"
@@ -201,11 +198,11 @@ function ListDevices() {
                     ellipsis={{ showTitle: false }}
                     render={(service: string) => (
                       <Popover content={service} overlayStyle={{ maxWidth: 300 }} placement="topLeft">
-                        <span>{service + " "}</span>
+                        <span>{service + ", "}</span>
                       </Popover>
                     )}
                   />
-                  <Column
+                  <Table.Column
                     title=""
                     dataIndex="ct"
                     key="ct"
@@ -215,7 +212,7 @@ function ListDevices() {
                       </>
                     )}
                   />
-                  <Column
+                  <Table.Column
                     title=""
                     dataIndex="cn"
                     key="cn"
@@ -226,7 +223,6 @@ function ListDevices() {
                     )}
                   />
                 </Table>
-                <Pagination total={100} showSizeChanger={false} style={{ textAlign: "right" }} />
               </div>
               <div className="col-1 mt-3">
                 <Link to={"/addDevice"}>
@@ -240,7 +236,7 @@ function ListDevices() {
               </div>
             </div>
           </div>
-        </Content>
+        </Layout.Content>
       </Layout>
     </Layout>
   );

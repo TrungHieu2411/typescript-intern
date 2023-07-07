@@ -10,6 +10,7 @@ import "../../assets/css/style.css";
 //firebase
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
+import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 
 const { Content } = Layout;
 
@@ -22,34 +23,102 @@ const popoverContent = (
   ></Card>
 );
 
-
 interface ProgressiveData {
+  id: string;
   number: string;
-  nameService: string;
+  nameService: firebase.firestore.DocumentReference | null;
   timeCreate: string;
   deadLineUsed: string;
+  fullName: string;
+  phone: string;
+  email: string;
+  authManagementId: string;
+}
+
+interface DeviceData {
+  typeDevice: string;
 }
 
 function DetailProgressives() {
   const { id } = useParams<{ id: string }>();
+
   const [progressive, setProgressive] = useState<ProgressiveData>({
     number: "",
-  nameService: "",
-  timeCreate: "",
-  deadLineUsed: "",
-  })
+    nameService: null,
+    timeCreate: "",
+    deadLineUsed: "",
+    fullName: "",
+    phone: "",
+    email: "",
+    authManagementId: "",
+    id: "",
+  });
+  const [typeDevice, setTypeDevice] = useState<string>("");
+
   useEffect(() => {
     const fetchProgressive = async () => {
-      const progressiveRef = firebase.firestore().collection("progressives").doc(id);
+      const progressiveRef = firebase
+        .firestore()
+        .collection("progressives")
+        .doc(id);
       const progressiveSnapshot = await progressiveRef.get();
 
       if (progressiveSnapshot.exists) {
         const progressiveData = progressiveSnapshot.data() as ProgressiveData;
-        setProgressive(progressiveData);
+        setProgressive({
+          ...progressiveData,
+          nameService: progressiveData.nameService || null,
+        });
+
+        if (progressiveData.authManagementId) {
+          // Fetch the associated device document
+          const deviceRef = firebase.firestore().collection("devices").where("authManagementId", "==", progressiveData.authManagementId);
+          const deviceSnapshot = await deviceRef.get();
+
+          if (!deviceSnapshot.empty) {
+            const deviceData = deviceSnapshot.docs[0].data() as DeviceData;
+            setTypeDevice(deviceData.typeDevice);
+          }
+        }
       }
-    }
+    };
+
     fetchProgressive();
-  }, [id])
+  }, [id]);
+
+  useEffect(() => {
+    const fetchProgressive = async () => {
+      const progressiveRef = firebase.firestore().collection("progressives");
+      const snapshot = await progressiveRef.get();
+        await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const progressive = doc.data() as ProgressiveData;
+            progressive.id = doc.id;
+  
+            const nameServiceRef = progressive.nameService;
+  
+            if (
+              nameServiceRef &&
+              nameServiceRef instanceof firebase.firestore.DocumentReference
+            ) {
+              const nameServiceDoc = await nameServiceRef.get();
+              if (nameServiceDoc.exists) {
+                const nameServiceData = nameServiceDoc.data();
+                if (nameServiceData && nameServiceData.nameService) {
+                  const nameService = nameServiceData.nameService;
+                  progressive.nameService = nameService;
+                  setNameServiceValue(nameService); // Đặt giá trị cho nameServiceValue
+                }
+              }
+            }
+            return progressive;
+          })
+        )
+    };
+  
+    fetchProgressive();
+  }, []);
+  const [nameServiceValue, setNameServiceValue] = useState<string | null>(null);
   return (
     <Layout className="layout">
       <SlideMain />
@@ -58,18 +127,7 @@ function DetailProgressives() {
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <Breadcrumb className="fs-6" separator=">">
-                  <Breadcrumb.Item>Cấp số</Breadcrumb.Item>
-                  <Breadcrumb.Item
-                    className="text-decoration-none"
-                    href="/device"
-                  >
-                    Danh sách cấp số
-                  </Breadcrumb.Item>
-                  <Breadcrumb.Item className="fw-bold custom-color">
-                    Chi tiết
-                  </Breadcrumb.Item>
-                </Breadcrumb>
+                <BreadCrumbThree text="Cấp số" text2="Danh sách cấp số" href="/device" text3="Chi tiết"/>
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
@@ -110,20 +168,18 @@ function DetailProgressives() {
                             </p>
                           </td>
                           <td>
-                            <p></p>
+                            <p>{progressive.fullName}</p>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <p>
-                              <span className="me-5 fw-bold">
-                                Tên dịch vụ:
-                              </span>{" "}
+                              <span className="me-5 fw-bold">Tên dịch vụ:</span>{" "}
                             </p>
                           </td>
                           <td>
                             <p>
-                              <span>{progressive.nameService}</span>
+                            <span>{nameServiceValue}</span>
                             </p>
                           </td>
                         </tr>
@@ -142,7 +198,9 @@ function DetailProgressives() {
                         <tr>
                           <td>
                             <p>
-                              <span className="me-5 fw-bold">Thời gian cấp:</span>{" "}
+                              <span className="me-5 fw-bold">
+                                Thời gian cấp:
+                              </span>{" "}
                             </p>
                           </td>
                           <td>
@@ -154,7 +212,7 @@ function DetailProgressives() {
                         <tr>
                           <td>
                             <p>
-                              <span className="me-5 fw-bold">Hạn sử dụng:</span>{" "}
+                              <span className="me-5 fw-bold">Hạn sử dụng:</span>
                             </p>
                           </td>
                           <td>
@@ -172,7 +230,7 @@ function DetailProgressives() {
                             <p className="me-5 fw-bold">Nguồn cấp: </p>
                           </td>
                           <td>
-                            <p>KOI_02</p>
+                            <p>{typeDevice}</p>
                           </td>
                         </tr>
                         <tr>
@@ -188,7 +246,7 @@ function DetailProgressives() {
                             <p className="me-5 fw-bold">Số điện thoại:</p>
                           </td>
                           <td>
-                            <p>CMS</p>
+                            <p>{progressive.phone}</p>
                           </td>
                         </tr>
                         <tr>
@@ -196,7 +254,7 @@ function DetailProgressives() {
                             <p className="me-5 fw-bold">Địa chỉ Email:</p>
                           </td>
                           <td>
-                            <p>CMS</p>
+                            <p>{progressive.email}</p>
                           </td>
                         </tr>
                       </table>

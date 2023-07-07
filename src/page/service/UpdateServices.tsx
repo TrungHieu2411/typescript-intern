@@ -21,8 +21,6 @@ import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
 import BreadCrumbFour from "../../components/BreadCrumb/BreadCrumbFour";
 
-const { Content } = Layout;
-
 const popoverContent = (
   <Card
     title="Thông báo"
@@ -79,7 +77,7 @@ function UpdateServices() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -275,7 +273,7 @@ function UpdateServices() {
               </div>
             </div>
           </div>
-        </Content>
+        </Layout.Content>
       </Layout>
     </Layout>
   );

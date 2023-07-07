@@ -23,6 +23,7 @@ import "../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
 
 const { Content } = Layout;
 
@@ -35,58 +36,6 @@ const popoverContent = (
   ></Card>
 );
 
-// const data = [
-//   {
-//     id: 2010001,
-//     nameCustomer: "Lê Huỳnh Ái Vân",
-//     nameService: "Khám tổng quát",
-//     time: "14:35 - 07/11/2021",
-//     deadTime: "14:35 - 07/11/2021",
-//     status: "Đã bỏ qua",
-//     service: "Kiosk",
-//     ct: "Chi tiết",
-//   },
-//   {
-//     id: 2010002,
-//     nameCustomer: "Nguyễn Văn A",
-//     nameService: "Chụp X-quang",
-//     time: "09:15 - 15/11/2021",
-//     deadTime: "09:15 - 15/11/2021",
-//     status: "Đã sử dụng",
-//     service: "Hệ thống",
-//     ct: "Chi tiết",
-//   },
-//   {
-//     id: 2010003,
-//     nameCustomer: "Trần Thị B",
-//     nameService: "Siêu âm tim",
-//     time: "10:30 - 20/11/2021",
-//     deadTime: "10:30 - 20/11/2021",
-//     status: "Đang chờ",
-//     service: "Kiosk",
-//     ct: "Chi tiết",
-//   },
-//   {
-//     id: 2010004,
-//     nameCustomer: "Phạm Văn C",
-//     nameService: "Điều trị cận thị",
-//     time: "13:45 - 25/11/2021",
-//     deadTime: "13:45 - 25/11/2021",
-//     status: "Đang chờ",
-//     service: "Kiosk",
-//     ct: "Chi tiết",
-//   },
-//   {
-//     id: 2010005,
-//     nameCustomer: "Nguyễn Thị D",
-//     nameService: "Phẫu thuật thẩm mỹ",
-//     time: "16:20 - 30/11/2021",
-//     deadTime: "16:20 - 30/11/2021",
-//     status: "Đã sử dụng",
-//     service: "Hệ thống",
-//     ct: "Chi tiết",
-//   },
-// ];
 const renderStatus = (status: string) => {
   let color = "";
   let text = "";
@@ -108,28 +57,49 @@ const renderStatus = (status: string) => {
 interface ProgressiveData {
   id: string;
   number: string;
-  nameService: string;
+  nameCustomer: string;
+  nameService: firebase.firestore.DocumentReference | null;
   timeCreate: string;
   deadLineUsed: string;
+  status: string;
+  service: string;
 }
+
 function ListProgressives() {
   const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
 
   useEffect(() => {
     const fetchProgressive = async () => {
       const progressiveRef = firebase.firestore().collection("progressives");
-      await progressiveRef.onSnapshot((snapshot) => {
-        const progressiveData: ProgressiveData[] = [];
-        snapshot.forEach((doc) => {
-          const progressive = doc.data() as ProgressiveData;
-          progressive.id = doc.id;
-          progressiveData.push(progressive)
-        })
-        setProgressiveData(progressiveData)
-      })
-    }
+      const snapshot = await progressiveRef.get();
+      setProgressiveData(
+        await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const progressive = doc.data() as ProgressiveData;
+            progressive.id = doc.id;
+
+            const serviceRef = progressive.nameService;
+            if (
+              serviceRef &&
+              serviceRef instanceof firebase.firestore.DocumentReference
+            ) {
+              const serviceDoc = await serviceRef.get();
+              if (serviceDoc.exists) {
+                const serviceData = serviceDoc.data();
+                if (serviceData && serviceData.nameService) {
+                  const nameService = serviceData.nameService;
+                  progressive.nameService = nameService;
+                }
+              }
+            }
+            return progressive;
+          })
+        )
+      );
+    };
+
     fetchProgressive();
-  })
+  }, []);
 
   return (
     <Layout className="layout">
@@ -173,7 +143,11 @@ function ListProgressives() {
                     <label htmlFor="">Tên dịch vụ</label>
                   </div>
                   <div className="col-12">
-                    <Select size="large" defaultValue="all" style={{ width: 170 }}>
+                    <Select
+                      size="large"
+                      defaultValue="all"
+                      style={{ width: 170 }}
+                    >
                       <Select.Option value="all">Tất cả</Select.Option>
                       <Select.Option value="active">
                         Khám sản - Phụ khoa
@@ -195,7 +169,11 @@ function ListProgressives() {
                     <label htmlFor="">Tình trạng</label>
                   </div>
                   <div className="col-12">
-                    <Select size="large" defaultValue="all" style={{ width: 170 }}>
+                    <Select
+                      size="large"
+                      defaultValue="all"
+                      style={{ width: 170 }}
+                    >
                       <Select.Option value="all">Tất cả</Select.Option>
                       <Select.Option value="connected">Đang chờ</Select.Option>
                       <Select.Option value="disconnected">
@@ -213,7 +191,11 @@ function ListProgressives() {
                     <label htmlFor="">Nguồn cấp</label>
                   </div>
                   <div className="col-12">
-                    <Select size="large" defaultValue="all" style={{ width: 170 }}>
+                    <Select
+                      size="large"
+                      defaultValue="all"
+                      style={{ width: 170 }}
+                    >
                       <Select.Option value="all">Tất cả</Select.Option>
                       <Select.Option value="connected">Kiosk</Select.Option>
                       <Select.Option value="disconnected">
@@ -245,7 +227,8 @@ function ListProgressives() {
                     <label htmlFor="">Từ khóa</label>
                   </div>
                   <div className="col-12">
-                    <Input size="large"
+                    <Input
+                      size="large"
                       placeholder="Nhập từ khóa"
                       suffix={
                         <Space>
@@ -264,7 +247,8 @@ function ListProgressives() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={progressiveData}
-                  pagination={false}
+                 
+                  pagination={{pageSize: 5}}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"
@@ -315,18 +299,15 @@ function ListProgressives() {
                     title=""
                     dataIndex="ct"
                     key="ct"
-                     render={(_: any, record: { id: string }) => (
+                    render={(_: any, record: { id: string }) => (
                       <>
-                        <Link to={`/detailProgressive/${record.id}`}>Chi tiết</Link>
+                        <Link to={`/detailProgressive/${record.id}`}>
+                          Chi tiết
+                        </Link>
                       </>
                     )}
                   />
                 </Table>
-                <Pagination
-                  total={100}
-                  showSizeChanger={false}
-                  style={{ textAlign: "right" }}
-                />
               </div>
               <div className="col-1 mt-3">
                 <Link to={"/addProgressive"}>

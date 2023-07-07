@@ -12,9 +12,13 @@ import "../../assets/css/style.css";
 //firebase
 import firebase from "firebase/compat/app";
 
-const { Content } = Layout;
 const popoverContent = (
-  <Card title="Thông báo" className="p-0 m-0" bordered={false} style={{ width: 270 }}></Card>
+  <Card
+    title="Thông báo"
+    className="p-0 m-0"
+    bordered={false}
+    style={{ width: 270 }}
+  ></Card>
 );
 
 interface DeviceData {
@@ -25,11 +29,15 @@ interface DeviceData {
   isConnected: string;
   service: string;
   typeDevice: string;
-  userName: string; // Thêm thuộc tính userName
-  password: string; // Thêm thuộc tính password
+  authManagementId: string;
+}
+
+interface AuthManagementData {
+  userName: string;
+  password: string;
 }
 function DetailDevices() {
-  const { id } = useParams<{ id: string }>();
+   const { id } = useParams<{ id: string }>();
   const [device, setDevice] = useState<DeviceData>({
     codeDevice: "",
     nameDevice: "",
@@ -38,6 +46,9 @@ function DetailDevices() {
     isConnected: "",
     service: "",
     typeDevice: "",
+    authManagementId: "",
+  });
+  const [authManagement, setAuthManagement] = useState<AuthManagementData>({
     userName: "",
     password: "",
   });
@@ -46,31 +57,61 @@ function DetailDevices() {
     const fetchDevice = async () => {
       const deviceRef = firebase.firestore().collection("devices").doc(id);
       const deviceSnapshot = await deviceRef.get();
-    
+
       if (deviceSnapshot.exists) {
         const deviceData = deviceSnapshot.data() as DeviceData;
         setDevice(deviceData);
+
+        if (deviceData.authManagementId) {
+          const authManagementRef = firebase
+            .firestore()
+            .collection("authManagements")
+            .doc(deviceData.authManagementId);
+          const authManagementSnapshot = await authManagementRef.get();
+
+          if (authManagementSnapshot.exists) {
+            const authManagementData = authManagementSnapshot.data() as AuthManagementData;
+            setAuthManagement(authManagementData);
+          }
+        }
       }
     };
 
     fetchDevice();
   }, [id]);
 
+
   return (
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbThree text="Thiết bị" text2="Danh sách thiết bị" href="/device" text3="Chi tiết thiết bị"/>
+                <BreadCrumbThree
+                  text="Thiết bị"
+                  text2="Danh sách thiết bị"
+                  href="/device"
+                  text3="Chi tiết thiết bị"
+                />
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button style={{ background: "#FFF2E7" }} type="ghost" shape="circle">
-                    <Popover placement="bottomLeft" content={popoverContent} trigger="click">
-                      <BellFilled style={{ color: "#FF7506" }} className="fs-5 d-flex align-items-center justify-content-center" />
+                  <Button
+                    style={{ background: "#FFF2E7" }}
+                    type="ghost"
+                    shape="circle"
+                  >
+                    <Popover
+                      placement="bottomLeft"
+                      content={popoverContent}
+                      trigger="click"
+                    >
+                      <BellFilled
+                        style={{ color: "#FF7506" }}
+                        className="fs-5 d-flex align-items-center justify-content-center"
+                      />
                     </Popover>
                   </Button>
                   <Account />
@@ -99,7 +140,9 @@ function DetailDevices() {
                           <tr>
                             <td>
                               <p>
-                                <span className="me-5 fw-bold">Tên thiết bị:</span>{" "}
+                                <span className="me-5 fw-bold">
+                                  Tên thiết bị:
+                                </span>{" "}
                               </p>
                             </td>
                             <td>
@@ -111,7 +154,9 @@ function DetailDevices() {
                           <tr>
                             <td>
                               <p>
-                                <span className="me-5 fw-bold">Địa chỉ IP:</span>{" "}
+                                <span className="me-5 fw-bold">
+                                  Địa chỉ IP:
+                                </span>{" "}
                               </p>
                             </td>
                             <td>
@@ -139,7 +184,7 @@ function DetailDevices() {
                               <p className="me-5 fw-bold">Tên đăng nhập:</p>{" "}
                             </td>
                             <td>
-                              <p>{device.userName}</p>
+                              <p>{authManagement.userName}</p>
                             </td>
                           </tr>
                           <tr>
@@ -147,7 +192,7 @@ function DetailDevices() {
                               <p className="me-5 fw-bold">Mật khẩu:</p>
                             </td>
                             <td>
-                              <p>{device.password}</p>
+                              <p>{authManagement.password}</p>
                             </td>
                           </tr>
                         </tbody>
@@ -172,7 +217,7 @@ function DetailDevices() {
               </div>
             </div>
           </div>
-        </Content>
+        </Layout.Content>
       </Layout>
     </Layout>
   );

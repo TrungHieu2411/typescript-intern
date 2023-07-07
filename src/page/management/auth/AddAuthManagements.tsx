@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  Layout,
-  Popover,
-  Select,
-} from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Card, Form, Input, Layout, Popover, Select } from "antd";
 import { BellFilled } from "@ant-design/icons";
+import { Option } from "antd/lib/mentions";
 
 import SlideMain from "../../../containers/SlideMain";
 import Account from "../../../components/User/Account";
@@ -18,7 +11,6 @@ import "../../../assets/css/style.css";
 // firebase
 import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
-import "firebase/compat/auth";
 
 const { Content } = Layout;
 
@@ -36,20 +28,45 @@ interface AuthManagementData {
   fullName: string;
   phone: string;
   email: string;
-  role: string;
+  role: string; // Thay đổi kiểu dữ liệu của role thành DocumentReference
   isActive: string;
 
   userName: string;
   password: string;
 }
 function AddAuthManagements() {
+  const [roles, setRoles] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    // Fetch roles from Firestore and set the roles state
+    const fetchRoles = async () => {
+      try {
+        const rolesSnapshot = await firebase
+          .firestore()
+          .collection("roles")
+          .get();
+        const rolesData = rolesSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.nameRole, // Thay "name" bằng tên trường chứa tên vai trò trong tài liệu Firestore
+          };
+        });
+        setRoles(rolesData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
   const [newAuthManagement, setNewAuthManagement] =
     useState<AuthManagementData>({
       id: "",
       fullName: "",
       phone: "",
       email: "",
-      role: "",
+      role: "", // Khởi tạo role ban đầu là null
       isActive: "",
       userName: "",
       password: "",
@@ -57,32 +74,26 @@ function AddAuthManagements() {
 
   const handleAddAuthManagement = async () => {
     try {
-      const { password, email } = newAuthManagement;
-
-      // Create user with email and password
-      const userCredential = await firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, password);
-
-      // Get the user's ID
-      const userId = userCredential.user?.uid;
-
       // Save the user's information in Firestore
-      if (userId) {
-        const authManagementCollection = firebase
-          .firestore()
-          .collection("authManagements");
 
-        await authManagementCollection.doc(userId).set({
-          fullName: newAuthManagement.fullName,
-          phone: newAuthManagement.phone,
-          email: newAuthManagement.email,
-          role: newAuthManagement.role,
-          isActive: newAuthManagement.isActive,
-          userName: newAuthManagement.userName,
-          password: newAuthManagement.password,
-        });
-      }
+      const authManagementCollection = firebase
+        .firestore()
+        .collection("authManagements");
+
+      // Lấy DocumentReference của vai trò (role)
+      const roleRef = firebase
+        .firestore()
+        .doc(`roles/${newAuthManagement.role}`);
+
+      await authManagementCollection.doc().set({
+        fullName: newAuthManagement.fullName,
+        phone: newAuthManagement.phone,
+        email: newAuthManagement.email,
+        role: roleRef, // Lưu DocumentReference vào Firestore
+        isActive: newAuthManagement.isActive,
+        userName: newAuthManagement.userName,
+        password: newAuthManagement.password,
+      });
 
       setNewAuthManagement({
         id: "",
@@ -200,21 +211,28 @@ function AddAuthManagements() {
                             />
                           </Form.Item>
                         </div>
+
                         <div className="col-12">
                           <label htmlFor="" className="mb-2">
                             Vai trò: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Input
+                            <Select
                               value={newAuthManagement.role}
-                              onChange={(e) =>
+                              onChange={(value) =>
                                 setNewAuthManagement({
                                   ...newAuthManagement,
-                                  role: e.target.value,
+                                  role: value,
                                 })
                               }
-                              placeholder="Khám tim mạch"
-                            />
+                              placeholder="Chọn vai trò"
+                            >
+                              {roles.map((role) => (
+                                <Option key={role.id} value={role.id}>
+                                  {role.name}
+                                </Option>
+                              ))}
+                            </Select>
                           </Form.Item>
                         </div>
                       </div>
@@ -295,8 +313,8 @@ function AddAuthManagements() {
                                   isActive: value,
                                 })
                               }
+                              placeholder="Chọn trạng thái"
                             >
-                              <Select.Option value="all">Tất cả</Select.Option>
                               <Select.Option value="Hoạt động">
                                 Hoạt động
                               </Select.Option>

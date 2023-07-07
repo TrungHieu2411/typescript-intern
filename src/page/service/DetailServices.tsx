@@ -25,9 +25,6 @@ import firebase from "firebase/compat/app";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import Account from "../../components/User/Account";
 
-const { Content } = Layout;
-const { Column } = Table;
-
 const popoverContent = (
   <Card
     title="Thông báo"
@@ -109,6 +106,7 @@ interface ServiceData {
   codeService: string;
   nameService: string;
   description: string;
+  progressiveId: string;
 }
 
 const renderIsActive = (status: string) => {
@@ -135,6 +133,7 @@ function DetailServices() {
     codeService: "",
     nameService: "",
     description: "",
+  progressiveId: "",
   });
 
   useEffect(() => {
@@ -154,7 +153,7 @@ function DetailServices() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -334,13 +333,13 @@ function DetailServices() {
                       rowClassName={() => "table-row"}
                       className="custom-table mb-4 pb-3"
                     >
-                      <Column
+                      <Table.Column
                         title={<span className="table-title">Số thứ tự</span>}
                         dataIndex="id"
                         key="id"
                         render={(text: string) => <span>{text}</span>}
                       />
-                      <Column
+                      <Table.Column
                         title={<span className="table-title">Trạng thái</span>}
                         dataIndex="isActive"
                         key="isActive"
@@ -382,7 +381,7 @@ function DetailServices() {
               </div>
             </div>
           </div>
-        </Content>
+        </Layout.Content>
       </Layout>
     </Layout>
   );

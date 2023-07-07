@@ -34,6 +34,7 @@ import UpdateAuthManagements from "./page/management/auth/UpdateAuthManagements"
 import UserLogManagements from "./page/management/user/UserLogManagements";
 import Admin from "./containers/Admin";
 import Dashboard from "./containers/Dashboard";
+import NotFould from "./page/error/NotFould";
 
 const Router = () => {
   // Hàm kiểm tra trạng thái đăng nhập
@@ -46,6 +47,8 @@ const Router = () => {
 
   return (
     <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
       {allowAccess ? (
         <>
           <Route path="/quenmatkhau" element={<ForgotPassword />} />
@@ -90,15 +93,13 @@ const Router = () => {
 
           <Route path="/userLogManagement" element={<UserLogManagements />} />
           {/* Các route khác cho phép truy cập khi đăng nhập */}
+          <Route path="/*" element={<NotFould />}/>
         </>
       ) : (
         <>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
-          <Route
-            path="*"
-            element={<Navigate to="/login" replace />}
-          />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </>
       )}
     </Routes>

@@ -10,6 +10,7 @@ import "../../assets/css/style.css";
 // firebase
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
+import { useParams } from "react-router-dom";
 
 const { Content } = Layout;
 
@@ -22,15 +23,73 @@ const popoverContent = (
   ></Card>
 );
 
+interface UserData {
+  fullName: string;
+  phone: string;
+  email: string;
+}
 function AddProgressives() {
+  const [nameService, setService] = useState<
+    { id: string; nameService: string }[]
+  >([]);
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const serviceSnapshot = await firebase
+          .firestore()
+          .collection("services")
+          .get();
+        const serviceData = serviceSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            nameService: data.nameService,
+          };
+        });
+        setService(serviceData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchService();
+  }, []);
+
+  const { id } = useParams<{ id: string }>();
+  const [user, setUser] = useState<UserData>({
+    fullName: "",
+    phone: "",
+    email: "",
+  });
+
+  const userId = localStorage.getItem("userId");
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userRef = firebase
+        .firestore()
+        .collection("authManagements")
+        .doc(userId || id);
+
+      const userSnapshot = await userRef.get();
+
+      if (userSnapshot.exists) {
+        const userData = userSnapshot.data() as UserData;
+        setUser(userData);
+      }
+    };
+    fetchUser();
+  }, [userId, id]);
 
   const [selectedService, setSelectedService] = useState("");
   const [showPopup, setShowPopup] = useState(false);
-  const [counter, setCounter] = useState(0);
+  const [counter, setCounter] = useState<number>(0);
 
   useEffect(() => {
     const fetchCounter = async () => {
-      const counterDoc = await firebase.firestore().collection("counters").doc("progressiveCounter").get();
+      const counterDoc = await firebase
+        .firestore()
+        .collection("counters")
+        .doc("progressiveCounter")
+        .get();
       const counterValue = counterDoc.data()?.value || 0;
       setCounter(counterValue);
     };
@@ -42,9 +101,13 @@ function AddProgressives() {
     const updatedCounter = counter + 1;
     setCounter(updatedCounter);
 
-    await firebase.firestore().collection("counters").doc("progressiveCounter").set({
-      value: updatedCounter,
-    });
+    await firebase
+      .firestore()
+      .collection("counters")
+      .doc("progressiveCounter")
+      .set({
+        value: updatedCounter,
+      });
   };
 
   const formatCounter = (counter: number) => {
@@ -66,21 +129,6 @@ function AddProgressives() {
     setShowPopup(false);
   };
 
-  const getKhoaForCounter = (counter: number) => {
-    switch (counter) {
-      case 1:
-        return "Khám tim mạch";
-      case 2:
-        return "Khám sản - Phụ khoa";
-      case 3:
-        return "Khám răng hàm mặt";
-      case 4:
-        return "Khám tai mũi họng";
-      default:
-        return "Chọn dịch vụ";
-    }
-  };
-
   const getCurrentTime = () => {
     const currentDate = new Date();
     const currentHour = currentDate.getHours();
@@ -98,12 +146,16 @@ function AddProgressives() {
     let currentDay = currentDate.getDate();
     let currentMonth = currentDate.getMonth() + 1;
     let currentYear = currentDate.getFullYear();
-    
+
     // Check if current time is past the expiration time
-    if (currentDate.getHours() > expirationHour || (currentDate.getHours() === expirationHour && currentDate.getMinutes() > expirationMinute)) {
+    if (
+      currentDate.getHours() > expirationHour ||
+      (currentDate.getHours() === expirationHour &&
+        currentDate.getMinutes() > expirationMinute)
+    ) {
       // Increment the current day by 1
       currentDay += 1;
-      
+
       // Adjust the month and year if necessary
       if (currentDay > 30) {
         currentDay = 1;
@@ -114,22 +166,27 @@ function AddProgressives() {
         }
       }
     }
-    
+
     return `${expirationHour}:${expirationMinute} ${currentDay}/${currentMonth}/${currentYear}`;
   };
 
   const handleAddProgressive = async () => {
-    const progressiveCollection = firebase.firestore().collection("progressives");
+    const progressiveCollection = firebase
+      .firestore()
+      .collection("progressives");
 
+    const serviceRef = firebase.firestore().doc(`services/${selectedService}`);
     try {
       await progressiveCollection.add({
-        number: formatCounter(counter),
-        nameService: selectedService,
+        number: formatCounter(counter + 1),
+        nameService: serviceRef,
         timeCreate: getCurrentTime(),
         deadLineUsed: getExpirationTime(),
+        fullName: user.fullName,
+        phone: user.phone,
+        email: user.email,
+        authManagementId: userId,
       });
-
-      
 
       window.location.href = "/addProgressive";
     } catch (error) {
@@ -189,24 +246,16 @@ function AddProgressives() {
                   <Form>
                     <Form.Item>
                       <Select
-                        defaultValue="all"
                         style={{ width: 300 }}
                         className="text-start"
                         onChange={handleServiceChange}
+                        placeholder="Chọn dịch vụ"
                       >
-                        <Select.Option value="all">Chọn dịch vụ</Select.Option>
-                        <Select.Option value={getKhoaForCounter(1)}>
-                          Khám tim mạch
-                        </Select.Option>
-                        <Select.Option value={getKhoaForCounter(2)}>
-                          Khám sản - Phụ khoa
-                        </Select.Option>
-                        <Select.Option value={getKhoaForCounter(3)}>
-                          Khám răng hàm mặt
-                        </Select.Option>
-                        <Select.Option value={getKhoaForCounter(4)}>
-                          Khám tai mũi họng
-                        </Select.Option>
+                        {nameService.map((service) => (
+                          <Select.Option key={service.id} value={service.id}>
+                            {service.nameService}
+                          </Select.Option>
+                        ))}
                       </Select>
                     </Form.Item>
                     <div className="col-6 text-center offset-3 mt-5">
@@ -259,7 +308,10 @@ function AddProgressives() {
                           <h4 className="text-center mt-4">
                             Số thứ tự được cấp
                           </h4>
-                          <h1 className="text-center my-4 fw-bold" style={{ color: "#FF9138" }}>
+                          <h1
+                            className="text-center my-4 fw-bold"
+                            style={{ color: "#FF9138" }}
+                          >
                             {formatCounter(counter)}
                           </h1>
 

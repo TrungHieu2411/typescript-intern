@@ -27,17 +27,21 @@ interface RoleManagementData {
   nameRole: string;
   description: string;
 }
+
 function UpdateRoleManagements() {
   const { id } = useParams<{ id: string }>();
   const [roleManagement, setRoleManagement] = useState<RoleManagementData>({
     nameRole: "",
     description: "",
   });
+  const [groupA, setGroupA] = useState<boolean[]>([]);
+  const [groupB, setGroupB] = useState<boolean[]>([]);
+
   useEffect(() => {
     const fetchRoleManagement = async () => {
       const roleManagementRef = firebase
         .firestore()
-        .collection("roleManagements")
+        .collection("roles")
         .doc(id);
       const roleManagementSnapshot = await roleManagementRef.get();
 
@@ -47,17 +51,19 @@ function UpdateRoleManagements() {
         setRoleManagement(roleManagementData);
       }
     };
+
     fetchRoleManagement();
   }, [id]);
 
   const handleUpdateRoleManagement = () => {
-    const roleManagementRef = firebase
-      .firestore()
-      .collection("roleManagements")
-      .doc(id);
+    const roleManagementRef = firebase.firestore().collection("roles").doc(id);
     const updatedRoleManagement = {
       nameRole: roleManagement.nameRole,
       description: roleManagement.description,
+      permissions: {
+        groupA,
+        groupB,
+      },
     };
 
     roleManagementRef
@@ -109,7 +115,7 @@ function UpdateRoleManagements() {
               </div>
             </div>
             <div className="pt-5">
-              <h4 style={{ color: "#FF7506" }}>Danh sach vai trò</h4>
+              <h4 style={{ color: "#FF7506" }}>Danh sách vai trò</h4>
             </div>
             <div className="mt-4 pt-2">
               <Card>
@@ -124,15 +130,16 @@ function UpdateRoleManagements() {
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Input 
-                             value={roleManagement.nameRole}
-                             onChange={(e) =>
-                               setRoleManagement({
-                                 ...roleManagement,
-                                 nameRole: e.target.value,
-                               })
-                             }
-                            placeholder="203" />
+                            <Input
+                              value={roleManagement.nameRole}
+                              onChange={(e) =>
+                                setRoleManagement({
+                                  ...roleManagement,
+                                  nameRole: e.target.value,
+                                })
+                              }
+                              placeholder="203"
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-12">
@@ -145,12 +152,12 @@ function UpdateRoleManagements() {
                               placeholder="Mô tả dịch vụ"
                               maxLength={6}
                               value={roleManagement.description}
-                             onChange={(e) =>
-                               setRoleManagement({
-                                 ...roleManagement,
-                                 description: e.target.value,
-                               })
-                             }
+                              onChange={(e) =>
+                                setRoleManagement({
+                                  ...roleManagement,
+                                  description: e.target.value,
+                                })
+                              }
                             />
                           </Form.Item>
                         </div>
@@ -173,6 +180,13 @@ function UpdateRoleManagements() {
                               <Checkbox
                                 className="blue-checkbox mb-2"
                                 id="tangTuDong"
+                                checked={groupA[0]}
+                                onChange={(e) =>
+                                  setGroupA([
+                                    e.target.checked,
+                                    ...groupA.slice(1),
+                                  ])
+                                }
                               >
                                 Tất cả
                               </Checkbox>
@@ -183,6 +197,14 @@ function UpdateRoleManagements() {
                               <Checkbox
                                 className="blue-checkbox mb-2"
                                 id="prefix"
+                                checked={groupA[1]}
+                                onChange={(e) =>
+                                  setGroupA([
+                                    ...groupA.slice(0, 1),
+                                    e.target.checked,
+                                    ...groupA.slice(2),
+                                  ])
+                                }
                               >
                                 Chức năng x
                               </Checkbox>
@@ -193,6 +215,14 @@ function UpdateRoleManagements() {
                               <Checkbox
                                 className="blue-checkbox mb-2"
                                 id="suffix"
+                                checked={groupA[2]}
+                                onChange={(e) =>
+                                  setGroupA([
+                                    ...groupA.slice(0, 2),
+                                    e.target.checked,
+                                    ...groupA.slice(3),
+                                  ])
+                                }
                               >
                                 Chức năng y
                               </Checkbox>
@@ -203,6 +233,13 @@ function UpdateRoleManagements() {
                               <Checkbox
                                 className="blue-checkbox"
                                 id="resetMoiNgay"
+                                checked={groupA[3]}
+                                onChange={(e) =>
+                                  setGroupA([
+                                    ...groupA.slice(0, 3),
+                                    e.target.checked,
+                                  ])
+                                }
                               >
                                 Chức năng z
                               </Checkbox>
@@ -216,8 +253,14 @@ function UpdateRoleManagements() {
                           <tr>
                             <td>
                               <Checkbox
-                                className="blue-checkbox"
+                                className="blue-checkbox mb-2"
                                 id="resetMoiNgay"
+                                onChange={(e) =>
+                                  setGroupB([
+                                    e.target.checked,
+                                    ...groupB.slice(1),
+                                  ])
+                                }
                               >
                                 Tất cả
                               </Checkbox>
@@ -228,6 +271,13 @@ function UpdateRoleManagements() {
                               <Checkbox
                                 className="blue-checkbox mb-2"
                                 id="tangTuDong"
+                                onChange={(e) =>
+                                  setGroupB([
+                                    ...groupB.slice(0, 1),
+                                    e.target.checked,
+                                    ...groupB.slice(2),
+                                  ])
+                                }
                               >
                                 Chức năng x
                               </Checkbox>
@@ -238,6 +288,14 @@ function UpdateRoleManagements() {
                               <Checkbox
                                 className="blue-checkbox mb-2"
                                 id="prefix"
+                                checked={groupB[2]}
+                                onChange={(e) =>
+                                  setGroupB([
+                                    ...groupB.slice(0, 2),
+                                    e.target.checked,
+                                    ...groupB.slice(3),
+                                  ])
+                                }
                               >
                                 Chức năng y
                               </Checkbox>
@@ -246,8 +304,15 @@ function UpdateRoleManagements() {
                           <tr>
                             <td>
                               <Checkbox
-                                className="blue-checkbox mb-2"
+                                className="blue-checkbox"
                                 id="suffix"
+                                checked={groupB[3]}
+                                onChange={(e) =>
+                                  setGroupB([
+                                    ...groupB.slice(0, 3),
+                                    e.target.checked,
+                                  ])
+                                }
                               >
                                 Chức năng z
                               </Checkbox>

@@ -139,7 +139,8 @@ function ListReport() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={data}
-                  pagination={false}
+                
+                  pagination={{pageSize: 5}}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"
@@ -175,11 +176,6 @@ function ListReport() {
                     render={(text: string) => <span>{text}</span>}
                   />
                 </Table>
-                <Pagination
-                  total={100}
-                  showSizeChanger={false}
-                  style={{ textAlign: "right" }}
-                />
               </div>
               <div className="col-1 mt-3">
                 <Link to={"#"}>

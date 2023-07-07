@@ -123,7 +123,8 @@ function UserLogManagements() {
               <div className="col-11">
                 <Table
                   dataSource={data}
-                  pagination={false}
+                 
+                  pagination={{pageSize: 5}}
                   bordered
                   className="mb-3"
                 >
@@ -156,11 +157,6 @@ function UserLogManagements() {
                     render={(text: string) => <span>{text}</span>}
                   />
                 </Table>
-                <Pagination
-                  total={100}
-                  showSizeChanger={false}
-                  style={{ textAlign: "right" }}
-                />
               </div>
             </div>
           </div>

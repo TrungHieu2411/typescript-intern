@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  Layout,
-  Popover,
-  Select,
-} from "antd";
+import { Button, Card, Form, Input, Layout, Popover, Select } from "antd";
 import { BellFilled } from "@ant-design/icons";
 
 import SlideMain from "../../containers/SlideMain";
@@ -16,11 +8,7 @@ import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 
 //firebase
 import firebase from "firebase/compat/app";
-
 import { useParams } from "react-router-dom";
-
-const { Content } = Layout;
-const { Option } = Select;
 
 const popoverContent = (
   <Card
@@ -48,6 +36,12 @@ interface DeviceData {
   isConnected: string;
   service: string;
   typeDevice: string;
+  authManagementId: string;
+}
+
+interface AuthManagementData {
+  userName: string;
+  password: string;
 }
 function UpdateDevices() {
   const { id } = useParams<{ id: string }>();
@@ -58,16 +52,32 @@ function UpdateDevices() {
     isActive: "",
     isConnected: "",
     service: "",
-    typeDevice: ""
+    typeDevice: "",
+    authManagementId: "",
   });
+  const [authManagement, setAuthManagement] = useState<AuthManagementData>({
+    userName: "",
+    password: "",
+  })
+
   useEffect(() => {
     const fetchDevice = async () => {
       const deviceRef = firebase.firestore().collection("devices").doc(id);
       const deviceSnapshot = await deviceRef.get();
-    
+
       if (deviceSnapshot.exists) {
         const deviceData = deviceSnapshot.data() as DeviceData;
         setDevice(deviceData);
+
+        if (deviceData.authManagementId) {
+          const authManagementRef = firebase.firestore().collection("authManagements").doc(deviceData.authManagementId);
+          const authManagementSnapshot = await authManagementRef.get();
+
+          if (authManagementSnapshot.exists) {
+            const authManagementData = authManagementSnapshot.data() as AuthManagementData;
+            setAuthManagement(authManagementData);
+          }
+        }
       }
     };
 
@@ -75,7 +85,7 @@ function UpdateDevices() {
   }, [id]);
 
   const handleUpdateDevice = () => {
-    const deviceRef = firebase.firestore().collection('devices').doc(id);
+    const deviceRef = firebase.firestore().collection("devices").doc(id);
     const updatedDevice = {
       codeDevice: device.codeDevice,
       nameDevice: device.nameDevice,
@@ -83,28 +93,33 @@ function UpdateDevices() {
       isActive: device.isActive,
       isConnected: device.isConnected,
       service: device.service,
-      typeDevice: device.typeDevice
+      typeDevice: device.typeDevice,
     };
-  
+
     deviceRef
       .update(updatedDevice)
       .then(() => {
-        console.log('Device updated successfully!');
+        console.log("Device updated successfully!");
         window.location.href = "/device";
       })
       .catch((error) => {
-        console.error('Error updating device:', error);
+        console.error("Error updating device:", error);
       });
   };
   return (
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbThree text="Thiết bị" text2="Danh sách thiết bị" href="/device" text3="Cập nhật thiết bị"/>
+                <BreadCrumbThree
+                  text="Thiết bị"
+                  text2="Danh sách thiết bị"
+                  href="/device"
+                  text3="Cập nhật thiết bị"
+                />
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
@@ -159,18 +174,23 @@ function UpdateDevices() {
                         <span style={{ color: "#FF7506" }}></span>
                       </label>
                       <Form.Item>
-                        <Select defaultValue="all"
-                        value={device.typeDevice}
-                        onChange={(value) =>
-                          setDevice({
-                            ...device,
-                            typeDevice: value,
-                          })
-                        }
+                        <Select
+                          defaultValue="all"
+                          value={device.typeDevice}
+                          onChange={(value) =>
+                            setDevice({
+                              ...device,
+                              typeDevice: value,
+                            })
+                          }
                         >
-                         <Option value="all">Chọn loại thiết bị</Option>
-                          <Option value="Kiosk">Kiosk</Option>
-                          <Option value="Display counter">Display counter</Option>
+                          <Select.Option value="all">
+                            Chọn loại thiết bị
+                          </Select.Option>
+                          <Select.Option value="Kiosk">Kiosk</Select.Option>
+                          <Select.Option value="Display counter">
+                            Display counter
+                          </Select.Option>
                         </Select>
                       </Form.Item>
                     </div>
@@ -197,7 +217,16 @@ function UpdateDevices() {
                         <span style={{ color: "#FF7506" }}></span>
                       </label>
                       <Form.Item className="">
-                        <Input placeholder="Nhập tài khoản" />
+                        <Input
+                          placeholder="Nhập tài khoản"
+                          value={authManagement.userName}
+                          onChange={(e) =>
+                            setAuthManagement({
+                              ...authManagement,
+                              userName: e.target.value,
+                            })
+                          }
+                        />
                       </Form.Item>
                     </div>
                     <div className="col-6">
@@ -222,7 +251,16 @@ function UpdateDevices() {
                         Mật khẩu: <span style={{ color: "#FF7506" }}></span>
                       </label>
                       <Form.Item className="">
-                        <Input placeholder="Nhập mật khẩu" />
+                        <Input
+                          placeholder="Nhập mật khẩu"
+                          value={authManagement.password}
+                          onChange={(e) =>
+                            setAuthManagement({
+                              ...authManagement,
+                              password: e.target.value,
+                            })
+                          }
+                        />
                       </Form.Item>
                     </div>
                     <div className="col-12">
@@ -231,7 +269,7 @@ function UpdateDevices() {
                         <span style={{ color: "#FF7506" }}></span>
                       </label>
                       <div style={{ display: "flex", flexDirection: "column" }}>
-                      <Select
+                        <Select
                           mode="tags"
                           style={{ height: 35, borderColor: "#FFAC6A" }}
                           tokenSeparators={[","]}
@@ -245,7 +283,7 @@ function UpdateDevices() {
                           }
                         >
                           {tags.map((tag) => (
-                            <Option key={tag}>{tag}</Option>
+                            <Select.Option key={tag}>{tag}</Select.Option>
                           ))}
                         </Select>
                       </div>
@@ -290,7 +328,7 @@ function UpdateDevices() {
               </div>
             </div>
           </div>
-        </Content>
+        </Layout.Content>
       </Layout>
     </Layout>
   );

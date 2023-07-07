@@ -125,7 +125,7 @@ const ConfirmPassword: React.FC = () => {
             </div>
           </div>
           <div className="col-7">
-            <img className="img-fluid" src="../assets/image/bg-main.jpg" alt="" />
+            <img className="img-fluid"  src="../assets/image/quenmatkhau.jpg" alt="" />
           </div>
         </div>
       </div>

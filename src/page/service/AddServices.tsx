@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Card, Checkbox, Form, Input, Layout, Popover } from "antd";
 import { BellFilled } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
@@ -10,16 +10,10 @@ import "../../assets/css/style.css";
 //firebase
 import firebase from "firebase/compat/app";
 import Account from "../../components/User/Account";
-
-const { Content } = Layout;
+import { CheckboxChangeEvent } from "antd/es/checkbox";
 
 const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
+  <Card title="Thông báo" className="p-0 m-0" bordered={false} style={{ width: 270 }}></Card>
 );
 
 interface ServiceData {
@@ -27,17 +21,100 @@ interface ServiceData {
   codeService: string;
   nameService: string;
   description: string;
+  progressiveId: string;
 }
 
+
 function AddServices() {
+  const [isAutoIncrement, setIsAutoIncrement] = useState<boolean>(false);
+  const [isPrefixEnabled, setIsPrefixEnabled] = useState<boolean>(false);
+  const [isSuffixEnabled, setIsSuffixEnabled] = useState<boolean>(false);
+  const [isResetDaily, setIsResetDaily] = useState<boolean>(false);
+
+  const handleAutoIncrementChange = (e: CheckboxChangeEvent) => {
+    setIsAutoIncrement(e.target.checked);
+  };
+
+  const handlePrefixChange = (e: CheckboxChangeEvent) => {
+    setIsPrefixEnabled(e.target.checked);
+  };
+
+  const handleSuffixChange = (e: CheckboxChangeEvent) => {
+    setIsSuffixEnabled(e.target.checked);
+  };
+
+  const handleResetDailyChange = (e: CheckboxChangeEvent) => {
+    setIsResetDaily(e.target.checked);
+  };
+
+  const generateProgressiveId = (
+    currentNumber: number,
+    isAutoIncrement: boolean,
+    isPrefixEnabled: boolean,
+    isSuffixEnabled: boolean
+  ): string => {
+    let progressiveId = String(currentNumber).padStart(4, "0");
+
+    if (isAutoIncrement) {
+      progressiveId = String(currentNumber + 1).padStart(4, "0");
+    }
+
+    if (isPrefixEnabled) {
+      progressiveId = "PREFIX" + progressiveId;
+    }
+
+    if (isSuffixEnabled) {
+      progressiveId += "SUFFIX";
+    }
+
+    return progressiveId;
+  };
+
+  useEffect(() => {
+    const fetchNextProgressiveId = async () => {
+      const serviceCollection = firebase.firestore().collection("services");
+      const snapshot = await serviceCollection.get();
+
+      if (snapshot.docs.length > 0) {
+        const lastService = snapshot.docs[snapshot.docs.length - 1].data() as ServiceData;
+        const currentProgressiveId = Number(lastService.progressiveId);
+        const nextProgressiveId = generateProgressiveId(
+          currentProgressiveId,
+          isAutoIncrement,
+          isPrefixEnabled,
+          isSuffixEnabled
+        );
+
+        setNewService((prevState) => ({
+          ...prevState,
+          progressiveId: nextProgressiveId,
+        }));
+      } else {
+        // Nếu không có dịch vụ nào trong collection, sử dụng progressiveId đầu tiên
+        setNewService((prevState) => ({
+          ...prevState,
+          progressiveId: generateProgressiveId(
+            1,
+            isAutoIncrement,
+            isPrefixEnabled,
+            isSuffixEnabled
+          ),
+        }));
+      }
+    };
+
+    fetchNextProgressiveId();
+  }, [isAutoIncrement, isPrefixEnabled, isSuffixEnabled]);
+
   const [newService, setNewService] = useState<ServiceData>({
     id: "",
     codeService: "",
     nameService: "",
     description: "",
+    progressiveId: "",
   });
 
-  const handleAddService = async () => {
+  const onFinish = async () => {
     const serviceCollection = firebase.firestore().collection("services");
 
     try {
@@ -45,6 +122,7 @@ function AddServices() {
         codeService: newService.codeService,
         nameService: newService.nameService,
         description: newService.description,
+        progressiveId: newService.progressiveId,
       });
 
       setNewService({
@@ -52,6 +130,7 @@ function AddServices() {
         codeService: "",
         nameService: "",
         description: "",
+        progressiveId: "",
       });
       // Thực hiện điều hướng đến trang danh sách sản phẩm
       window.location.href = "/service";
@@ -59,11 +138,25 @@ function AddServices() {
       console.error(error);
     }
   };
+
+  const [form] = Form.useForm();
+  const handleAddService = () => {
+    // Kiểm tra và submit form
+    form
+      .validateFields()
+      .then(() => {
+        form.submit();
+      })
+      .catch((error) => {
+        console.error("Validation failed:", error);
+      });
+  };
+
   return (
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -76,16 +169,8 @@ function AddServices() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
+                  <Button style={{ background: "#FFF2E7" }} type="ghost" shape="circle">
+                    <Popover placement="bottomLeft" content={popoverContent} trigger="click">
                       <BellFilled
                         style={{ color: "#FF7506" }}
                         className="fs-5 d-flex align-items-center justify-content-center"
@@ -102,16 +187,23 @@ function AddServices() {
             <div className="mt-3">
               <Card style={{ width: 1140 }}>
                 <h6 style={{ color: "#FF7506" }}>Thông tin dịch vụ</h6>
-                <Form className="mt-3">
+                <Form className="mt-3" form={form} onFinish={onFinish}>
                   <div className="row">
                     <div className="col-6">
                       <div className="row">
                         <div className="col-12">
                           <label htmlFor="" className="mb-2">
-                            Mã dịch vụ:{" "}
-                            <span style={{ color: "#FF7506" }}>*</span>
+                            Mã dịch vụ: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item
+                            name="codeService"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập mã dịch vụ!",
+                              },
+                            ]}
+                          >
                             <Input
                               value={newService.codeService}
                               onChange={(e) =>
@@ -126,10 +218,17 @@ function AddServices() {
                         </div>
                         <div className="col-12">
                           <label htmlFor="" className="mb-2">
-                            Tên dịch vụ:{" "}
-                            <span style={{ color: "#FF7506" }}>*</span>
+                            Tên dịch vụ: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item
+                            name="nameService"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập tên dịch vụ!",
+                              },
+                            ]}
+                          >
                             <Input
                               value={newService.nameService}
                               onChange={(e) =>
@@ -148,7 +247,15 @@ function AddServices() {
                       <label htmlFor="" className="mb-2">
                         Mô tả: <span style={{ color: "#FF7506" }}>*</span>
                       </label>
-                      <Form.Item className="">
+                      <Form.Item
+                        name="description"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng nhập mô tả!",
+                          },
+                        ]}
+                      >
                         <TextArea
                           rows={5}
                           placeholder="Mô tả dịch vụ"
@@ -166,65 +273,87 @@ function AddServices() {
                 </Form>
                 <h6 style={{ color: "#FF7506" }}>Quy tắc cấp số</h6>
                 <table>
-                  <tr>
-                    <td>
-                      <Checkbox className="blue-checkbox" id="tangTuDong">
-                        Tăng tự động
-                      </Checkbox>
-                    </td>
-                    <td>
-                      <Input
-                        value="0001"
-                        className="mb-2"
-                        style={{ width: 58, height: 40 }}
-                      />
-                    </td>
-                    <td>
-                      <p className="mx-2 mb-2">đến</p>
-                    </td>
-                    <td>
-                      <Input
-                        value="0009"
-                        className="mb-2"
-                        style={{ width: 58, height: 40 }}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <Checkbox className="blue-checkbox" id="prefix">
-                        Prefix
-                      </Checkbox>
-                    </td>
-                    <td>
-                      <Input
-                        value="0001"
-                        className="mb-2"
-                        style={{ width: 58, height: 40 }}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <Checkbox className="blue-checkbox" id="suffix">
-                        Suffix
-                      </Checkbox>
-                    </td>
-                    <td>
-                      <Input
-                        value="0001"
-                        className="mb-2"
-                        style={{ width: 58, height: 40 }}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <Checkbox className="blue-checkbox" id="resetMoiNgay">
-                        Reset mỗi ngày
-                      </Checkbox>
-                    </td>
-                  </tr>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <Checkbox
+                          className="blue-checkbox"
+                          id="tangTuDong"
+                          checked={isAutoIncrement}
+                          onChange={handleAutoIncrementChange}
+                        >
+                          Tăng tự động
+                        </Checkbox>
+                      </td>
+                      <td>
+                        <Input
+                          value="0001"
+                          className="mb-2"
+                          style={{ width: 58, height: 40 }}
+                        />
+                      </td>
+                      <td>
+                        <p className="mx-2 mb-2">đến</p>
+                      </td>
+                      <td>
+                        <Input
+                          value="9999"
+                          className="mb-2"
+                          style={{ width: 58, height: 40 }}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Checkbox
+                          className="blue-checkbox"
+                          id="prefix"
+                          checked={isPrefixEnabled}
+                          onChange={handlePrefixChange}
+                        >
+                          Prefix
+                        </Checkbox>
+                      </td>
+                      <td>
+                        <Input
+                          value="0001"
+                          className="mb-2"
+                          style={{ width: 58, height: 40 }}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Checkbox
+                          className="blue-checkbox"
+                          id="suffix"
+                          checked={isSuffixEnabled}
+                          onChange={handleSuffixChange}
+                        >
+                          Suffix
+                        </Checkbox>
+                      </td>
+                      <td>
+                        <Input
+                          value="0001"
+                          className="mb-2"
+                          style={{ width: 58, height: 40 }}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Checkbox
+                          className="blue-checkbox"
+                          id="resetMoiNgay"
+                          checked={isResetDaily}
+                          onChange={handleResetDailyChange}
+                        >
+                          Reset mỗi ngày
+                        </Checkbox>
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
                 <div className="mt-4 text-right">
                   <span style={{ color: "#FF7506" }}>*</span>{" "}
@@ -264,7 +393,7 @@ function AddServices() {
               </div>
             </div>
           </div>
-        </Content>
+        </Layout.Content>
       </Layout>
     </Layout>
   );

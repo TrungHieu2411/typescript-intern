@@ -7,6 +7,7 @@ import {
   Input,
   Layout,
   Popover,
+  Select,
   Upload,
 } from "antd";
 import {
@@ -23,10 +24,11 @@ const { Content } = Layout;
 const popoverContent = <h4>dadasd</h4>;
 
 interface UserData {
+  id: string;
   fullName: string;
   phone: string;
   email: string;
-  role: string;
+  role: firebase.firestore.DocumentReference | null;
   isActive: string;
   image: string;
   userName: string;
@@ -36,10 +38,11 @@ interface UserData {
 function Admin() {
   const { id } = useParams<{ id: string }>();
   const [user, setUser] = useState<UserData>({
+    id: "",
     fullName: "",
     phone: "",
     email: "",
-    role: "",
+    role: null,
     isActive: "",
     image: "",
     userName: "",
@@ -49,30 +52,33 @@ function Admin() {
   const [loadingImage, setLoadingImage] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<any>(null);
+  const [roleValue, setRoleValue] = useState<string | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleUpdateAuthManagement = () => {
-    const userRef = firebase.firestore().collection("authManagements").doc(id);
-    const updatedUser = {
-      fullName: user.fullName,
-      phone: user.phone,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      image: imageUrl || user.image,
-      userName: user.userName,
-      password: user.password,
-    };
-
-    userRef
-      .update(updatedUser)
-      .then(() => {
-        console.log("AuthManagement updated successfully!");
-      })
-      .catch((error) => {
-        console.error("Error updating AuthManagement:", error);
-      });
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ const handleUpdateAuthManagement = () => {
+  const userRef = firebase.firestore().collection("authManagements").doc(id);
+  const updatedUser: UserData = {
+    fullName: user.fullName,
+    phone: user.phone,
+    email: user.email,
+    role: user.role,
+    isActive: user.isActive,
+    image: imageUrl || user.image,
+    userName: user.userName,
+    password: user.password,
+    id: user.id,
   };
+
+  userRef
+    .update(updatedUser)
+    .then(() => {
+      console.log("AuthManagement updated successfully!");
+    })
+    .catch((error) => {
+      console.error("Error updating AuthManagement:", error);
+    });
+};
+
 
   const handleImageUpload = async (file: any) => {
     setLoadingImage(true);
@@ -91,21 +97,19 @@ function Admin() {
     }
   };
 
-   // Lấy id từ localStorage
-   const storedUserId = localStorage.getItem('userId');
-   useEffect(() => {
+  const storedUserId = localStorage.getItem('userId');
+  useEffect(() => {
     const fetchUser = async () => {
       const userRef = firebase
         .firestore()
         .collection("authManagements")
-        .doc(storedUserId || id); // Sử dụng storedUserId nếu tồn tại, nếu không thì sử dụng id từ params
+        .doc(storedUserId || id);
 
       const userSnapshot = await userRef.get();
-
+      
       if (userSnapshot.exists) {
         const userData = userSnapshot.data() as UserData;
         setUser(userData);
-
         setImageUrl(userData.image);
       }
     };
@@ -123,6 +127,55 @@ function Admin() {
     updateAuthManagement();
   }, [handleUpdateAuthManagement, imageUrl]);
 
+  const [authManagementData, setAuthManagementData] = useState<UserData[]>([]);
+  useEffect(() => {
+    const fetchAuthManagement = async () => {
+      const authManagementRef = firebase.firestore().collection("authManagements");
+      const snapshot = await authManagementRef.get();
+      setAuthManagementData(await Promise.all(snapshot.docs.map(async (doc) => {
+        const authManagement = doc.data() as UserData;
+        authManagement.id = doc.id;
+
+        const roleRef = authManagement.role;
+
+        if (roleRef) {
+          const roleDoc = await roleRef.get();
+          if (roleDoc.exists) {
+            const roleData = roleDoc.data();
+            if (roleData && roleData.nameRole) {
+              const roleName = roleData.nameRole;
+              authManagement.role = roleName;
+            }
+          }
+        }
+        return authManagement;
+      })))
+    }
+    fetchAuthManagement();
+  }, []);
+
+  useEffect(() => {
+    const fetchRoleData = async () => {
+      if (user.role) {
+        const roleRef = user.role;
+        const roleSnapshot = await roleRef.get();
+        if (roleSnapshot.exists) {
+          const roleData = roleSnapshot.data();
+          if (roleData && roleData.nameRole) {
+            const roleName = roleData.nameRole;
+            setRoleValue(roleName);
+          }
+        }
+      }
+    };
+
+    fetchRoleData();
+  }, [user]);
+
+  const handleRoleChange = (value: string) => {
+    setRoleValue(value);
+    // Update user.role here if necessary
+  };
   return (
     <Layout className="layout">
       <SlideMain />
@@ -312,15 +365,13 @@ function Admin() {
                             Vai trò:
                           </label>
                           <Form.Item className="">
-                            <Input
-                              value={user.role}
-                              onChange={(e) =>
-                                setUser({
-                                  ...user,
-                                  role: e.target.value,
-                                })
-                              }
-                            />
+                            <Select value={roleValue} onChange={handleRoleChange}>
+                              {authManagementData.map((authManagement) => (
+                                <Select.Option key={authManagement.id} value={authManagement.role}>
+                                  
+                                </Select.Option>
+                              ))}
+                            </Select>
                           </Form.Item>
                         </div>
                       </div>

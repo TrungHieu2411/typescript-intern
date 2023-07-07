@@ -34,64 +34,34 @@ const popoverContent = (
   ></Card>
 );
 
-// const data = [
-//   {
-//     nameRole: "Kế toán",
-//     userNumber: "6",
-//     description: "Thực hiện nhiệm vụ về thống kê số liệu và tổng hợp số liệu",
-//     cn: "Cập nhật",
-//   },
-//   {
-//     nameRole: "Bác sĩ",
-//     userNumber: "6",
-//     description: "Thực hiện nhiệm vụ về thống kê số liệu và tổng hợp số liệu",
-//     cn: "Cập nhật",
-//   },
-//   {
-//     nameRole: "Lễ tân",
-//     userNumber: "6",
-//     description: "Thực hiện nhiệm vụ về thống kê số liệu và tổng hợp số liệu",
-//     cn: "Cập nhật",
-//   },
-//   {
-//     nameRole: "Quản lý",
-//     userNumber: "6",
-//     description: "Thực hiện nhiệm vụ về thống kê số liệu và tổng hợp số liệu",
-//     cn: "Cập nhật",
-//   },
-//   {
-//     nameRole: "Admin",
-//     userNumber: "6",
-//     description: "Thực hiện nhiệm vụ về thống kê số liệu và tổng hợp số liệu",
-//     cn: "Cập nhật",
-//   },
- 
-// ];
-
 interface RoleManagementData {
   id: string;
   nameRole: string;
   description: string;
+  numberUser: string;
 }
+
 function RoleManagement() {
-  const [roleManagementData, setRoleManagementData] = useState<RoleManagementData[]>([]);
+  const [roleManagementData, setRoleManagementData] = useState<
+    RoleManagementData[]
+  >([]);
 
   useEffect(() => {
     const fetchRoleManagement = async () => {
-      const roleManagementRef = firebase.firestore().collection("roleManagements");
+      const roleManagementRef = firebase.firestore().collection("roles");
       await roleManagementRef.onSnapshot((snapshot) => {
         const roleManagementData: RoleManagementData[] = [];
         snapshot.forEach((doc) => {
           const roleManagement = doc.data() as RoleManagementData;
           roleManagement.id = doc.id;
-          roleManagementData.push(roleManagement)
-        })
-        setRoleManagementData(roleManagementData)
-      })
-    }
+          roleManagementData.push(roleManagement);
+        });
+        setRoleManagementData(roleManagementData);
+      });
+    };
     fetchRoleManagement();
-  })
-  
+  }, []);
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -100,7 +70,10 @@ function RoleManagement() {
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbTwo text="Cài đặt hệ thống" text2="Quản lý vai trò" />
+                <BreadCrumbTwo
+                  text="Cài đặt hệ thống"
+                  text2="Quản lý vai trò"
+                />
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
@@ -128,7 +101,7 @@ function RoleManagement() {
               <Col lg={5}>
                 <Row style={{ maxWidth: 200 }}>
                   <Col span={24}>
-                  <h4 style={{ color: "#FF7506" }}>Danh sách vai trò</h4>
+                    <h4 style={{ color: "#FF7506" }}>Danh sách vai trò</h4>
                   </Col>
                 </Row>
               </Col>
@@ -136,7 +109,8 @@ function RoleManagement() {
                 <Row style={{ maxWidth: 325 }} className="ms-3">
                   <label htmlFor="">Từ khóa</label>
                   <Col span={24}>
-                    <Input size="large"
+                    <Input
+                      size="large"
                       placeholder="Nhập từ khóa"
                       suffix={
                         <Space>
@@ -155,7 +129,8 @@ function RoleManagement() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={roleManagementData}
-                  pagination={false}
+                 
+                  pagination={{pageSize: 5}}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"
@@ -184,7 +159,9 @@ function RoleManagement() {
                     key="cn"
                     render={(_: any, record: { id: string }) => (
                       <>
-                        <Link to={`/editRoleManagement/${record.id}`}>Cập nhật</Link>
+                        <Link to={`/editRoleManagement/${record.id}`}>
+                          Cập nhật
+                        </Link>
                       </>
                     )}
                   />

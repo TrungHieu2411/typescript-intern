@@ -24,9 +24,6 @@ import "../../assets/css/style.css";
 //firebase
 import firebase from "firebase/compat/app";
 
-const { Content } = Layout;
-const { Column } = Table;
-
 const popoverContent = (
   <Card
     title="Thông báo"
@@ -80,7 +77,7 @@ function ListService() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -177,30 +174,31 @@ function ListService() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={serviceData}
-                  pagination={false}
+                 
+                  pagination={{pageSize: 5}}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"
                 >
-                  <Column
+                  <Table.Column
                     title={<span className="table-title">Mã dịch vụ</span>}
                     dataIndex="codeService"
                     key="codeService"
                     render={(text: string) => <span>{text}</span>}
                   />
-                  <Column
+                  <Table.Column
                     title={<span className="table-title">Tên dịch vụ</span>}
                     dataIndex="nameService"
                     key="nameService"
                     render={(text: string) => <span>{text}</span>}
                   />
-                  <Column
+                  <Table.Column
                     title={<span className="table-title">Mô tả</span>}
                     dataIndex="description"
                     key="description"
                     render={(text: string) => <span>{text}</span>}
                   />
-                  <Column
+                  <Table.Column
                     title={
                       <span className="table-title">Trạng thái hoạt động</span>
                     }
@@ -208,7 +206,7 @@ function ListService() {
                     key="isActive"
                     render={(isActive: string) => renderIsActive(isActive)}
                   />
-                  <Column
+                  <Table.Column
                     title=""
                     dataIndex="ct"
                     key="ct"
@@ -218,7 +216,7 @@ function ListService() {
                       </>
                     )}
                   />
-                  <Column
+                  <Table.Column
                     title=""
                     dataIndex="cn"
                     key="cn"
@@ -229,11 +227,6 @@ function ListService() {
                     )}
                   />
                 </Table>
-                <Pagination
-                  total={100}
-                  showSizeChanger={false}
-                  style={{ textAlign: "right" }}
-                />
               </div>
               <div className="col-1 mt-3">
                 <Link to={"/addService"}>
@@ -247,7 +240,7 @@ function ListService() {
               </div>
             </div>
           </div>
-        </Content>
+        </Layout.Content>
       </Layout>
     </Layout>
   );

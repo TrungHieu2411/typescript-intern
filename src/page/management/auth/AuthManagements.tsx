@@ -6,12 +6,11 @@ import {
   Col,
   Input,
   Layout,
-  Pagination,
   Popover,
   Row,
   Select,
   Space,
-  Table
+  Table,
 } from "antd";
 import { BellFilled, SearchOutlined } from "@ant-design/icons";
 
@@ -57,27 +56,50 @@ interface AuthManagementData {
   fullName: string;
   phone: string;
   email: string;
-  role: string;
+  role: firebase.firestore.DocumentReference | null;
   isActive: string;
 }
 function AuthManagements() {
-  const [authManagementData, setAuthManagementData] = useState<AuthManagementData[]>([]);
+  const [authManagementData, setAuthManagementData] = useState<
+    AuthManagementData[]
+  >([]);
 
   useEffect(() => {
     const fetchAuthManagement = async () => {
-      const authManagementRef = firebase.firestore().collection("authManagements");
-      await authManagementRef.onSnapshot((snapshot) => {
-        const authManagementData: AuthManagementData[] = [];
-        snapshot.forEach((doc) => {
-          const authManagement = doc.data() as AuthManagementData;
-          authManagement.id = doc.id;
-          authManagementData.push(authManagement);
-      })
-      setAuthManagementData(authManagementData);
-    });
-  };
-  fetchAuthManagement();
-});
+      const authManagementRef = firebase
+        .firestore()
+        .collection("authManagements");
+      const snapshot = await authManagementRef.get();
+      setAuthManagementData(
+        await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const authManagement = doc.data() as AuthManagementData;
+            authManagement.id = doc.id;
+
+            const roleRef = authManagement.role;
+
+            if (
+              roleRef &&
+              roleRef instanceof firebase.firestore.DocumentReference
+            ) {
+              const roleDoc = await roleRef.get();
+              if (roleDoc.exists) {
+                const roleData = roleDoc.data();
+                if (roleData && roleData.nameRole) {
+                  const roleName = roleData.nameRole;
+                  authManagement.role = roleName;
+                }
+              }
+            }
+
+            return authManagement;
+          })
+        )
+      );
+    };
+    fetchAuthManagement();
+  });
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -160,7 +182,8 @@ function AuthManagements() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={authManagementData}
-                  pagination={false}
+                  
+                  pagination={{pageSize: 5}}
                   bordered
                   className="mb-3"
                 >
@@ -192,7 +215,6 @@ function AuthManagements() {
                     title={<span className="table-title">Vai trò</span>}
                     dataIndex="role"
                     key="role"
-                    render={(text: string) => <span>{text}</span>}
                   />
                   <Column
                     title={
@@ -214,13 +236,8 @@ function AuthManagements() {
                       </>
                     )}
                   />
-                 
                 </Table>
-                <Pagination
-                  total={100}
-                  showSizeChanger={false}
-                  style={{ textAlign: "right" }}
-                />
+                
               </div>
               <div className="col-1 mt-3">
                 <Link to={"/addAuthManagement"}>

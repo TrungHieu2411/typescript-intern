@@ -23,27 +23,33 @@ const popoverContent = (
 );
 
 interface RoleManagementData {
-  id: string;
   nameRole: string;
   description: string;
 }
+
 function AddRoleManagements() {
   const [newRoleManagement, setNewRoleManagement] =
     useState<RoleManagementData>({
-      id: "",
       nameRole: "",
       description: "",
     });
-    const handleAddRoleManagement = async () => {
-      const roleManagementCollection = firebase.firestore().collection("roleManagements");
+  const [groupA, setGroupA] = useState<boolean[]>([]);
+  const [groupB, setGroupB] = useState<boolean[]>([]);
 
-      try {
-        await roleManagementCollection.add({
-          nameRole: newRoleManagement.nameRole,
-          description: newRoleManagement.description
-        })
-       
-         // Thực hiện điều hướng đến trang danh sách sản phẩm
+  const handleAddRoleManagement = async () => {
+    const roleManagementCollection = firebase.firestore().collection("roles");
+
+    try {
+      await roleManagementCollection.add({
+        nameRole: newRoleManagement.nameRole,
+        description: newRoleManagement.description,
+        permissions: {
+          groupA,
+          groupB,
+        },
+      });
+
+      // Thực hiện điều hướng đến trang danh sách vai trò
       window.location.href = "/roleManagement";
     } catch (error) {
       console.error(error);
@@ -104,14 +110,15 @@ function AddRoleManagements() {
                           </label>
                           <Form.Item className="">
                             <Input
-                            value={newRoleManagement.nameRole}
-                            onChange={(e) =>
-                              setNewRoleManagement({
-                                ...newRoleManagement,
-                                nameRole: e.target.value,
-                              })
-                            }
-                            placeholder="203" />
+                              value={newRoleManagement.nameRole}
+                              onChange={(e) =>
+                                setNewRoleManagement({
+                                  ...newRoleManagement,
+                                  nameRole: e.target.value,
+                                })
+                              }
+                              placeholder="203"
+                            />
                           </Form.Item>
                         </div>
                         <div className="col-12">
@@ -122,7 +129,6 @@ function AddRoleManagements() {
                             <TextArea
                               rows={5}
                               placeholder="Mô tả dịch vụ"
-                              maxLength={6}
                               value={newRoleManagement.description}
                               onChange={(e) =>
                                 setNewRoleManagement({
@@ -151,6 +157,13 @@ function AddRoleManagements() {
                             <td>
                               <Checkbox
                                 className="blue-checkbox mb-2"
+                                checked={groupA[0]}
+                                onChange={(e) =>
+                                  setGroupA([
+                                    e.target.checked,
+                                    ...groupA.slice(1),
+                                  ])
+                                }
                                 id="tangTuDong"
                               >
                                 Tất cả
@@ -161,6 +174,14 @@ function AddRoleManagements() {
                             <td>
                               <Checkbox
                                 className="blue-checkbox mb-2"
+                                checked={groupA[1]}
+                                onChange={(e) =>
+                                  setGroupA([
+                                    ...groupA.slice(0, 1),
+                                    e.target.checked,
+                                    ...groupA.slice(2),
+                                  ])
+                                }
                                 id="prefix"
                               >
                                 Chức năng x
@@ -171,6 +192,14 @@ function AddRoleManagements() {
                             <td>
                               <Checkbox
                                 className="blue-checkbox mb-2"
+                                checked={groupA[2]}
+                                onChange={(e) =>
+                                  setGroupA([
+                                    ...groupA.slice(0, 2),
+                                    e.target.checked,
+                                    ...groupA.slice(3),
+                                  ])
+                                }
                                 id="suffix"
                               >
                                 Chức năng y
@@ -181,6 +210,13 @@ function AddRoleManagements() {
                             <td>
                               <Checkbox
                                 className="blue-checkbox"
+                                checked={groupA[3]}
+                                onChange={(e) =>
+                                  setGroupA([
+                                    ...groupA.slice(0, 3),
+                                    e.target.checked,
+                                  ])
+                                }
                                 id="resetMoiNgay"
                               >
                                 Chức năng z
@@ -196,6 +232,13 @@ function AddRoleManagements() {
                             <td>
                               <Checkbox
                                 className="blue-checkbox mb-2"
+                                checked={groupB[0]}
+                                onChange={(e) =>
+                                  setGroupB([
+                                    e.target.checked,
+                                    ...groupB.slice(1),
+                                  ])
+                                }
                                 id="resetMoiNgay"
                               >
                                 Tất cả
@@ -206,6 +249,14 @@ function AddRoleManagements() {
                             <td>
                               <Checkbox
                                 className="blue-checkbox mb-2"
+                                checked={groupB[1]}
+                                onChange={(e) =>
+                                  setGroupB([
+                                    ...groupB.slice(0, 1),
+                                    e.target.checked,
+                                    ...groupB.slice(2),
+                                  ])
+                                }
                                 id="tangTuDong"
                               >
                                 Chức năng x
@@ -216,6 +267,14 @@ function AddRoleManagements() {
                             <td>
                               <Checkbox
                                 className="blue-checkbox mb-2"
+                                checked={groupB[2]}
+                                onChange={(e) =>
+                                  setGroupB([
+                                    ...groupB.slice(0, 2),
+                                    e.target.checked,
+                                    ...groupB.slice(3),
+                                  ])
+                                }
                                 id="prefix"
                               >
                                 Chức năng y
@@ -226,6 +285,13 @@ function AddRoleManagements() {
                             <td>
                               <Checkbox
                                 className="blue-checkbox mb-2"
+                                checked={groupB[3]}
+                                onChange={(e) =>
+                                  setGroupB([
+                                    ...groupB.slice(0, 3),
+                                    e.target.checked,
+                                  ])
+                                }
                                 id="suffix"
                               >
                                 Chức năng z
