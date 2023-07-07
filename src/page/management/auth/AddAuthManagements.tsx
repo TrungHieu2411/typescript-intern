@@ -30,7 +30,6 @@ interface AuthManagementData {
   email: string;
   role: string; // Thay đổi kiểu dữ liệu của role thành DocumentReference
   isActive: string;
-
   userName: string;
   password: string;
 }

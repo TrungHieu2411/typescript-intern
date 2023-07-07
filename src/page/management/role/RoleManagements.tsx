@@ -38,7 +38,7 @@ interface RoleManagementData {
   id: string;
   nameRole: string;
   description: string;
-  numberUser: string;
+  userNumber: string;
 }
 
 function RoleManagement() {
@@ -61,7 +61,31 @@ function RoleManagement() {
     };
     fetchRoleManagement();
   }, []);
-
+  const [adminUserCount, setAdminUserCount] = useState(0);
+  useEffect(() => {
+    const fetchRoleManagement = async () => {
+      const roleManagementRef = firebase.firestore().collection("roles");
+      await roleManagementRef.onSnapshot((snapshot) => {
+        const roleManagementData: RoleManagementData[] = [];
+        snapshot.forEach((doc) => {
+          const roleManagement = doc.data() as RoleManagementData;
+          roleManagement.id = doc.id;
+          roleManagementData.push(roleManagement);
+        });
+        setRoleManagementData(roleManagementData);
+  
+        let adminCount = 0;
+        roleManagementData.forEach((role) => {
+          if (role.nameRole === "Admin") {
+            adminCount++;
+          }
+        });
+        setAdminUserCount(adminCount);
+      });
+    };
+    fetchRoleManagement();
+  }, []);
+  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -145,7 +169,7 @@ function RoleManagement() {
                     title={<span className="table-title">Số người dùng</span>}
                     dataIndex="userNumber"
                     key="userNumber"
-                    render={(text: string) => <span>{text}</span>}
+                    render={(text: string) => <span>{adminUserCount}</span>}
                   />
                   <Column
                     title={<span className="table-title">Mô tả</span>}

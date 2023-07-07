@@ -28,10 +28,15 @@ interface UserData {
   phone: string;
   email: string;
 }
+
+interface ServiceData {
+  id: string;
+  nameService: string;
+  progressiveId: number;
+}
+
 function AddProgressives() {
-  const [nameService, setService] = useState<
-    { id: string; nameService: string }[]
-  >([]);
+  const [nameService, setService] = useState<ServiceData[]>([]);
   useEffect(() => {
     const fetchService = async () => {
       try {
@@ -39,11 +44,12 @@ function AddProgressives() {
           .firestore()
           .collection("services")
           .get();
-        const serviceData = serviceSnapshot.docs.map((doc) => {
+        const serviceData: ServiceData[] = serviceSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             id: doc.id,
             nameService: data.nameService,
+            progressiveId: data.progressiveId,
           };
         });
         setService(serviceData);
@@ -81,47 +87,17 @@ function AddProgressives() {
 
   const [selectedService, setSelectedService] = useState("");
   const [showPopup, setShowPopup] = useState(false);
-  const [counter, setCounter] = useState<number>(0);
-
-  useEffect(() => {
-    const fetchCounter = async () => {
-      const counterDoc = await firebase
-        .firestore()
-        .collection("counters")
-        .doc("progressiveCounter")
-        .get();
-      const counterValue = counterDoc.data()?.value || 0;
-      setCounter(counterValue);
-    };
-
-    fetchCounter();
-  }, []);
-
-  const increaseCounter = async () => {
-    const updatedCounter = counter + 1;
-    setCounter(updatedCounter);
-
-    await firebase
-      .firestore()
-      .collection("counters")
-      .doc("progressiveCounter")
-      .set({
-        value: updatedCounter,
-      });
-  };
-
-  const formatCounter = (counter: number) => {
-    return counter.toString().padStart(7, "0");
-  };
+  const [selectedServiceData, setSelectedServiceData] =
+    useState<ServiceData | null>(null);
 
   const handleServiceChange = (value: string) => {
     setSelectedService(value);
+    const service = nameService.find((service) => service.id === value);
+    setSelectedServiceData(service || null);
   };
 
   const handlePrintButtonClick = () => {
     setShowPopup(true);
-    increaseCounter();
-
     handleAddProgressive();
   };
 
@@ -174,11 +150,11 @@ function AddProgressives() {
     const progressiveCollection = firebase
       .firestore()
       .collection("progressives");
-
+    const progressiveId = selectedServiceData?.progressiveId;
     const serviceRef = firebase.firestore().doc(`services/${selectedService}`);
     try {
       await progressiveCollection.add({
-        number: formatCounter(counter + 1),
+        number: progressiveId,
         nameService: serviceRef,
         timeCreate: getCurrentTime(),
         deadLineUsed: getExpirationTime(),
@@ -188,7 +164,7 @@ function AddProgressives() {
         authManagementId: userId,
       });
 
-      window.location.href = "/addProgressive";
+      window.location.href = "/progressive";
     } catch (error) {
       console.log(`Error adding document: ${error}`);
     }
@@ -249,6 +225,7 @@ function AddProgressives() {
                         style={{ width: 300 }}
                         className="text-start"
                         onChange={handleServiceChange}
+                        value={selectedService}
                         placeholder="Chọn dịch vụ"
                       >
                         {nameService.map((service) => (
@@ -312,11 +289,11 @@ function AddProgressives() {
                             className="text-center my-4 fw-bold"
                             style={{ color: "#FF9138" }}
                           >
-                            {formatCounter(counter)}
+                            {selectedServiceData?.progressiveId}
                           </h1>
 
                           <p className="text-center">
-                            DV: {selectedService}{" "}
+                            DV: {selectedServiceData?.nameService}{" "}
                             <span className="fw-bold">
                               (tại quầy số{" "}
                               {selectedService === "Khám tim mạch"

@@ -5,7 +5,6 @@ import {
   Card,
   DatePicker,
   Layout,
-  Pagination,
   Popover,
   Table,
 } from "antd";
@@ -16,6 +15,10 @@ import SlideMain from "../../containers/SlideMain";
 import BreadCrumbTwo from "../../components/BreadCrumb/BreadCrumbTwo";
 import Account from "../../components/User/Account";
 import "../../assets/css/style.css";
+
+//firebase
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
 
 const { Content } = Layout;
 const { Column } = Table;
@@ -84,6 +87,14 @@ const renderStatus = (status: string) => {
 
   return <Badge color={color} text={text} />;
 };
+
+interface ProgressiveData {
+  number: string;
+  nameService: firebase.firestore.DocumentReference | null;
+  timeCreate: string;
+  status: string;
+  authManagementId: "";
+}
 function ListReport() {
   return (
     <Layout className="layout">

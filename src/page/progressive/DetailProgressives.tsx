@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Button, Card, Layout, Popover } from "antd";
+import { Button, Card, Layout, Popover } from "antd";
 import { BellFilled } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -127,7 +127,7 @@ function DetailProgressives() {
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbThree text="Cấp số" text2="Danh sách cấp số" href="/device" text3="Chi tiết"/>
+                <BreadCrumbThree text="Cấp số" text2="Danh sách cấp số" href="/progressive" text3="Chi tiết"/>
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
