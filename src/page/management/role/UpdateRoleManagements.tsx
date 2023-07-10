@@ -30,6 +30,8 @@ interface RoleManagementData {
 
 function UpdateRoleManagements() {
   const { id } = useParams<{ id: string }>();
+
+//-------------
   const [roleManagement, setRoleManagement] = useState<RoleManagementData>({
     nameRole: "",
     description: "",
@@ -55,6 +57,7 @@ function UpdateRoleManagements() {
     fetchRoleManagement();
   }, [id]);
 
+//-------------
   const handleUpdateRoleManagement = () => {
     const roleManagementRef = firebase.firestore().collection("roles").doc(id);
     const updatedRoleManagement = {

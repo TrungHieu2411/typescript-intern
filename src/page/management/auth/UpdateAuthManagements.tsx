@@ -30,13 +30,13 @@ interface AuthManagementData {
   email: string;
   role: firebase.firestore.DocumentReference | null; // Thay đổi kiểu dữ liệu của role thành DocumentReference
   isActive: string;
-
   userName: string;
   password: string;
 }
 function UpdateAuthManagements() {
-  
   const { id } = useParams<{ id: string }>();
+  
+  //-------------
   const [authManagement, setAuthManagement] = useState<AuthManagementData>({
     fullName: "",
     phone: "",
@@ -69,6 +69,7 @@ function UpdateAuthManagements() {
     fetchAuthManagement();
   }, [id]);
 
+//-------------
   const handleUpdateAuthManagement = () => {
     const userRef = firebase.firestore().collection("authManagements").doc(id);
   const updatedUser: AuthManagementData = {
@@ -92,8 +93,8 @@ function UpdateAuthManagements() {
     });
 };
 
+//-------------
   const [authManagementData, setAuthManagementData] = useState<AuthManagementData[]>([]);
-  const [roleValue, setRoleValue] = useState<string | null>(null);
 
  useEffect(() => {
     const fetchAuthManagement = async () => {
@@ -120,6 +121,9 @@ function UpdateAuthManagements() {
     }
     fetchAuthManagement();
   }, []);
+
+//-------------
+const [roleValue, setRoleValue] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRoleData = async () => {

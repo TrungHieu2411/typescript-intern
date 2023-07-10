@@ -36,6 +36,13 @@ interface UserData {
 }
 
 function Admin() {
+  //Ảnh 
+  const [loadingImage, setLoadingImage] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<any>(null);
+  //Vai trò
+  const [roleValue, setRoleValue] = useState<string | null>(null);
+//-------
   const { id } = useParams<{ id: string }>();
   const [user, setUser] = useState<UserData>({
     id: "",
@@ -48,12 +55,7 @@ function Admin() {
     userName: "",
     password: "",
   });
-
-  const [loadingImage, setLoadingImage] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<any>(null);
-  const [roleValue, setRoleValue] = useState<string | null>(null);
-
+//Cập nhật tài khoản
  // eslint-disable-next-line react-hooks/exhaustive-deps
  const handleUpdateAuthManagement = () => {
   const userRef = firebase.firestore().collection("authManagements").doc(id);
@@ -78,8 +80,7 @@ function Admin() {
       console.error("Error updating AuthManagement:", error);
     });
 };
-
-
+//Cập nhật ảnh
   const handleImageUpload = async (file: any) => {
     setLoadingImage(true);
     setImageFile(file);
@@ -96,7 +97,7 @@ function Admin() {
       setLoadingImage(false);
     }
   };
-
+//Lấy id tài khoản
   const storedUserId = localStorage.getItem('userId');
   useEffect(() => {
     const fetchUser = async () => {
@@ -117,6 +118,7 @@ function Admin() {
     fetchUser();
   }, [storedUserId, id]);
 
+  //Ảnh tự upload
   useEffect(() => {
     const updateAuthManagement = () => {
       if (imageUrl) {
@@ -126,7 +128,7 @@ function Admin() {
 
     updateAuthManagement();
   }, [handleUpdateAuthManagement, imageUrl]);
-
+//Liên kết bảng authManagements với bảng roles
   const [authManagementData, setAuthManagementData] = useState<UserData[]>([]);
   useEffect(() => {
     const fetchAuthManagement = async () => {
@@ -153,7 +155,7 @@ function Admin() {
     }
     fetchAuthManagement();
   }, []);
-
+//Lấy tên vai trò
   useEffect(() => {
     const fetchRoleData = async () => {
       if (user.role) {
@@ -171,11 +173,7 @@ function Admin() {
 
     fetchRoleData();
   }, [user]);
-
-  const handleRoleChange = (value: string) => {
-    setRoleValue(value);
-    // Update user.role here if necessary
-  };
+  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -365,7 +363,7 @@ function Admin() {
                             Vai trò:
                           </label>
                           <Form.Item className="">
-                            <Select value={roleValue} onChange={handleRoleChange}>
+                            <Select value={roleValue}>
                               {authManagementData.map((authManagement) => (
                                 <Select.Option key={authManagement.id} value={authManagement.role}>
                                   

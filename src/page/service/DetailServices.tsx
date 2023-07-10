@@ -129,6 +129,7 @@ const renderIsActive = (status: string) => {
 
 function DetailServices() {
   const { id } = useParams<{ id: string }>();
+  //------------
   const [service, setService] = useState<ServiceData>({
     codeService: "",
     nameService: "",

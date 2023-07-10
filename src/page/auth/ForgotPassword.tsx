@@ -2,38 +2,24 @@ import React, { useEffect, useState } from "react";
 import { Button, Input, Form, message } from "antd";
 import { FormInstance } from "antd/lib/form";
 import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
 
 const ForgotPassword: React.FC = () => {
   const formRef = React.useRef<FormInstance>(null);
-  const [email, setEmail] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
 
+//------------
+  const [email, setEmail] = useState("");
   const onFinish = async (values: any) => {
     const { email } = values;
 
     try {
-      const emailExists = await checkEmailExists(email);
-      if (!emailExists) {
+      const accountId = await getAccountIdByEmail(email);
+      if (!accountId) {
         message.error("Không tìm thấy địa chỉ email.");
         return;
       }
 
-      // Gửi email đặt lại mật khẩu
-      const actionCodeSettings = {
-        url: `${
-          window.location.origin
-        }/xacnhanmatkhau?email=${encodeURIComponent(email)}`,
-        handleCodeInApp: true,
-      };
-      await firebase.auth().sendPasswordResetEmail(email, actionCodeSettings);
-
-      setEmail(email); // Lưu email đã gửi vào state
-      setIsSuccess(true);
-      message.success("Gửi email đặt lại mật khẩu thành công!");
-
       setTimeout(() => {
-        window.location.href = `/xacnhanmatkhau/${email}`;
+        window.location.href = `/xacnhanmatkhau/${accountId}`;
       }, 2000);
     } catch (error) {
       console.log("Lỗi gửi email đặt lại mật khẩu:", error);
@@ -41,14 +27,22 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
-  const checkEmailExists = async (email: string) => {
+//------------
+  const getAccountIdByEmail = async (email: string) => {
     try {
-      const providers = await firebase.auth().fetchSignInMethodsForEmail(email);
+      const authManagementCollection = firebase.firestore().collection("authManagements");
+      const snapshot = await authManagementCollection.where("email", "==", email).get();
 
-      return providers.length > 0; // Email tồn tại nếu có phương thức đăng nhập được cung cấp
+      if (!snapshot.empty) {
+        const doc = snapshot.docs[0];
+        const accountId = doc.id;
+        return accountId;
+      } else {
+        return null;
+      }
     } catch (error) {
       console.log("Lỗi kiểm tra email:", error);
-      return false;
+      return null;
     }
   };
 
@@ -57,6 +51,7 @@ const ForgotPassword: React.FC = () => {
     window.location.href = "/"; // Chuyển đến trang chủ
   };
 
+//------------
   useEffect(() => {
     const emailParam = new URLSearchParams(window.location.search).get("email");
     if (emailParam) {

@@ -31,7 +31,6 @@ interface ServiceData {
 
 function AddServices() {
   const [isAutoIncrement, setIsAutoIncrement] = useState<boolean>(false);
-  const [currentNumber, setCurrentNumber] = useState<number>(200000);
 
   const handleAutoIncrementChange = (e: CheckboxChangeEvent) => {
     setIsAutoIncrement(e.target.checked);
@@ -46,7 +45,8 @@ function AddServices() {
 
     return progressiveId;
   };
-
+//------------
+  const [currentNumber, setCurrentNumber] = useState<number>(200000);
   useEffect(() => {
     const fetchNextProgressiveId = async () => {
       const serviceCollection = firebase.firestore().collection("services");
@@ -63,6 +63,7 @@ function AddServices() {
     fetchNextProgressiveId();
   }, []);
 
+//------------
   const [newService, setNewService] = useState<ServiceData>({
     id: "",
     codeService: "",
@@ -97,6 +98,7 @@ function AddServices() {
     }
   };
 
+//------------
   const [form] = Form.useForm();
 
   const handleAddService = () => {

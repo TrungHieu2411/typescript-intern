@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Form, Layout, Popover, Select, Modal } from "antd";
 import { BellFilled } from "@ant-design/icons";
-
 import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import "../../assets/css/style.css";
-
-// firebase
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import { useParams } from "react-router-dom";
@@ -40,10 +37,7 @@ function AddProgressives() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const serviceSnapshot = await firebase
-          .firestore()
-          .collection("services")
-          .get();
+        const serviceSnapshot = await firebase.firestore().collection("services").get();
         const serviceData: ServiceData[] = serviceSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
@@ -61,6 +55,7 @@ function AddProgressives() {
   }, []);
 
   const { id } = useParams<{ id: string }>();
+
   const [user, setUser] = useState<UserData>({
     fullName: "",
     phone: "",
@@ -70,10 +65,7 @@ function AddProgressives() {
   const userId = localStorage.getItem("userId");
   useEffect(() => {
     const fetchUser = async () => {
-      const userRef = firebase
-        .firestore()
-        .collection("authManagements")
-        .doc(userId || id);
+      const userRef = firebase.firestore().collection("authManagements").doc(userId || id);
 
       const userSnapshot = await userRef.get();
 
@@ -87,8 +79,7 @@ function AddProgressives() {
 
   const [selectedService, setSelectedService] = useState("");
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedServiceData, setSelectedServiceData] =
-    useState<ServiceData | null>(null);
+  const [selectedServiceData, setSelectedServiceData] = useState<ServiceData | null>(null);
 
   const handleServiceChange = (value: string) => {
     setSelectedService(value);
@@ -96,9 +87,9 @@ function AddProgressives() {
     setSelectedServiceData(service || null);
   };
 
-  const handlePrintButtonClick = () => {
+  const handlePrintButtonClick = async () => {
     setShowPopup(true);
-    handleAddProgressive();
+    await handleAddProgressive();
   };
 
   const handlePopupClose = () => {
@@ -116,40 +107,29 @@ function AddProgressives() {
   };
 
   const getExpirationTime = () => {
-    const expirationHour = 17;
-    const expirationMinute = 30;
     const currentDate = new Date();
-    let currentDay = currentDate.getDate();
-    let currentMonth = currentDate.getMonth() + 1;
-    let currentYear = currentDate.getFullYear();
-
-    // Check if current time is past the expiration time
-    if (
-      currentDate.getHours() > expirationHour ||
-      (currentDate.getHours() === expirationHour &&
-        currentDate.getMinutes() > expirationMinute)
-    ) {
-      // Increment the current day by 1
-      currentDay += 1;
-
-      // Adjust the month and year if necessary
-      if (currentDay > 30) {
-        currentDay = 1;
-        currentMonth += 1;
-        if (currentMonth > 12) {
-          currentMonth = 1;
-          currentYear += 1;
-        }
-      }
-    }
-
+    currentDate.setMinutes(currentDate.getMinutes() + 1);
+    const expirationHour = currentDate.getHours();
+    const expirationMinute = currentDate.getMinutes();
+    const currentDay = currentDate.getDate();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
     return `${expirationHour}:${expirationMinute} ${currentDay}/${currentMonth}/${currentYear}`;
   };
 
+  const updateProgressiveStatus = async (progressiveId: string) => {
+    const progressiveRef = firebase.firestore().collection("progressives").doc(progressiveId);
+    try {
+      await progressiveRef.update({
+        status: "Đã sử dụng",
+      });
+    } catch (error) {
+      console.log(`Error updating document: ${error}`);
+    }
+  };
+
   const handleAddProgressive = async () => {
-    const progressiveCollection = firebase
-      .firestore()
-      .collection("progressives");
+    const progressiveCollection = firebase.firestore().collection("progressives");
     const progressiveId = selectedServiceData?.progressiveId;
     const serviceRef = firebase.firestore().doc(`services/${selectedService}`);
     try {
@@ -162,7 +142,9 @@ function AddProgressives() {
         phone: user.phone,
         email: user.email,
         authManagementId: userId,
+        status: "Đang chờ",
       });
+
 
       window.location.href = "/progressive";
     } catch (error) {
@@ -222,7 +204,7 @@ function AddProgressives() {
                   <Form>
                     <Form.Item>
                       <Select
-                        style={{ width: 300 }}
+                        style={{ width:300 }}
                         className="text-start"
                         onChange={handleServiceChange}
                         value={selectedService}

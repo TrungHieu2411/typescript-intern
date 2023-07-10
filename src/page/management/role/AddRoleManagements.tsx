@@ -28,6 +28,8 @@ interface RoleManagementData {
 }
 
 function AddRoleManagements() {
+
+//-------------
   const [newRoleManagement, setNewRoleManagement] =
     useState<RoleManagementData>({
       nameRole: "",
@@ -36,6 +38,7 @@ function AddRoleManagements() {
   const [groupA, setGroupA] = useState<boolean[]>([]);
   const [groupB, setGroupB] = useState<boolean[]>([]);
 
+//-------------
   const handleAddRoleManagement = async () => {
     const roleManagementCollection = firebase.firestore().collection("roles");
 

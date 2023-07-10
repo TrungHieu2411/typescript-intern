@@ -37,6 +37,7 @@ interface ServiceData {
 }
 function UpdateServices() {
   const { id } = useParams<{ id: string }>();
+  //------------
   const [service, setService] = useState<ServiceData>({
     codeService: "",
     nameService: "",
@@ -55,6 +56,7 @@ function UpdateServices() {
     fetchService();
   }, [id]);
 
+//------------
   const handleUpdateService = () => {
     const serviceRef = firebase.firestore().collection("services").doc(id);
     const updateService = {

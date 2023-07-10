@@ -59,7 +59,7 @@ function UpdateDevices() {
     userName: "",
     password: "",
   })
-
+//-------------
   useEffect(() => {
     const fetchDevice = async () => {
       const deviceRef = firebase.firestore().collection("devices").doc(id);
@@ -84,6 +84,7 @@ function UpdateDevices() {
     fetchDevice();
   }, [id]);
 
+//-------------
   const handleUpdateDevice = () => {
     const deviceRef = firebase.firestore().collection("devices").doc(id);
     const updatedDevice = {
@@ -106,6 +107,7 @@ function UpdateDevices() {
         console.error("Error updating device:", error);
       });
   };
+  
   return (
     <Layout className="layout">
       <SlideMain />

@@ -42,6 +42,8 @@ interface RoleManagementData {
 }
 
 function RoleManagement() {
+
+//-------------
   const [roleManagementData, setRoleManagementData] = useState<
     RoleManagementData[]
   >([]);
@@ -61,6 +63,8 @@ function RoleManagement() {
     };
     fetchRoleManagement();
   }, []);
+
+//-------------
   const [adminUserCount, setAdminUserCount] = useState(0);
   useEffect(() => {
     const fetchRoleManagement = async () => {

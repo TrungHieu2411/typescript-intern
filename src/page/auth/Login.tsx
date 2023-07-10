@@ -9,33 +9,35 @@ const { Link } = Typography;
 
 const Login: React.FC = () => {
   const formRef = React.useRef<FormInstance>(null);
+
+//------------
   const [showError, setShowError] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+//------------
   const onFinish = async (values: any) => {
     const { userName, password } = values;
     try {
-      const authManagementsCollection = firebase.firestore().collection("authManagements");
+      const authManagementsCollection = firebase
+        .firestore()
+        .collection("authManagements");
       const querySnapshot = await authManagementsCollection
         .where("userName", "==", userName)
         .where("password", "==", password)
         .get();
-  
+
       if (!querySnapshot.empty) {
         // Tìm thấy tài khoản hợp lệ
         const userId = querySnapshot.docs[0].id;
         console.log("Đăng nhập thành công!");
         console.log("ID tài khoản:", userId);
-  
-        // Cập nhật trạng thái đăng nhập
-        setIsLoggedIn(true);
+
         setShowError(false);
-        
+
         // Lưu trạng thái đăng nhập vào Local Storage
-        localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userId", userId);
-  
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userStatus", "Hoạt động"); // Cập nhật trạng thái người dùng
+
         // Thực hiện các hành động tiếp theo sau khi đăng nhập thành công
         // Ví dụ: chuyển đến trang admin
         const adminURL = `/admin/${userId}`;
@@ -51,7 +53,8 @@ const Login: React.FC = () => {
       setShowError(true);
     }
   };
-  
+
+//------------
   const handleForgotPasswordClick = () => {
     // Xử lý sự kiện khi bấm nút "Quên mật khẩu"
     console.log("Bấm nút Quên mật khẩu");
@@ -120,15 +123,16 @@ const Login: React.FC = () => {
                         <div className="mb-4 mt-2 d-flex align-items-center">
                           <ExclamationCircleOutlined className="me-1 fs-5" />
                           <span>Sai mật khẩu hoặc tên đăng nhập</span>
-                         
                         </div>
-                      ) :  <Link
-                      onClick={handleForgotPasswordClick}
-                      href="/quenmatkhau"
-                      style={{ color: "#E73F3F", marginLeft: "auto" }}
-                    >
-                      Quên mật khẩu?
-                    </Link>
+                      ) : (
+                        <Link
+                          onClick={handleForgotPasswordClick}
+                          href="/quenmatkhau"
+                          style={{ color: "#E73F3F", marginLeft: "auto" }}
+                        >
+                          Quên mật khẩu?
+                        </Link>
+                      )
                     }
                   >
                     <Input.Password />

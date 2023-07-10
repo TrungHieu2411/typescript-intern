@@ -42,6 +42,7 @@ interface DeviceData {
 function DetailProgressives() {
   const { id } = useParams<{ id: string }>();
 
+//-------------
   const [progressive, setProgressive] = useState<ProgressiveData>({
     number: "",
     nameService: null,
@@ -53,6 +54,7 @@ function DetailProgressives() {
     authManagementId: "",
     id: "",
   });
+
   const [typeDevice, setTypeDevice] = useState<string>("");
 
   useEffect(() => {
@@ -86,6 +88,9 @@ function DetailProgressives() {
     fetchProgressive();
   }, [id]);
 
+//-------------
+  const [nameServiceValue, setNameServiceValue] = useState<string | null>(null);
+  
   useEffect(() => {
     const fetchProgressive = async () => {
       const progressiveRef = firebase.firestore().collection("progressives");
@@ -118,7 +123,6 @@ function DetailProgressives() {
   
     fetchProgressive();
   }, []);
-  const [nameServiceValue, setNameServiceValue] = useState<string | null>(null);
   return (
     <Layout className="layout">
       <SlideMain />

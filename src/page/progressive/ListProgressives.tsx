@@ -54,20 +54,21 @@ const renderStatus = (status: string) => {
 };
 
 interface ProgressiveData {
-  typeDevice: string;
   id: string;
   number: string;
   nameCustomer: string;
-  nameService: firebase.firestore.DocumentReference | null;
   timeCreate: string;
   deadLineUsed: string;
   status: string;
   service: string;
-  fullName: "";
-  authManagementId: "";
+  fullName: string;
+  authManagementId: string;
+  typeDevice: string;
+  nameService: firebase.firestore.DocumentReference | null;
 }
 
 function ListProgressives() {
+  //------------
   const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
 
   useEffect(() => {
@@ -313,7 +314,7 @@ function ListProgressives() {
                     title={<span className="table-title">Nguồn cấp</span>}
                     dataIndex="typeDevice"
                     key="typeDevice"
-                    render={(text: string) => <span>{text}</span>}
+                   
                   />
                   <Column
                     title=""

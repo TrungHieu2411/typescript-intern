@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 //Xử lý Đăng nhập
 import ConfilmPassword from "./page/auth/ConfilmPassword";
@@ -51,9 +51,6 @@ const Router = () => {
       <Route path="/login" element={<Login />} />
       {allowAccess ? (
         <>
-          <Route path="/quenmatkhau" element={<ForgotPassword />} />
-          <Route path="/xacnhanmatkhau/*" element={<ConfilmPassword />} />
-
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/:id" element={<Admin />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -99,7 +96,9 @@ const Router = () => {
         <>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/quenmatkhau" element={<ForgotPassword />} />
+          <Route path="/xacnhanmatkhau/:id" element={<ConfilmPassword />} />
+          <Route path="/*" element={<NotFould />}/>
         </>
       )}
     </Routes>

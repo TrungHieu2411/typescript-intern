@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Popover,
   Card,
@@ -16,15 +16,6 @@ import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import "../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 const popoverContent = <div></div>;
-
-const tags = [
-  " Khám tim mạch",
-  " Khám Sản - Phụ khoa",
-  " Khám răng hàm mặt",
-  " Khám tai mũi họng",
-  " Khám hô hấp",
-  " Khám tổng quát",
-];
 
 interface DeviceData {
   id: string;
@@ -45,6 +36,27 @@ interface AuthManagementData {
 }
 
 function AddDevices() {
+  //------------
+  const [service, setService] = useState<{ id: String; nameService: string }[]>([]);
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const serviceSnapshot = await firebase.firestore().collection("services").get();
+        const serviceData = serviceSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            nameService: data.nameService,
+          }
+        })
+        setService(serviceData);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchService();
+  }, []);
+
   const [newDevice, setNewDevice] = useState<DeviceData>({
     id: "",
     codeDevice: "",
@@ -62,6 +74,7 @@ function AddDevices() {
     password: "",
   });
 
+//------------
   const onFinish = async () => {
     const deviceCollection = firebase.firestore().collection("devices");
     // Hiển thị thông báo "Thiết bị đã được thêm thành công"
@@ -84,6 +97,7 @@ function AddDevices() {
     }
   };
 
+//------------
   const [form] = Form.useForm();
   const handleAddDevice = async () => {
     try {
@@ -360,7 +374,7 @@ function AddDevices() {
                         <Select
                           mode="tags"
                           style={{ height: 35, borderColor: "#FFAC6A" }}
-                          tokenSeparators={[","]}
+                          tokenSeparators={[" "]}
                           className="w-100"
                           value={newDevice.service}
                           onChange={(value) =>
@@ -372,8 +386,8 @@ function AddDevices() {
                           aria-required
                           placeholder="Nhập dịch vụ sử dụng"
                         >
-                          {tags.map((tag) => (
-                            <Select.Option key={tag}> {tag}</Select.Option>
+                          {service.map((service) => (
+                            <Select.Option key={service.nameService} value={" " + service.nameService}> {service.nameService}</Select.Option>
                           ))}
                         </Select>
                       </Form.Item>

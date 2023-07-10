@@ -1,5 +1,5 @@
-import React from 'react';
-import Router from './router';
+import React from "react";
+import Router from "./router";
 
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
@@ -13,7 +13,7 @@ const firebaseConfig = {
   storageBucket: "queuing-system-b3bad.appspot.com",
   messagingSenderId: "743235220310",
   appId: "1:743235220310:web:a76c721afdb5aa781b9cf7",
-  measurementId: "G-G54M2M7CCD"
+  measurementId: "G-G54M2M7CCD",
 };
 
 // Initialize Firebase
@@ -24,7 +24,8 @@ firebase.firestore();
 function App() {
   return (
     <>
-      <Router />
+        <Router />
+     
     </>
   );
 }

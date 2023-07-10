@@ -3,34 +3,69 @@ import { Button, Input, Form, message } from "antd";
 import { FormInstance } from "antd/lib/form";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
+import "firebase/compat/firestore";
+import { useParams } from "react-router-dom";
+
+interface AuthManagementData {
+  password: string;
+}
 
 const ConfirmPassword: React.FC = () => {
+
   const formRef = React.useRef<FormInstance>(null);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [email, setEmail] = useState("");
 
+  //Lấy id trên params
+  const { id } = useParams<{ id: string }>(); // Lấy giá trị id từ params
+  const [passwordAuth, setPasswordAuth] = useState<AuthManagementData>({
+    password: "",
+  });
+//------------
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const emailParam = searchParams.get("email");
+    const fetchAuthManagement = async () => {
+      try {
+        if (id) {
+          const authManagementRef = firebase
+            .firestore()
+            .collection("authManagements")
+            .doc(id);
+          const authManagementSnapshot = await authManagementRef.get();
 
-    if (emailParam) {
-      setEmail(decodeURIComponent(emailParam));
-    }
-  }, []);
+          if (authManagementSnapshot.exists) {
+            const authManagementData = authManagementSnapshot.data() as AuthManagementData;
+            setPasswordAuth(authManagementData);
+          } else {
+            message.error("Không tìm thấy thông tin xác thực.");
+          }
+        } else {
+          message.error("Không tìm thấy ID.");
+        }
+      } catch (error) {
+        console.log("Lỗi thay đổi mật khẩu:", error);
+        message.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+      }
+    };
 
+    fetchAuthManagement();
+  }, [id]);
+
+//------------
   const onFinish = async (values: any) => {
     const { password } = values;
 
     try {
-      if (!email) {
-        message.error("Không tìm thấy địa chỉ email.");
+      if (!id) {
+        message.error("Không tìm thấy ID.");
         return;
       }
 
-      // Xác nhận mật khẩu mới
-      await firebase.auth().confirmPasswordReset(email, password);
+      const authManagementRef = firebase
+        .firestore()
+        .collection("authManagements")
+        .doc(id);
 
-      setIsSuccess(true);
+      await authManagementRef.update({ password: password });
+
+    
       message.success("Thay đổi mật khẩu thành công!");
 
       setTimeout(() => {
@@ -49,7 +84,11 @@ const ConfirmPassword: React.FC = () => {
           <div className="col-5">
             <div className="row px-5">
               <div className="col-12 text-center">
-                <img className="h-50 mt-5" src="../assets/image/logo.jpg" alt="" />
+                <img
+                  className="h-50 mt-5"
+                  src="../assets/image/logo.jpg"
+                  alt=""
+                />
               </div>
 
               <Form
@@ -102,7 +141,9 @@ const ConfirmPassword: React.FC = () => {
                           if (!value || getFieldValue("password") === value) {
                             return Promise.resolve();
                           }
-                          return Promise.reject(new Error("Mật khẩu không khớp!"));
+                          return Promise.reject(
+                            new Error("Mật khẩu không khớp!")
+                          );
                         },
                       }),
                     ]}
@@ -125,7 +166,11 @@ const ConfirmPassword: React.FC = () => {
             </div>
           </div>
           <div className="col-7">
-            <img className="img-fluid"  src="../assets/image/quenmatkhau.jpg" alt="" />
+            <img
+              className="img-fluid"
+              src="../assets/image/quenmatkhau.jpg"
+              alt=""
+            />
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Badge,
   Button,
@@ -32,44 +32,6 @@ const popoverContent = (
   ></Card>
 );
 
-const data = [
-  {
-    id: "2010001",
-    nameService: "Khám tim mạch",
-    time: "07:20 - 10/06/2023",
-    status: "Đang chờ",
-    service: "Kiosk",
-  },
-  {
-    id: "2010001",
-    nameService: "Khám tim mạch",
-    time: "07:20 - 10/06/2023",
-    status: "Đang chờ",
-    service: "Kiosk",
-  },
-  {
-    id: "2010001",
-    nameService: "Khám tim mạch",
-    time: "07:20 - 10/06/2023",
-    status: "Đang chờ",
-    service: "Kiosk",
-  },
-  {
-    id: "2010001",
-    nameService: "Khám tim mạch",
-    time: "07:20 - 10/06/2023",
-    status: "Đang chờ",
-    service: "Kiosk",
-  },
-  {
-    id: "2010001",
-    nameService: "Khám tim mạch",
-    time: "07:20 - 10/06/2023",
-    status: "Đang chờ",
-    service: "Kiosk",
-  },
-];
-
 const renderStatus = (status: string) => {
   let color = "";
   let text = "";
@@ -89,13 +51,68 @@ const renderStatus = (status: string) => {
 };
 
 interface ProgressiveData {
+  typeDevice: string;
+  id: string;
   number: string;
   nameService: firebase.firestore.DocumentReference | null;
   timeCreate: string;
   status: string;
   authManagementId: "";
 }
+
 function ListReport() {
+  const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
+
+  useEffect(() => {
+    const fetchProgressive = async () => {
+      const progressiveRef = firebase.firestore().collection("progressives");
+      const snapshot = await progressiveRef.get();
+      setProgressiveData(
+        await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const progressive = doc.data() as ProgressiveData;
+            progressive.id = doc.id;
+
+            const serviceRef = progressive.nameService;
+            if (
+              serviceRef &&
+              serviceRef instanceof firebase.firestore.DocumentReference
+            ) {
+              const serviceDoc = await serviceRef.get();
+              if (serviceDoc.exists) {
+                const serviceData = serviceDoc.data();
+                if (serviceData && serviceData.nameService) {
+                  const nameService = serviceData.nameService;
+                  progressive.nameService = nameService;
+                }
+              }
+            }
+
+            const authManagementId = progressive.authManagementId;
+            if (authManagementId) {
+              // Fetch the associated device document
+              const deviceRef = firebase
+                .firestore()
+                .collection("devices")
+                .where("authManagementId", "==", authManagementId);
+              const deviceSnapshot = await deviceRef.get();
+
+              if (!deviceSnapshot.empty) {
+                const deviceData = deviceSnapshot.docs[0].data();
+                const typeDevice = deviceData.typeDevice;
+                progressive.typeDevice = typeDevice;
+              }
+            }
+            
+            return progressive;
+          })
+        )
+      );
+    };
+
+    fetchProgressive();
+  }, []);
+  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -149,7 +166,7 @@ function ListReport() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={data}
+                  dataSource={progressiveData}
                 
                   pagination={{pageSize: 5}}
                   bordered
@@ -158,8 +175,8 @@ function ListReport() {
                 >
                   <Column
                     title={<span className="table-title">Số thứ tự</span>}
-                    dataIndex="id"
-                    key="id"
+                    dataIndex="number"
+                    key="number"
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
@@ -170,8 +187,8 @@ function ListReport() {
                   />
                   <Column
                     title={<span className="table-title">Thời gian cấp</span>}
-                    dataIndex="time"
-                    key="time"
+                    dataIndex="timeCreate"
+                    key="timeCreate"
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
@@ -182,8 +199,8 @@ function ListReport() {
                   />
                   <Column
                     title={<span className="table-title">Nguồn cấp</span>}
-                    dataIndex="service"
-                    key="service"
+                    dataIndex="typeDevice"
+                    key="typeDevice"
                     render={(text: string) => <span>{text}</span>}
                   />
                 </Table>

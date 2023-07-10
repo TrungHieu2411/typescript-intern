@@ -21,24 +21,25 @@ import "../../assets/css/style.css";
 //firebase
 import firebase from "firebase/compat/app";
 
-
 const popoverContent = (
-  <Card title="Thông báo" className="p-0 m-0" bordered={false} style={{ width: 270 }}></Card>
+  <Card
+    title="Thông báo"
+    className="p-0 m-0"
+    bordered={false}
+    style={{ width: 270 }}
+  ></Card>
 );
 
 const renderIsActive = (status: string) => {
   let color = "";
-  let text = "";
 
   if (status === "Hoạt động") {
     color = "#008000"; // Xanh lá cây
-    text = "Hoạt động";
   } else if (status === "Ngưng hoạt động") {
     color = "#FF0000"; // Đỏ
-    text = "Ngưng hoạt động";
   }
 
-  return <Badge color={color} text={text} />;
+  return <Badge color={color} text={status} />;
 };
 
 const renderIsConnected = (status: string) => {
@@ -61,29 +62,48 @@ interface DeviceData {
   codeDevice: string;
   nameDevice: string;
   ipAddress: string;
-  isActive: string;
   isConnected: string;
   service: string;
+  authManagementId: string;
+  isActive: string;
 }
 
 function ListDevices() {
+
+//------------
   const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
 
   useEffect(() => {
     const fetchDevice = async () => {
       const deviceRef = firebase.firestore().collection("devices");
-      await deviceRef.onSnapshot((snapshot) => {
-        const deviceData: DeviceData[] = [];
-        snapshot.forEach((doc) => {
-          const device = doc.data() as DeviceData;
-          device.id = doc.id; // Gán giá trị của id từ Firestore
-          deviceData.push(device);
-        });
-        setDeviceData(deviceData);
-      });
+      const snapshot = await deviceRef.get();
+      setDeviceData(
+        await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const device = doc.data() as DeviceData;
+            device.id = doc.id;
+
+            const authManagementId = device.authManagementId;
+            if (authManagementId) {
+              const deviceRef = firebase
+                .firestore()
+                .collection("authManagements")
+                .where("authManagementId", "==", authManagementId);
+              const deviceSnapshot = await deviceRef.get();
+
+              if (!deviceSnapshot.empty) {
+                const deviceData = deviceSnapshot.docs[0].data();
+                const isActive = deviceData.isActive;
+                device.isActive = isActive;
+              }
+            }
+            return device;
+          })
+        )
+      );
     };
     fetchDevice();
-  }); 
+  }, []);
 
   return (
     <Layout className="layout">
@@ -97,8 +117,16 @@ function ListDevices() {
               </div>
               <div className="col-auto">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button style={{ background: "#FFF2E7" }} type="ghost" shape="circle">
-                    <Popover placement="bottomLeft" content={popoverContent} trigger="click">
+                  <Button
+                    style={{ background: "#FFF2E7" }}
+                    type="ghost"
+                    shape="circle"
+                  >
+                    <Popover
+                      placement="bottomLeft"
+                      content={popoverContent}
+                      trigger="click"
+                    >
                       <BellFilled
                         style={{ color: "#FF7506" }}
                         className="fs-5 d-flex align-items-center justify-content-center"
@@ -119,10 +147,16 @@ function ListDevices() {
                     <label htmlFor="">Trạng thái hoạt động</label>
                   </div>
                   <div className="col-12">
-                    <Select size="large" defaultValue="all" style={{ width: 280 }}>
+                    <Select
+                      size="large"
+                      defaultValue="all"
+                      style={{ width: 280 }}
+                    >
                       <Select.Option value="all">Tất cả</Select.Option>
                       <Select.Option value="active">Hoạt động</Select.Option>
-                      <Select.Option value="inactive">Ngưng hoạt động</Select.Option>
+                      <Select.Option value="inactive">
+                        Ngưng hoạt động
+                      </Select.Option>
                     </Select>
                   </div>
                 </div>
@@ -134,10 +168,16 @@ function ListDevices() {
                     <label htmlFor="">Trạng thái kết nối</label>
                   </div>
                   <div className="col-12">
-                    <Select size="large" defaultValue="all" style={{ width: 280 }}>
+                    <Select
+                      size="large"
+                      defaultValue="all"
+                      style={{ width: 280 }}
+                    >
                       <Select.Option value="all">Tất cả</Select.Option>
                       <Select.Option value="connected">Kết nối</Select.Option>
-                      <Select.Option value="disconnected">Mất kết nối</Select.Option>
+                      <Select.Option value="disconnected">
+                        Mất kết nối
+                      </Select.Option>
                     </Select>
                   </div>
                 </div>
@@ -170,25 +210,41 @@ function ListDevices() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={deviceData}
-                  pagination={{pageSize: 5}}
+                  pagination={{ pageSize: 5 }}
                   bordered
                   className="mb-3"
                   rowClassName={() => "table-row"}
                 >
-                  <Table.Column title="Mã thiết bị" dataIndex="codeDevice" key="codeDevice" />
-                  <Table.Column title="Tên thiết bị" dataIndex="nameDevice" key="nameDevice" />
-                  <Table.Column title="Địa chỉ IP" dataIndex="ipAddress" key="ipAddress" />
+                  <Table.Column
+                    title="Mã thiết bị"
+                    dataIndex="codeDevice"
+                    key="codeDevice"
+                  />
+                  <Table.Column
+                    title="Tên thiết bị"
+                    dataIndex="nameDevice"
+                    key="nameDevice"
+                  />
+                  <Table.Column
+                    title="Địa chỉ IP"
+                    dataIndex="ipAddress"
+                    key="ipAddress"
+                  />
                   <Table.Column
                     title="Trạng thái hoạt động"
                     dataIndex="isActive"
                     key="isActive"
-                    render={(isActive: string) => renderIsActive(isActive)}
+                    render={(isActive: string) =>
+                      renderIsActive(isActive)
+                    }
                   />
                   <Table.Column
                     title="Trạng thái kết nối"
                     dataIndex="isConnected"
                     key="isConnected"
-                    render={(isConnected: string) => renderIsConnected(isConnected)}
+                    render={(isConnected: string) =>
+                      renderIsConnected(isConnected)
+                    }
                   />
                   <Table.Column
                     title="Dịch vụ sử dụng"
@@ -197,8 +253,12 @@ function ListDevices() {
                     width={220}
                     ellipsis={{ showTitle: false }}
                     render={(service: string) => (
-                      <Popover content={service} overlayStyle={{ maxWidth: 300 }} placement="topLeft">
-                        <span>{service + ", "}</span>
+                      <Popover
+                        content={service}
+                        overlayStyle={{ maxWidth: 300 }}
+                        placement="topLeft"
+                      >
+                        <span>{service + " "}</span>
                       </Popover>
                     )}
                   />
