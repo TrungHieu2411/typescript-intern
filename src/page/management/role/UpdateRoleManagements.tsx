@@ -11,6 +11,7 @@ import "../../../assets/css/style.css";
 //firebase
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
+import moment from "moment";
 
 const { Content } = Layout;
 
@@ -58,7 +59,32 @@ function UpdateRoleManagements() {
   }, [id]);
 
 //-------------
-  const handleUpdateRoleManagement = () => {
+
+ const addNoteToCollection = async (action: string) => {
+  const noteUsersCollection = firebase.firestore().collection("noteUsers");
+  const ipAddress = await fetch("https://api.ipify.org?format=json")
+    .then((response) => response.json())
+    .then((data) => data.ip)
+    .catch((error) => {
+      console.error("Failed to fetch IP address:", error);
+      return "";
+    });
+
+  // Lấy userId từ localStorage
+  const userName = localStorage.getItem('userName');
+  try {
+    await noteUsersCollection.add({
+      action: action,
+      timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+      ipAddress: ipAddress,
+      userName: userName,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+  const handleUpdateRoleManagement = async () => {
     const roleManagementRef = firebase.firestore().collection("roles").doc(id);
     const updatedRoleManagement = {
       nameRole: roleManagement.nameRole,
@@ -68,6 +94,9 @@ function UpdateRoleManagements() {
         groupB,
       },
     };
+
+ // Thêm ghi chú vào collection noteUsers
+ await addNoteToCollection(`Cập nhật vai trò: ${roleManagement.nameRole}`);
 
     roleManagementRef
       .update(updatedRoleManagement)
@@ -153,7 +182,6 @@ function UpdateRoleManagements() {
                             <TextArea
                               rows={5}
                               placeholder="Mô tả dịch vụ"
-                              maxLength={6}
                               value={roleManagement.description}
                               onChange={(e) =>
                                 setRoleManagement({

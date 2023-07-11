@@ -53,7 +53,6 @@ function DetailDevices() {
     password: "",
   });
 
-//------------
   useEffect(() => {
     const fetchDevice = async () => {
       const deviceRef = firebase.firestore().collection("devices").doc(id);
@@ -80,6 +79,7 @@ function DetailDevices() {
 
     fetchDevice();
   }, [id]);
+
 
   return (
     <Layout className="layout">

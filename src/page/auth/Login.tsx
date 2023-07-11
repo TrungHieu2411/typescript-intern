@@ -35,6 +35,7 @@ const Login: React.FC = () => {
 
         // Lưu trạng thái đăng nhập vào Local Storage
         localStorage.setItem("userId", userId);
+        localStorage.setItem("userName", userName);
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userStatus", "Hoạt động"); // Cập nhật trạng thái người dùng
 

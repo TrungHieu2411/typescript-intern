@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -6,11 +6,11 @@ import {
   DatePicker,
   Input,
   Layout,
-  Pagination,
   Popover,
   Row,
   Space,
   Table,
+  message,
 } from "antd";
 import { BellFilled, SearchOutlined } from "@ant-design/icons";
 import Column from "antd/es/table/Column";
@@ -19,6 +19,10 @@ import SlideMain from "../../../containers/SlideMain";
 import BreadCrumbTwo from "../../../components/BreadCrumb/BreadCrumbTwo";
 import Account from "../../../components/User/Account";
 import "../../../assets/css/style.css";
+
+
+//firebase
+import firebase from "firebase/compat/app";
 
 const { Content } = Layout;
 
@@ -30,28 +34,40 @@ const popoverContent = (
     style={{ width: 270 }}
   ></Card>
 );
-const data = [
-  {
-    id: "1",
-    name: "Quản trị viên",
-    ipAddress: "10",
-    cn: "Cập nhật",
-  },
-  {
-    id: "2",
-    name: "Người dùng thông thường",
-    ipAddress: "25",
-    cn: "Cập nhật",
-  },
-  {
-    id: "3",
-    name: "Quản lý nội dung",
-    ipAddress: "8",
-    cn: "Cập nhật",
-  },
-];
 
+interface NoteUserData {
+  userName: string;
+  timeAction: string;
+  ipAddress: string;
+  action: string;
+}
 function UserLogManagements() {
+  const [noteUserData, setNoteUserData] = useState<NoteUserData[]>([]);
+
+  useEffect(() => {
+    const fetchNoteUser = async () => {
+      try {
+        const serviceRef = firebase.firestore().collection("noteUsers");
+        const snapshot = await serviceRef.get();
+
+        const serviceData = snapshot.docs.map(async (doc) => {
+          const service = doc.data() as NoteUserData;
+         
+          return service;
+        });
+
+        const resolvedServiceData = await Promise.all(serviceData);
+        setNoteUserData(resolvedServiceData);
+      } catch (error) {
+        console.log(error);
+        message.error("Failed to fetch service data.");
+      }
+    };
+
+    fetchNoteUser();
+  }, []);
+
+  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -122,24 +138,26 @@ function UserLogManagements() {
             <div className="row mt-3">
               <div className="col-11">
                 <Table
-                  dataSource={data}
+                  dataSource={noteUserData}
                  
                   pagination={{pageSize: 5}}
                   bordered
+
+                  rowClassName={() => "table-row"}
                   className="mb-3"
                 >
                   <Column
                     title={<span className="table-title">Tên đăng nhập</span>}
-                    dataIndex="id"
-                    key="id"
+                    dataIndex="userName"
+                    key="userName"
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
                     title={
                       <span className="table-title">Thời gian tác động</span>
                     }
-                    dataIndex="name"
-                    key="name"
+                    dataIndex="timeAction"
+                    key="timeAction"
                     render={(text: string) => <span>{text}</span>}
                   />
                   <Column
@@ -152,8 +170,8 @@ function UserLogManagements() {
                     title={
                       <span className="table-title">Thao tác thực hiện</span>
                     }
-                    dataIndex="cn"
-                    key="cn"
+                    dataIndex="action"
+                    key="action"
                     render={(text: string) => <span>{text}</span>}
                   />
                 </Table>

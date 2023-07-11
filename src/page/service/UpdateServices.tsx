@@ -20,6 +20,7 @@ import firebase from "firebase/compat/app";
 
 import { useParams } from "react-router-dom";
 import BreadCrumbFour from "../../components/BreadCrumb/BreadCrumbFour";
+import moment from "moment";
 
 const popoverContent = (
   <Card
@@ -57,13 +58,42 @@ function UpdateServices() {
   }, [id]);
 
 //------------
-  const handleUpdateService = () => {
+
+const addNoteToCollection = async (action: string) => {
+  const noteUsersCollection = firebase.firestore().collection("noteUsers");
+  const ipAddress = await fetch("https://api.ipify.org?format=json")
+    .then((response) => response.json())
+    .then((data) => data.ip)
+    .catch((error) => {
+      console.error("Failed to fetch IP address:", error);
+      return "";
+    });
+
+  // Lấy userId từ localStorage
+  const userName = localStorage.getItem('userName');
+  try {
+    await noteUsersCollection.add({
+      action: action,
+      timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+      ipAddress: ipAddress,
+      userName: userName,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+  
+  const handleUpdateService = async () => {
     const serviceRef = firebase.firestore().collection("services").doc(id);
     const updateService = {
       codeService: service.codeService,
       nameService: service.nameService,
       description: service.description,
     };
+
+ // Thêm ghi chú vào collection noteUsers
+    await addNoteToCollection(`Cập nhật dịch vụ: ${service.codeService}`);
+
 
     serviceRef
       .update(updateService)

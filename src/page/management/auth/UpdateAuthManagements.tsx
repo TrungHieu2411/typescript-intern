@@ -11,6 +11,7 @@ import "../../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 
 import { useParams } from "react-router-dom";
+import moment from "moment";
 
 const { Content } = Layout;
 
@@ -70,7 +71,32 @@ function UpdateAuthManagements() {
   }, [id]);
 
 //-------------
-  const handleUpdateAuthManagement = () => {
+
+const addNoteToCollection = async (action: string) => {
+  const noteUsersCollection = firebase.firestore().collection("noteUsers");
+  const ipAddress = await fetch("https://api.ipify.org?format=json")
+    .then((response) => response.json())
+    .then((data) => data.ip)
+    .catch((error) => {
+      console.error("Failed to fetch IP address:", error);
+      return "";
+    });
+
+  // Lấy userId từ localStorage
+  const userName = localStorage.getItem('userName');
+  try {
+    await noteUsersCollection.add({
+      action: action,
+      timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+      ipAddress: ipAddress,
+      userName: userName,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+  const handleUpdateAuthManagement = async () => {
     const userRef = firebase.firestore().collection("authManagements").doc(id);
   const updatedUser: AuthManagementData = {
     fullName: authManagement.fullName,
@@ -82,6 +108,8 @@ function UpdateAuthManagements() {
     password: authManagement.password,
     id: authManagement.id,
   };
+ // Thêm ghi chú vào collection noteUsers
+ await addNoteToCollection(`Cập nhật thông tin tài khoản: ${authManagement.userName}`);
 
   userRef
     .update(updatedUser)

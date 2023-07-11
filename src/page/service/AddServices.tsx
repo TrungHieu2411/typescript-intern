@@ -11,6 +11,7 @@ import "../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import Account from "../../components/User/Account";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
+import moment from "moment";
 
 const popoverContent = (
   <Card
@@ -36,7 +37,10 @@ function AddServices() {
     setIsAutoIncrement(e.target.checked);
   };
 
-  const generateProgressiveId = (currentNumber: number, isAutoIncrement: boolean): number => {
+  const generateProgressiveId = (
+    currentNumber: number,
+    isAutoIncrement: boolean
+  ): number => {
     let progressiveId = currentNumber;
 
     if (isAutoIncrement) {
@@ -45,7 +49,7 @@ function AddServices() {
 
     return progressiveId;
   };
-//------------
+  //------------
   const [currentNumber, setCurrentNumber] = useState<number>(200000);
   useEffect(() => {
     const fetchNextProgressiveId = async () => {
@@ -53,7 +57,9 @@ function AddServices() {
       const snapshot = await serviceCollection.get();
 
       if (snapshot.docs.length > 0) {
-        const lastService = snapshot.docs[snapshot.docs.length - 1].data() as ServiceData;
+        const lastService = snapshot.docs[
+          snapshot.docs.length - 1
+        ].data() as ServiceData;
         setCurrentNumber(lastService.progressiveId);
       } else {
         setCurrentNumber(200000);
@@ -63,7 +69,7 @@ function AddServices() {
     fetchNextProgressiveId();
   }, []);
 
-//------------
+  //------------
   const [newService, setNewService] = useState<ServiceData>({
     id: "",
     codeService: "",
@@ -72,6 +78,30 @@ function AddServices() {
     progressiveId: 0,
   });
 
+  const addNoteToCollection = async (action: string) => {
+    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const ipAddress = await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => data.ip)
+      .catch((error) => {
+        console.error("Failed to fetch IP address:", error);
+        return "";
+      });
+  
+    // Lấy userId từ localStorage
+    const userName = localStorage.getItem('userName');
+    try {
+      await noteUsersCollection.add({
+        action: action,
+        timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+        ipAddress: ipAddress,
+        userName: userName,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
   const onFinish = async () => {
     const serviceCollection = firebase.firestore().collection("services");
 
@@ -82,6 +112,9 @@ function AddServices() {
         description: newService.description,
         progressiveId: generateProgressiveId(currentNumber, isAutoIncrement),
       });
+
+      // Thêm ghi chú vào collection noteUsers
+    await addNoteToCollection(`Thêm mới dịch vụ: ${newService.codeService}`);
 
       setNewService({
         id: "",
@@ -98,7 +131,7 @@ function AddServices() {
     }
   };
 
-//------------
+  //------------
   const [form] = Form.useForm();
 
   const handleAddService = () => {
@@ -277,10 +310,7 @@ function AddServices() {
                     </tr>
                     <tr>
                       <td>
-                        <Checkbox
-                          className="blue-checkbox"
-                          id="prefix"
-                        >
+                        <Checkbox className="blue-checkbox" id="prefix">
                           Prefix
                         </Checkbox>
                       </td>
@@ -293,10 +323,7 @@ function AddServices() {
                     </tr>
                     <tr>
                       <td>
-                        <Checkbox
-                          className="blue-checkbox"
-                          id="suffix"
-                        >
+                        <Checkbox className="blue-checkbox" id="suffix">
                           Suffix
                         </Checkbox>
                       </td>
@@ -309,10 +336,7 @@ function AddServices() {
                     </tr>
                     <tr>
                       <td>
-                        <Checkbox
-                          className="blue-checkbox"
-                          id="resetMoiNgay"
-                        >
+                        <Checkbox className="blue-checkbox" id="resetMoiNgay">
                           Reset mỗi ngày
                         </Checkbox>
                       </td>

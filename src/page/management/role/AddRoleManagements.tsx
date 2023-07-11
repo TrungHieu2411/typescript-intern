@@ -10,6 +10,7 @@ import "../../../assets/css/style.css";
 
 // firebase
 import firebase from "firebase/compat/app";
+import moment from "moment";
 
 const { Content } = Layout;
 
@@ -39,6 +40,31 @@ function AddRoleManagements() {
   const [groupB, setGroupB] = useState<boolean[]>([]);
 
 //-------------
+
+const addNoteToCollection = async (action: string) => {
+  const noteUsersCollection = firebase.firestore().collection("noteUsers");
+  const ipAddress = await fetch("https://api.ipify.org?format=json")
+    .then((response) => response.json())
+    .then((data) => data.ip)
+    .catch((error) => {
+      console.error("Failed to fetch IP address:", error);
+      return "";
+    });
+
+  // Lấy userId từ localStorage
+  const userName = localStorage.getItem('userName');
+  try {
+    await noteUsersCollection.add({
+      action: action,
+      timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+      ipAddress: ipAddress,
+      userName: userName,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+  
   const handleAddRoleManagement = async () => {
     const roleManagementCollection = firebase.firestore().collection("roles");
 
@@ -51,6 +77,10 @@ function AddRoleManagements() {
           groupB,
         },
       });
+
+
+ // Thêm ghi chú vào collection noteUsers
+ await addNoteToCollection(`Thêm mới vai trò: ${newRoleManagement.nameRole}`);
 
       // Thực hiện điều hướng đến trang danh sách vai trò
       window.location.href = "/roleManagement";

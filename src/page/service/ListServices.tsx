@@ -6,11 +6,11 @@ import {
   DatePicker,
   Input,
   Layout,
-  Pagination,
   Popover,
   Select,
   Space,
   Table,
+  message,
 } from "antd";
 
 import { BellFilled, SearchOutlined } from "@ant-design/icons";
@@ -49,30 +49,74 @@ const renderIsActive = (status: string) => {
 };
 
 interface ServiceData {
+  number: string;
+  progressiveId: string;
+  isActive: string;
+  authManagementId: string;
   id: string;
   codeService: string;
   nameService: string;
   description: string;
 }
 function ListService() {
-  //------------
   const [serviceData, setServiceData] = useState<ServiceData[]>([]);
 
   useEffect(() => {
-    const fetchService = async () => {
-      const serviceRef = firebase.firestore().collection("services");
-      await serviceRef.onSnapshot((snapshot) => {
-        const serviceData: ServiceData[] = [];
-        snapshot.forEach((doc) => {
-          const service = doc.data() as ServiceData;
-          service.id = doc.id;
-          serviceData.push(service);
-        });
+    const fetchServiceData = async () => {
+      try {
+        const serviceRef = firebase.firestore().collection("services");
+        const snapshot = await serviceRef.get();
+  
+        const serviceData = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const service = doc.data() as ServiceData;
+            service.id = doc.id;
+  
+            const progressiveId = service.progressiveId;
+            if (progressiveId) {
+              const progressiveRef = firebase
+                .firestore()
+                .collection("progressives")
+                .where("number", "==", progressiveId);
+              const progressiveSnapshot = await progressiveRef.get();
+  
+              if (!progressiveSnapshot.empty) {
+                const progressiveData = progressiveSnapshot.docs[0].data();
+                const authManagementId = progressiveData.authManagementId;
+  
+                if (authManagementId) {
+                  const authManagementRef = firebase
+                    .firestore()
+                    .collection("authManagements")
+                    .doc(authManagementId);
+                  const authManagementSnapshot = await authManagementRef.get();
+  
+                  if (authManagementSnapshot.exists) {
+                    const authManagementData = authManagementSnapshot.data();
+                    if (authManagementData) {
+                      const isActive = authManagementData.isActive;
+                      service.isActive = isActive;
+                    }
+                  }
+                }
+              }
+            }
+  
+            return service;
+          })
+        );
+  
         setServiceData(serviceData);
-      })
-    }
-    fetchService();
-  })
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+        message.error("Failed to fetch service data.");
+      }
+    };
+  
+    fetchServiceData();
+  }, []);
+  
+  
 
   return (
     <Layout className="layout">

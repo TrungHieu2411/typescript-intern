@@ -12,14 +12,32 @@ import Sider from "antd/es/layout/Sider";
 import SubMenu from "antd/es/menu/SubMenu";
 import Link from "antd/es/typography/Link";
 
+import firebase from "firebase/compat/app";
+
 function SlideMain() {
+  const deleteNoteUsersCollection = async () => {
+    const noteUsersCollectionRef = firebase.firestore().collection("noteUsers");
+  
+    try {
+      const snapshot = await noteUsersCollectionRef.get();
+  
+      // Delete collection noteUsers
+      snapshot.forEach((doc) => {
+        doc.ref.delete();
+      });
+  
+      console.log("Bảng noteUsers đã được xóa thành công");
+    } catch (error) {
+      console.error("Lỗi khi xóa bảng noteUsers:", error);
+    }
+  };
+
   const handleLogoutClick = () => {
     console.log("Bấm nút Đăng xuất");
-
     localStorage.removeItem("userId");
     localStorage.setItem("isLoggedIn", "false"); // Cập nhật giá trị isLoggedIn thành false
     localStorage.setItem("userStatus", "Ngưng hoạt động"); // Cập nhật trạng thái người dùng
-
+   
   };
 
   return (

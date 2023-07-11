@@ -15,6 +15,9 @@ import SlideMain from "../../containers/SlideMain";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import "../../assets/css/style.css";
 import firebase from "firebase/compat/app";
+import { useDispatch } from "react-redux";
+import { createDevice } from "../../redux/device/deviceSlice";
+import moment from "moment";
 const popoverContent = <div></div>;
 
 interface DeviceData {
@@ -36,6 +39,8 @@ interface AuthManagementData {
 }
 
 function AddDevices() {
+
+  const dispatch = useDispatch();
   //------------
   const [service, setService] = useState<{ id: String; nameService: string }[]>([]);
   useEffect(() => {
@@ -75,30 +80,39 @@ function AddDevices() {
   });
 
 //------------
-  const onFinish = async () => {
-    const deviceCollection = firebase.firestore().collection("devices");
-    // Hiển thị thông báo "Thiết bị đã được thêm thành công"
-    message.success("Thiết bị đã được thêm thành công");
-    try {
-      await deviceCollection.add({
-        codeDevice: newDevice.codeDevice,
-        nameDevice: newDevice.nameDevice,
-        ipAddress: newDevice.ipAddress,
-        isActive: newDevice.isActive,
-        isConnected: newDevice.isConnected,
-        service: newDevice.service,
-        typeDevice: newDevice.typeDevice,
-      });
+const onFinish = async () => {
+  const authManagementInfo = { userName: authManagement.userName, password: authManagement.password };
+  await dispatch(createDevice(newDevice, authManagementInfo) as any);
+};
 
-      // Thực hiện điều hướng đến trang danh sách sản phẩm
-      window.location.href = "/device";
+//------------
+  const [form] = Form.useForm();
+
+  const addNoteToCollection = async (action: string) => {
+    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const ipAddress = await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => data.ip)
+      .catch((error) => {
+        console.error("Failed to fetch IP address:", error);
+        return "";
+      });
+  
+    // Lấy userId từ localStorage
+    const userName = localStorage.getItem('userName');
+    try {
+      await noteUsersCollection.add({
+        action: action,
+        timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+        ipAddress: ipAddress,
+        userName: userName,
+      });
     } catch (error) {
       console.error(error);
     }
   };
-
-//------------
-  const [form] = Form.useForm();
+  
+  
   const handleAddDevice = async () => {
     try {
       // Kiểm tra và submit form
@@ -127,12 +141,13 @@ function AddDevices() {
           nameDevice: newDevice.nameDevice,
           ipAddress: newDevice.ipAddress,
           isActive: newDevice.isActive,
-          isConnected: newDevice.isConnected,
           service: newDevice.service,
           typeDevice: newDevice.typeDevice,
           authManagementId: authManagementId,
         });
-  
+          // Thêm ghi chú vào collection noteUsers
+  await addNoteToCollection(`Thêm mới thiết bị: ${newDevice.codeDevice}`);
+
         // Thực hiện điều hướng đến trang danh sách sản phẩm
         window.location.href = "/device";
       } else {
@@ -143,7 +158,6 @@ function AddDevices() {
     }
   };
   
-
   return (
     <Layout className="layout">
       <SlideMain />

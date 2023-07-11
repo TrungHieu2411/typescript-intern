@@ -8,6 +8,7 @@ import "../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import { useParams } from "react-router-dom";
+import moment from "moment";
 
 const { Content } = Layout;
 
@@ -128,6 +129,30 @@ function AddProgressives() {
     }
   };
 
+  const addNoteToCollection = async (action: string) => {
+    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const ipAddress = await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => data.ip)
+      .catch((error) => {
+        console.error("Failed to fetch IP address:", error);
+        return "";
+      });
+  
+    // Lấy userId từ localStorage
+    const userName = localStorage.getItem('userName');
+    try {
+      await noteUsersCollection.add({
+        action: action,
+        timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+        ipAddress: ipAddress,
+        userName: userName,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
   const handleAddProgressive = async () => {
     const progressiveCollection = firebase.firestore().collection("progressives");
     const progressiveId = selectedServiceData?.progressiveId;
@@ -145,6 +170,9 @@ function AddProgressives() {
         status: "Đang chờ",
       });
 
+
+ // Thêm ghi chú vào collection noteUsers
+ await addNoteToCollection(`Thêm mới cấp số: ${progressiveId}`);
 
       window.location.href = "/progressive";
     } catch (error) {

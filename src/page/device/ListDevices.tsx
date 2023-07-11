@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Badge,
   Button,
@@ -20,6 +20,9 @@ import "../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
+import { setData } from "../../redux/device/deviceSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 const popoverContent = (
   <Card
@@ -69,41 +72,48 @@ interface DeviceData {
 }
 
 function ListDevices() {
-
-//------------
-  const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
+  const dispatch = useDispatch();
+  const deviceData = useSelector((state: RootState) => state.firestoreDeviceData.data);
 
   useEffect(() => {
     const fetchDevice = async () => {
-      const deviceRef = firebase.firestore().collection("devices");
-      const snapshot = await deviceRef.get();
-      setDeviceData(
-        await Promise.all(
+      try {
+        const deviceRef = firebase.firestore().collection("devices");
+        const snapshot = await deviceRef.get();
+
+        const deviceData = await Promise.all(
           snapshot.docs.map(async (doc) => {
             const device = doc.data() as DeviceData;
             device.id = doc.id;
-
+        
             const authManagementId = device.authManagementId;
             if (authManagementId) {
-              const deviceRef = firebase
+              const authManagementRef = firebase
                 .firestore()
                 .collection("authManagements")
-                .where("authManagementId", "==", authManagementId);
-              const deviceSnapshot = await deviceRef.get();
-
-              if (!deviceSnapshot.empty) {
-                const deviceData = deviceSnapshot.docs[0].data();
-                const isActive = deviceData.isActive;
-                device.isActive = isActive;
+                .doc(authManagementId);
+              const authManagementSnapshot = await authManagementRef.get();
+        
+              if (authManagementSnapshot.exists) {
+                const authManagementData = authManagementSnapshot.data();
+                if (authManagementData) {
+                  const isActive = authManagementData.isActive;
+                  device.isActive = isActive;
+                }
               }
             }
             return device;
           })
-        )
-      );
+        );
+
+        dispatch(setData(deviceData));
+      } catch (error) {
+        console.log(error);
+      }
     };
+
     fetchDevice();
-  }, []);
+  }, [dispatch]);
 
   return (
     <Layout className="layout">

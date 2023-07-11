@@ -9,6 +9,9 @@ import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 //firebase
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
+import { updateDevice } from "../../redux/device/deviceSlice";
+import { useDispatch } from "react-redux";
+import moment from "moment";
 
 const popoverContent = (
   <Card
@@ -58,8 +61,10 @@ function UpdateDevices() {
   const [authManagement, setAuthManagement] = useState<AuthManagementData>({
     userName: "",
     password: "",
-  })
-//-------------
+  });
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const fetchDevice = async () => {
       const deviceRef = firebase.firestore().collection("devices").doc(id);
@@ -70,7 +75,10 @@ function UpdateDevices() {
         setDevice(deviceData);
 
         if (deviceData.authManagementId) {
-          const authManagementRef = firebase.firestore().collection("authManagements").doc(deviceData.authManagementId);
+          const authManagementRef = firebase
+            .firestore()
+            .collection("authManagements")
+            .doc(deviceData.authManagementId);
           const authManagementSnapshot = await authManagementRef.get();
 
           if (authManagementSnapshot.exists) {
@@ -84,10 +92,34 @@ function UpdateDevices() {
     fetchDevice();
   }, [id]);
 
-//-------------
-  const handleUpdateDevice = () => {
-    const deviceRef = firebase.firestore().collection("devices").doc(id);
+  const addNoteToCollection = async (action: string) => {
+    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const ipAddress = await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => data.ip)
+      .catch((error) => {
+        console.error("Failed to fetch IP address:", error);
+        return "";
+      });
+  
+    // Lấy userId từ localStorage
+    const userName = localStorage.getItem('userName');
+    try {
+      await noteUsersCollection.add({
+        action: action,
+        timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+        ipAddress: ipAddress,
+        userName: userName,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  
+  const handleUpdateDevice = async () => {
     const updatedDevice = {
+      id:"",
       codeDevice: device.codeDevice,
       nameDevice: device.nameDevice,
       ipAddress: device.ipAddress,
@@ -95,17 +127,18 @@ function UpdateDevices() {
       isConnected: device.isConnected,
       service: device.service,
       typeDevice: device.typeDevice,
+      authManagementId: device.authManagementId,
     };
 
-    deviceRef
-      .update(updatedDevice)
-      .then(() => {
-        console.log("Device updated successfully!");
-        window.location.href = "/device";
-      })
-      .catch((error) => {
-        console.error("Error updating device:", error);
-      });
+ // Thêm ghi chú vào collection noteUsers
+ await addNoteToCollection(`Cập nhật thông tin thiết bị: ${device.codeDevice}`);
+
+    const authManagementInfo = {
+      userName: authManagement.userName,
+      password: authManagement.password,
+    };
+
+    dispatch(updateDevice(updatedDevice, authManagementInfo) as any);
   };
   
   return (

@@ -8,7 +8,6 @@ import {
   Form,
   Input,
   Layout,
-  Pagination,
   Popover,
   Select,
   Space,
@@ -34,74 +33,6 @@ const popoverContent = (
   ></Card>
 );
 
-const data = [
-  {
-    id: 1,
-    name: "Thiết bị A",
-    ipAddress: "192.168.1.1",
-    isActive: "Đã hoàn thành",
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 2,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: "Đã hoàn thành",
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 3,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: "Đang thực hiện",
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 4,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: "Vắng",
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 5,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: "Đã hoàn thành",
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 6,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: "Đang thực hiện",
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 7,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: "Vắng",
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  {
-    id: 8,
-    name: "Thiết bị B",
-    ipAddress: "192.168.1.2",
-    isActive: "Đã hoàn thành",
-    ct: "Chi tiết",
-    cn: "Cập nhật",
-  },
-  // ...Thêm dữ liệu của các thiết bị khác
-];
-
 interface ServiceData {
   codeService: string;
   nameService: string;
@@ -116,10 +47,10 @@ const renderIsActive = (status: string) => {
   if (status === "Vắng") {
     color = "#535261"; // Xanh lá cây
     text = "Vắng";
-  } else if (status === "Đang thực hiện") {
+  } else if (status === "Đang chờ") {
     color = "#5490EB"; // Đỏ
     text = "Đang thực hiện";
-  } else if (status === "Đã hoàn thành") {
+  } else if (status === "Đã sử dụng") {
     color = "#34CD26"; // Đỏ
     text = "Đã hoàn thành";
   }
@@ -127,6 +58,11 @@ const renderIsActive = (status: string) => {
   return <Badge color={color} text={text} />;
 };
 
+interface ProgressiveData {
+  id: string;
+  number: string;
+  status: string;
+}
 function DetailServices() {
   const { id } = useParams<{ id: string }>();
   //------------
@@ -149,6 +85,27 @@ function DetailServices() {
     };
     fetchService();
   }, [id]);
+   //------------
+  const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
+
+  useEffect(() => {
+    const fetchProgressive = async () => {
+      const progressiveRef = firebase.firestore().collection("progressives");
+      const snapshot = await progressiveRef.get();
+      setProgressiveData(
+        await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const progressive = doc.data() as ProgressiveData;
+            progressive.id = doc.id;
+
+            return progressive;
+          })
+        )
+      );
+    };
+
+    fetchProgressive();
+  }, []);
 
   return (
     <Layout className="layout">
@@ -328,31 +285,26 @@ function DetailServices() {
                   </div>
                   <div className="row mt-3">
                     <Table
-                      dataSource={data}
-                      pagination={false}
+                      dataSource={progressiveData}
+                        pagination={{ pageSize: 5 }}
                       size="small"
                       rowClassName={() => "table-row"}
                       className="custom-table mb-4 pb-3"
                     >
                       <Table.Column
                         title={<span className="table-title">Số thứ tự</span>}
-                        dataIndex="id"
-                        key="id"
+                        dataIndex="number"
+                        key="number"
                         render={(text: string) => <span>{text}</span>}
                       />
                       <Table.Column
                         title={<span className="table-title">Trạng thái</span>}
-                        dataIndex="isActive"
-                        key="isActive"
-                        render={(isActive: string) => renderIsActive(isActive)}
+                        dataIndex="status"
+                        key="status"
+                        render={(status: string) => renderIsActive(status)}
                       />
                     </Table>
                   </div>
-                  <Pagination
-                    total={100}
-                    showSizeChanger={false}
-                    style={{ textAlign: "right" }}
-                  />
                 </Card>
               </div>
               <div className="col-1 mt-3">

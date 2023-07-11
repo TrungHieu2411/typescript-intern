@@ -69,6 +69,7 @@ function Admin() {
     userName: user.userName,
     password: user.password,
     id: user.id,
+    
   };
 
   userRef
@@ -80,6 +81,11 @@ function Admin() {
       console.error("Error updating AuthManagement:", error);
     });
 };
+ // Lưu userName vào localStorage
+ useEffect(() => {
+  localStorage.setItem("userName", user.userName);
+}, [user.userName]);
+
 //Cập nhật ảnh
   const handleImageUpload = async (file: any) => {
     setLoadingImage(true);
@@ -99,6 +105,7 @@ function Admin() {
   };
 //Lấy id tài khoản
   const storedUserId = localStorage.getItem('userId');
+  
   useEffect(() => {
     const fetchUser = async () => {
       const userRef = firebase
