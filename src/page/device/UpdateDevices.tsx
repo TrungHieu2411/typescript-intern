@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Form, Input, Layout, Popover, Select } from "antd";
-import { BellFilled } from "@ant-design/icons";
-
+import { Button, Card, Form, Input, Layout, Select, message } from "antd";
 import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
@@ -12,15 +10,6 @@ import { useParams } from "react-router-dom";
 import { updateDevice } from "../../redux/device/deviceSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 const tags = [
   " Khám tim mạch",
@@ -82,7 +71,8 @@ function UpdateDevices() {
           const authManagementSnapshot = await authManagementRef.get();
 
           if (authManagementSnapshot.exists) {
-            const authManagementData = authManagementSnapshot.data() as AuthManagementData;
+            const authManagementData =
+              authManagementSnapshot.data() as AuthManagementData;
             setAuthManagement(authManagementData);
           }
         }
@@ -101,9 +91,9 @@ function UpdateDevices() {
         console.error("Failed to fetch IP address:", error);
         return "";
       });
-  
+
     // Lấy userId từ localStorage
-    const userName = localStorage.getItem('userName');
+    const userName = localStorage.getItem("userName");
     try {
       await noteUsersCollection.add({
         action: action,
@@ -115,11 +105,10 @@ function UpdateDevices() {
       console.error(error);
     }
   };
-  
-  
+
   const handleUpdateDevice = async () => {
     const updatedDevice = {
-      id:"",
+      id: device.authManagementId,
       codeDevice: device.codeDevice,
       nameDevice: device.nameDevice,
       ipAddress: device.ipAddress,
@@ -130,8 +119,13 @@ function UpdateDevices() {
       authManagementId: device.authManagementId,
     };
 
- // Thêm ghi chú vào collection noteUsers
- await addNoteToCollection(`Cập nhật thông tin thiết bị: ${device.codeDevice}`);
+    message.success(
+      `Cập nhật thông tin thiết bị ${device.nameDevice} thành công!`
+    );
+    // Thêm ghi chú vào collection noteUsers
+    await addNoteToCollection(
+      `Cập nhật thông tin thiết bị: ${device.codeDevice}`
+    );
 
     const authManagementInfo = {
       userName: authManagement.userName,
@@ -140,7 +134,7 @@ function UpdateDevices() {
 
     dispatch(updateDevice(updatedDevice, authManagementInfo) as any);
   };
-  
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -158,22 +152,6 @@ function UpdateDevices() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>

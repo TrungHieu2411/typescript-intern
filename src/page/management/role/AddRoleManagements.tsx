@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Button, Card, Checkbox, Form, Input, Layout, Popover } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Button, Card, Checkbox, Form, Input, Layout, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import SlideMain from "../../../containers/SlideMain";
@@ -14,23 +13,13 @@ import moment from "moment";
 
 const { Content } = Layout;
 
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
-
 interface RoleManagementData {
   nameRole: string;
   description: string;
 }
 
 function AddRoleManagements() {
-
-//-------------
+  //-------------
   const [newRoleManagement, setNewRoleManagement] =
     useState<RoleManagementData>({
       nameRole: "",
@@ -39,32 +28,32 @@ function AddRoleManagements() {
   const [groupA, setGroupA] = useState<boolean[]>([]);
   const [groupB, setGroupB] = useState<boolean[]>([]);
 
-//-------------
+  //-------------
 
-const addNoteToCollection = async (action: string) => {
-  const noteUsersCollection = firebase.firestore().collection("noteUsers");
-  const ipAddress = await fetch("https://api.ipify.org?format=json")
-    .then((response) => response.json())
-    .then((data) => data.ip)
-    .catch((error) => {
-      console.error("Failed to fetch IP address:", error);
-      return "";
-    });
+  const addNoteToCollection = async (action: string) => {
+    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const ipAddress = await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => data.ip)
+      .catch((error) => {
+        console.error("Failed to fetch IP address:", error);
+        return "";
+      });
 
-  // Lấy userId từ localStorage
-  const userName = localStorage.getItem('userName');
-  try {
-    await noteUsersCollection.add({
-      action: action,
-      timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
-      ipAddress: ipAddress,
-      userName: userName,
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
-  
+    // Lấy userId từ localStorage
+    const userName = localStorage.getItem("userName");
+    try {
+      await noteUsersCollection.add({
+        action: action,
+        timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+        ipAddress: ipAddress,
+        userName: userName,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleAddRoleManagement = async () => {
     const roleManagementCollection = firebase.firestore().collection("roles");
 
@@ -77,10 +66,11 @@ const addNoteToCollection = async (action: string) => {
           groupB,
         },
       });
-
-
- // Thêm ghi chú vào collection noteUsers
- await addNoteToCollection(`Thêm mới vai trò: ${newRoleManagement.nameRole}`);
+      message.success(`Thêm mới vai trò ${newRoleManagement.nameRole} thành công!`)
+      // Thêm ghi chú vào collection noteUsers
+      await addNoteToCollection(
+        `Thêm mới vai trò: ${newRoleManagement.nameRole}`
+      );
 
       // Thực hiện điều hướng đến trang danh sách vai trò
       window.location.href = "/roleManagement";
@@ -106,22 +96,6 @@ const addNoteToCollection = async (action: string) => {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -150,7 +124,7 @@ const addNoteToCollection = async (action: string) => {
                                   nameRole: e.target.value,
                                 })
                               }
-                              placeholder="203"
+                              placeholder="Nhập tên vai trò"
                             />
                           </Form.Item>
                         </div>
@@ -161,7 +135,7 @@ const addNoteToCollection = async (action: string) => {
                           <Form.Item className="">
                             <TextArea
                               rows={5}
-                              placeholder="Mô tả dịch vụ"
+                              placeholder="Mô tả vai trò"
                               value={newRoleManagement.description}
                               onChange={(e) =>
                                 setNewRoleManagement({

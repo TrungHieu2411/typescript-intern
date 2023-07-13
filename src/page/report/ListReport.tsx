@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Badge,
-  Button,
-  Card,
-  DatePicker,
-  Layout,
-  Popover,
-  Table,
-} from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Badge, Card, DatePicker, Layout, Table } from "antd";
 import { Link } from "react-router-dom";
 
 import SlideMain from "../../containers/SlideMain";
@@ -22,15 +13,6 @@ import "firebase/compat/firestore";
 
 const { Content } = Layout;
 const { Column } = Table;
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 const renderStatus = (status: string) => {
   let color = "";
@@ -103,7 +85,7 @@ function ListReport() {
                 progressive.typeDevice = typeDevice;
               }
             }
-            
+
             return progressive;
           })
         )
@@ -112,7 +94,7 @@ function ListReport() {
 
     fetchProgressive();
   }, []);
-  
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -125,22 +107,6 @@ function ListReport() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -167,8 +133,7 @@ function ListReport() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={progressiveData}
-                
-                  pagination={{pageSize: 5}}
+                  pagination={{ pageSize: 5 }}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"

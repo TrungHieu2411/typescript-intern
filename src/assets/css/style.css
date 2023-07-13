@@ -138,3 +138,62 @@ a:hover {
 .table-row:nth-child(even) {
   background-color: #FFF2E7;
 }
+
+
+.list-item-wrapper {
+  position: relative;
+  display: block;
+}
+
+.item-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 8px;
+  background: #FF9138;
+  color: #FFFFFF;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.card-container canvas {
+  width: 720px !important;
+  height: 300px !important;
+}
+
+/* //------------ */
+.hide-datepicker {
+  opacity: 0;
+  transform: scale(0.1);
+  font-size: 0px;
+}
+
+.ant-picker-footer {
+  display: none;
+}
+
+
+.progress-container {
+  position: relative;
+  display: inline-block;
+}
+
+.outer-progress {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.inner-progress {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.inner-progress .ant-progress-text {
+  display: contents;
+}
+

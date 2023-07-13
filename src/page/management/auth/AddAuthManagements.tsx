@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Form, Input, Layout, Popover, Select } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Button, Card, Form, Input, Layout, Select, message } from "antd";
 import { Option } from "antd/lib/mentions";
 
 import SlideMain from "../../../containers/SlideMain";
@@ -15,15 +14,6 @@ import moment from "moment";
 
 const { Content } = Layout;
 
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
-
 interface AuthManagementData {
   id: string;
   fullName: string;
@@ -33,6 +23,7 @@ interface AuthManagementData {
   isActive: string;
   userName: string;
   password: string;
+  confirmPassword: string;
 }
 
 function AddAuthManagements() {
@@ -61,7 +52,7 @@ function AddAuthManagements() {
     fetchRoles();
   }, []);
 
-//-------------
+  //-------------
   const [newAuthManagement, setNewAuthManagement] =
     useState<AuthManagementData>({
       id: "",
@@ -72,9 +63,10 @@ function AddAuthManagements() {
       isActive: "",
       userName: "",
       password: "",
+      confirmPassword: "",
     });
 
-   const addNoteToCollection = async (action: string) => {
+  const addNoteToCollection = async (action: string) => {
     const noteUsersCollection = firebase.firestore().collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
@@ -83,9 +75,9 @@ function AddAuthManagements() {
         console.error("Failed to fetch IP address:", error);
         return "";
       });
-  
+
     // Lấy userId từ localStorage
-    const userName = localStorage.getItem('userName');
+    const userName = localStorage.getItem("userName");
     try {
       await noteUsersCollection.add({
         action: action,
@@ -97,7 +89,7 @@ function AddAuthManagements() {
       console.error(error);
     }
   };
-  
+
   const handleAddAuthManagement = async () => {
     try {
       // Save the user's information in Firestore
@@ -120,21 +112,12 @@ function AddAuthManagements() {
         userName: newAuthManagement.userName,
         password: newAuthManagement.password,
       });
+      message.success(`Thêm mới tài khoản ${newAuthManagement.userName} thành công!`)
 
-      setNewAuthManagement({
-        id: "",
-        fullName: "",
-        phone: "",
-        email: "",
-        role: "",
-        isActive: "",
-        userName: "",
-        password: "",
-      });
-
-          // Thêm ghi chú vào collection noteUsers
-    await addNoteToCollection(`Thêm mới tài khoản: ${newAuthManagement.userName}`);
-
+      // Thêm ghi chú vào collection noteUsers
+      await addNoteToCollection(
+        `Thêm mới tài khoản: ${newAuthManagement.userName}`
+      );
 
       window.location.href = "/authManagement";
     } catch (error) {
@@ -142,6 +125,29 @@ function AddAuthManagements() {
     }
   };
 
+  const [passwordMatchError, setPasswordMatchError] = useState(false);
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const password = e.target.value;
+    const passwordMatchError = password !== newAuthManagement.confirmPassword;
+    setNewAuthManagement((prevState) => ({
+      ...prevState,
+      password,
+    }));
+    setPasswordMatchError(passwordMatchError);
+  };
+
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const confirmPassword = e.target.value;
+    const passwordMatchError = confirmPassword !== newAuthManagement.password;
+    setNewAuthManagement((prevState) => ({
+      ...prevState,
+      confirmPassword,
+    }));
+    setPasswordMatchError(passwordMatchError);
+  };
   return (
     <Layout className="layout">
       <SlideMain />
@@ -159,22 +165,6 @@ function AddAuthManagements() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -202,7 +192,7 @@ function AddAuthManagements() {
                                   fullName: e.target.value,
                                 })
                               }
-                              placeholder="203"
+                              placeholder="Nhập họ và tên"
                             />
                           </Form.Item>
                         </div>
@@ -220,7 +210,7 @@ function AddAuthManagements() {
                                   phone: e.target.value,
                                 })
                               }
-                              placeholder="Khám tim mạch"
+                              placeholder="Nhập số điện thoại"
                             />
                           </Form.Item>
                         </div>
@@ -237,7 +227,7 @@ function AddAuthManagements() {
                                   email: e.target.value,
                                 })
                               }
-                              placeholder="Khám tim mạch"
+                              placeholder="Nhập email"
                             />
                           </Form.Item>
                         </div>
@@ -288,45 +278,42 @@ function AddAuthManagements() {
                                   userName: e.target.value,
                                 })
                               }
-                              placeholder="203"
+                              placeholder="Nhập tên đăng nhập"
                             />
                           </Form.Item>
                         </div>
-                        <div className="col-12">
-                          <label htmlFor="" className="mb-2">
-                            Mật khẩu:{" "}
-                            <span style={{ color: "#FF7506" }}>*</span>
-                          </label>
-                          <Form.Item className="">
-                            <Input.Password
-                              value={newAuthManagement.password}
-                              onChange={(e) =>
-                                setNewAuthManagement({
-                                  ...newAuthManagement,
-                                  password: e.target.value,
-                                })
-                              }
-                              placeholder="Khám tim mạch"
-                            />
-                          </Form.Item>
-                        </div>
-                        <div className="col-12">
-                          <label htmlFor="" className="mb-2">
-                            Nhập lại mật khẩu:{" "}
-                            <span style={{ color: "#FF7506" }}>*</span>
-                          </label>
-                          <Form.Item className="">
-                            <Input.Password
-                              value={newAuthManagement.password}
-                              onChange={(e) =>
-                                setNewAuthManagement({
-                                  ...newAuthManagement,
-                                  password: e.target.value,
-                                })
-                              }
-                              placeholder="Khám tim mạch"
-                            />
-                          </Form.Item>
+                        <div>
+                          <div className="col-12">
+                            <label htmlFor="" className="mb-2">
+                              Mật khẩu:{" "}
+                              <span style={{ color: "#FF7506" }}>*</span>
+                            </label>
+                            <Form.Item className="">
+                              <Input.Password
+                                value={newAuthManagement.password}
+                                onChange={handlePasswordChange}
+                                placeholder="Nhập mật khẩu"
+                              />
+                            </Form.Item>
+                          </div>
+                          <div className="col-12">
+                            <label htmlFor="" className="mb-2">
+                              Nhập lại mật khẩu:{" "}
+                              <span style={{ color: "#FF7506" }}>*</span>
+                            </label>
+                            <Form.Item className="">
+                              <Input.Password
+                                value={newAuthManagement.confirmPassword}
+                                onChange={handleConfirmPasswordChange}
+                                placeholder="Nhập lại mật khẩu"
+                              />
+                              {passwordMatchError && (
+                                <div style={{ color: "red" }}>
+                                  Mật khẩu không khớp. Vui lòng nhập lại.
+                                </div>
+                              )}
+                            </Form.Item>
+                          </div>
                         </div>
                         <div className="col-12">
                           <label htmlFor="" className="mb-2">

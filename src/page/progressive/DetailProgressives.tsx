@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Layout, Popover } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Card, Layout } from "antd";
 import { Link } from "react-router-dom";
 
 import SlideMain from "../../containers/SlideMain";
@@ -13,15 +12,6 @@ import { useParams } from "react-router-dom";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 
 const { Content } = Layout;
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 interface ProgressiveData {
   id: string;
@@ -42,7 +32,7 @@ interface DeviceData {
 function DetailProgressives() {
   const { id } = useParams<{ id: string }>();
 
-//-------------
+  //-------------
   const [progressive, setProgressive] = useState<ProgressiveData>({
     number: "",
     nameService: null,
@@ -74,7 +64,10 @@ function DetailProgressives() {
 
         if (progressiveData.authManagementId) {
           // Fetch the associated device document
-          const deviceRef = firebase.firestore().collection("devices").where("authManagementId", "==", progressiveData.authManagementId);
+          const deviceRef = firebase
+            .firestore()
+            .collection("devices")
+            .where("authManagementId", "==", progressiveData.authManagementId);
           const deviceSnapshot = await deviceRef.get();
 
           if (!deviceSnapshot.empty) {
@@ -88,39 +81,39 @@ function DetailProgressives() {
     fetchProgressive();
   }, [id]);
 
-//-------------
+  //-------------
   const [nameServiceValue, setNameServiceValue] = useState<string | null>(null);
-  
+
   useEffect(() => {
     const fetchProgressive = async () => {
       const progressiveRef = firebase.firestore().collection("progressives");
       const snapshot = await progressiveRef.get();
-        await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const progressive = doc.data() as ProgressiveData;
-            progressive.id = doc.id;
-  
-            const nameServiceRef = progressive.nameService;
-  
-            if (
-              nameServiceRef &&
-              nameServiceRef instanceof firebase.firestore.DocumentReference
-            ) {
-              const nameServiceDoc = await nameServiceRef.get();
-              if (nameServiceDoc.exists) {
-                const nameServiceData = nameServiceDoc.data();
-                if (nameServiceData && nameServiceData.nameService) {
-                  const nameService = nameServiceData.nameService;
-                  progressive.nameService = nameService;
-                  setNameServiceValue(nameService); // Đặt giá trị cho nameServiceValue
-                }
+      await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const progressive = doc.data() as ProgressiveData;
+          progressive.id = doc.id;
+
+          const nameServiceRef = progressive.nameService;
+
+          if (
+            nameServiceRef &&
+            nameServiceRef instanceof firebase.firestore.DocumentReference
+          ) {
+            const nameServiceDoc = await nameServiceRef.get();
+            if (nameServiceDoc.exists) {
+              const nameServiceData = nameServiceDoc.data();
+              if (nameServiceData && nameServiceData.nameService) {
+                const nameService = nameServiceData.nameService;
+                progressive.nameService = nameService;
+                setNameServiceValue(nameService); // Đặt giá trị cho nameServiceValue
               }
             }
-            return progressive;
-          })
-        )
+          }
+          return progressive;
+        })
+      );
     };
-  
+
     fetchProgressive();
   }, []);
   return (
@@ -131,26 +124,15 @@ function DetailProgressives() {
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbThree text="Cấp số" text2="Danh sách cấp số" href="/progressive" text3="Chi tiết"/>
+                <BreadCrumbThree
+                  text="Cấp số"
+                  text2="Danh sách cấp số"
+                  href="/progressive"
+                  text3="Chi tiết"
+                />
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -183,7 +165,7 @@ function DetailProgressives() {
                           </td>
                           <td>
                             <p>
-                            <span>{nameServiceValue}</span>
+                              <span>{nameServiceValue}</span>
                             </p>
                           </td>
                         </tr>

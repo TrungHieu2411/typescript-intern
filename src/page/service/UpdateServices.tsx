@@ -6,9 +6,8 @@ import {
   Form,
   Input,
   Layout,
-  Popover,
+  message,
 } from "antd";
-import { BellFilled } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 
 import Account from "../../components/User/Account";
@@ -21,15 +20,6 @@ import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
 import BreadCrumbFour from "../../components/BreadCrumb/BreadCrumbFour";
 import moment from "moment";
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 interface ServiceData {
   codeService: string;
@@ -44,6 +34,7 @@ function UpdateServices() {
     nameService: "",
     description: "",
   });
+
   useEffect(() => {
     const fetchService = async () => {
       const serviceRef = firebase.firestore().collection("services").doc(id);
@@ -57,32 +48,32 @@ function UpdateServices() {
     fetchService();
   }, [id]);
 
-//------------
+  //------------
 
-const addNoteToCollection = async (action: string) => {
-  const noteUsersCollection = firebase.firestore().collection("noteUsers");
-  const ipAddress = await fetch("https://api.ipify.org?format=json")
-    .then((response) => response.json())
-    .then((data) => data.ip)
-    .catch((error) => {
-      console.error("Failed to fetch IP address:", error);
-      return "";
-    });
+  const addNoteToCollection = async (action: string) => {
+    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const ipAddress = await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => data.ip)
+      .catch((error) => {
+        console.error("Failed to fetch IP address:", error);
+        return "";
+      });
 
-  // Lấy userId từ localStorage
-  const userName = localStorage.getItem('userName');
-  try {
-    await noteUsersCollection.add({
-      action: action,
-      timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
-      ipAddress: ipAddress,
-      userName: userName,
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
-  
+    // Lấy userId từ localStorage
+    const userName = localStorage.getItem("userName");
+    try {
+      await noteUsersCollection.add({
+        action: action,
+        timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+        ipAddress: ipAddress,
+        userName: userName,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleUpdateService = async () => {
     const serviceRef = firebase.firestore().collection("services").doc(id);
     const updateService = {
@@ -90,10 +81,9 @@ const addNoteToCollection = async (action: string) => {
       nameService: service.nameService,
       description: service.description,
     };
-
- // Thêm ghi chú vào collection noteUsers
+    message.success(`Thêm mới một ${service.codeService} thành công!`);
+    // Thêm ghi chú vào collection noteUsers
     await addNoteToCollection(`Cập nhật dịch vụ: ${service.codeService}`);
-
 
     serviceRef
       .update(updateService)
@@ -105,6 +95,7 @@ const addNoteToCollection = async (action: string) => {
         console.error("Error updating service:", error);
       });
   };
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -113,26 +104,17 @@ const addNoteToCollection = async (action: string) => {
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbFour text="Dịch vụ" text2="Danh sách dịch vụ" href="/service" text3="Chi tiết" href2={`/detailService/${id}`} text4="Cập nhật"/>
+                <BreadCrumbFour
+                  text="Dịch vụ"
+                  text2="Danh sách dịch vụ"
+                  href="/service"
+                  text3="Chi tiết"
+                  href2={`/detailService/${id}`}
+                  text4="Cập nhật"
+                />
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>

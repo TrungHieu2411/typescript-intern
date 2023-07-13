@@ -1,15 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Popover,
-  Card,
-  Form,
-  Input,
-  Select,
-  Button,
-  Layout,
-  message,
-} from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Card, Form, Input, Select, Button, Layout, message } from "antd";
 import Account from "../../components/User/Account";
 import SlideMain from "../../containers/SlideMain";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
@@ -18,7 +8,6 @@ import firebase from "firebase/compat/app";
 import { useDispatch } from "react-redux";
 import { createDevice } from "../../redux/device/deviceSlice";
 import moment from "moment";
-const popoverContent = <div></div>;
 
 interface DeviceData {
   id: string;
@@ -39,26 +28,30 @@ interface AuthManagementData {
 }
 
 function AddDevices() {
-
   const dispatch = useDispatch();
   //------------
-  const [service, setService] = useState<{ id: String; nameService: string }[]>([]);
+  const [service, setService] = useState<{ id: String; nameService: string }[]>(
+    []
+  );
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const serviceSnapshot = await firebase.firestore().collection("services").get();
+        const serviceSnapshot = await firebase
+          .firestore()
+          .collection("services")
+          .get();
         const serviceData = serviceSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             id: doc.id,
             nameService: data.nameService,
-          }
-        })
+          };
+        });
         setService(serviceData);
       } catch (error) {
         console.error(error);
       }
-    }
+    };
     fetchService();
   }, []);
 
@@ -79,13 +72,16 @@ function AddDevices() {
     password: "",
   });
 
-//------------
-const onFinish = async () => {
-  const authManagementInfo = { userName: authManagement.userName, password: authManagement.password };
-  await dispatch(createDevice(newDevice, authManagementInfo) as any);
-};
+  //------------
+  const onFinish = async () => {
+    const authManagementInfo = {
+      userName: authManagement.userName,
+      password: authManagement.password,
+    };
+    await dispatch(createDevice(newDevice, authManagementInfo) as any);
+  };
 
-//------------
+  //------------
   const [form] = Form.useForm();
 
   const addNoteToCollection = async (action: string) => {
@@ -97,9 +93,9 @@ const onFinish = async () => {
         console.error("Failed to fetch IP address:", error);
         return "";
       });
-  
+
     // Lấy userId từ localStorage
-    const userName = localStorage.getItem('userName');
+    const userName = localStorage.getItem("userName");
     try {
       await noteUsersCollection.add({
         action: action,
@@ -111,29 +107,30 @@ const onFinish = async () => {
       console.error(error);
     }
   };
-  
-  
+
   const handleAddDevice = async () => {
     try {
       // Kiểm tra và submit form
       await form.validateFields();
-  
+
       const { username, password } = form.getFieldsValue();
-  
+
       // Lấy thông tin authManagement từ Firebase Firestore
-      const authManagementCollection = firebase.firestore().collection("authManagements");
+      const authManagementCollection = firebase
+        .firestore()
+        .collection("authManagements");
       const snapshot = await authManagementCollection.get();
       const matchingData = snapshot.docs.find((doc) => {
         const data = doc.data() as AuthManagementData;
         return data.userName === username && data.password === password;
       });
-  
+
       if (matchingData) {
         const authManagementId = matchingData.id;
-  
+
         // Hiển thị thông báo "Thiết bị đã được thêm thành công"
         message.success("Thiết bị đã được thêm thành công");
-  
+
         // Thực hiện thêm thiết bị và lưu trữ authManagementId
         const deviceCollection = firebase.firestore().collection("devices");
         await deviceCollection.add({
@@ -141,12 +138,16 @@ const onFinish = async () => {
           nameDevice: newDevice.nameDevice,
           ipAddress: newDevice.ipAddress,
           isActive: newDevice.isActive,
+          isConnected: "Kết nối",
           service: newDevice.service,
           typeDevice: newDevice.typeDevice,
           authManagementId: authManagementId,
         });
-          // Thêm ghi chú vào collection noteUsers
-  await addNoteToCollection(`Thêm mới thiết bị: ${newDevice.codeDevice}`);
+        message.success(
+          `Thêm mới thiết bị ${newDevice.nameDevice} thành công!`
+        );
+        // Thêm ghi chú vào collection noteUsers
+        await addNoteToCollection(`Thêm mới thiết bị: ${newDevice.codeDevice}`);
 
         // Thực hiện điều hướng đến trang danh sách sản phẩm
         window.location.href = "/device";
@@ -157,7 +158,7 @@ const onFinish = async () => {
       console.error("Validation failed:", error);
     }
   };
-  
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -175,22 +176,6 @@ const onFinish = async () => {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -401,7 +386,13 @@ const onFinish = async () => {
                           placeholder="Nhập dịch vụ sử dụng"
                         >
                           {service.map((service) => (
-                            <Select.Option key={service.nameService} value={" " + service.nameService}> {service.nameService}</Select.Option>
+                            <Select.Option
+                              key={service.nameService}
+                              value={" " + service.nameService}
+                            >
+                              {" "}
+                              {service.nameService}
+                            </Select.Option>
                           ))}
                         </Select>
                       </Form.Item>

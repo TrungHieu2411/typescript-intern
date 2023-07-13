@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Checkbox, Form, Input, Layout, Popover } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Button, Card, Checkbox, Form, Input, Layout, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import Account from "../../../components/User/Account";
@@ -15,15 +14,6 @@ import moment from "moment";
 
 const { Content } = Layout;
 
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
-
 interface RoleManagementData {
   nameRole: string;
   description: string;
@@ -32,7 +22,7 @@ interface RoleManagementData {
 function UpdateRoleManagements() {
   const { id } = useParams<{ id: string }>();
 
-//-------------
+  //-------------
   const [roleManagement, setRoleManagement] = useState<RoleManagementData>({
     nameRole: "",
     description: "",
@@ -58,31 +48,31 @@ function UpdateRoleManagements() {
     fetchRoleManagement();
   }, [id]);
 
-//-------------
+  //-------------
 
- const addNoteToCollection = async (action: string) => {
-  const noteUsersCollection = firebase.firestore().collection("noteUsers");
-  const ipAddress = await fetch("https://api.ipify.org?format=json")
-    .then((response) => response.json())
-    .then((data) => data.ip)
-    .catch((error) => {
-      console.error("Failed to fetch IP address:", error);
-      return "";
-    });
+  const addNoteToCollection = async (action: string) => {
+    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const ipAddress = await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => data.ip)
+      .catch((error) => {
+        console.error("Failed to fetch IP address:", error);
+        return "";
+      });
 
-  // Lấy userId từ localStorage
-  const userName = localStorage.getItem('userName');
-  try {
-    await noteUsersCollection.add({
-      action: action,
-      timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
-      ipAddress: ipAddress,
-      userName: userName,
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
+    // Lấy userId từ localStorage
+    const userName = localStorage.getItem("userName");
+    try {
+      await noteUsersCollection.add({
+        action: action,
+        timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+        ipAddress: ipAddress,
+        userName: userName,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleUpdateRoleManagement = async () => {
     const roleManagementRef = firebase.firestore().collection("roles").doc(id);
@@ -94,9 +84,11 @@ function UpdateRoleManagements() {
         groupB,
       },
     };
-
- // Thêm ghi chú vào collection noteUsers
- await addNoteToCollection(`Cập nhật vai trò: ${roleManagement.nameRole}`);
+    message.success(
+      `Cập nhật thông tin vai trò ${roleManagement.nameRole} thành công!`
+    );
+    // Thêm ghi chú vào collection noteUsers
+    await addNoteToCollection(`Cập nhật vai trò: ${roleManagement.nameRole}`);
 
     roleManagementRef
       .update(updatedRoleManagement)
@@ -126,22 +118,6 @@ function UpdateRoleManagements() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -170,7 +146,7 @@ function UpdateRoleManagements() {
                                   nameRole: e.target.value,
                                 })
                               }
-                              placeholder="203"
+                              placeholder="Nhập tên vai trò"
                             />
                           </Form.Item>
                         </div>
@@ -181,7 +157,7 @@ function UpdateRoleManagements() {
                           <Form.Item className="">
                             <TextArea
                               rows={5}
-                              placeholder="Mô tả dịch vụ"
+                              placeholder="Mô tả vai trò"
                               value={roleManagement.description}
                               onChange={(e) =>
                                 setRoleManagement({

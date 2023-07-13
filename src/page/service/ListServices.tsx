@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
   Badge,
-  Button,
   Card,
   DatePicker,
   Input,
   Layout,
-  Popover,
   Select,
   Space,
   Table,
   message,
 } from "antd";
 
-import { BellFilled, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 import BreadCrumbTwo from "../../components/BreadCrumb/BreadCrumbTwo";
@@ -23,15 +21,6 @@ import "../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 const renderIsActive = (status: string) => {
   let color = "";
@@ -66,12 +55,12 @@ function ListService() {
       try {
         const serviceRef = firebase.firestore().collection("services");
         const snapshot = await serviceRef.get();
-  
+
         const serviceData = await Promise.all(
           snapshot.docs.map(async (doc) => {
             const service = doc.data() as ServiceData;
             service.id = doc.id;
-  
+
             const progressiveId = service.progressiveId;
             if (progressiveId) {
               const progressiveRef = firebase
@@ -79,18 +68,18 @@ function ListService() {
                 .collection("progressives")
                 .where("number", "==", progressiveId);
               const progressiveSnapshot = await progressiveRef.get();
-  
+
               if (!progressiveSnapshot.empty) {
                 const progressiveData = progressiveSnapshot.docs[0].data();
                 const authManagementId = progressiveData.authManagementId;
-  
+
                 if (authManagementId) {
                   const authManagementRef = firebase
                     .firestore()
                     .collection("authManagements")
                     .doc(authManagementId);
                   const authManagementSnapshot = await authManagementRef.get();
-  
+
                   if (authManagementSnapshot.exists) {
                     const authManagementData = authManagementSnapshot.data();
                     if (authManagementData) {
@@ -101,22 +90,20 @@ function ListService() {
                 }
               }
             }
-  
+
             return service;
           })
         );
-  
+
         setServiceData(serviceData);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
         message.error("Failed to fetch service data.");
       }
     };
-  
+
     fetchServiceData();
   }, []);
-  
-  
 
   return (
     <Layout className="layout">
@@ -130,22 +117,6 @@ function ListService() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>

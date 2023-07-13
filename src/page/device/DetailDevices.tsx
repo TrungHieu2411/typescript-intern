@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Layout, Popover } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Card, Layout } from "antd";
 
 import SlideMain from "../../containers/SlideMain";
 import { Link, useParams } from "react-router-dom";
@@ -11,15 +10,6 @@ import "../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 interface DeviceData {
   codeDevice: string;
@@ -37,7 +27,7 @@ interface AuthManagementData {
   password: string;
 }
 function DetailDevices() {
-   const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
   const [device, setDevice] = useState<DeviceData>({
     codeDevice: "",
     nameDevice: "",
@@ -70,7 +60,8 @@ function DetailDevices() {
           const authManagementSnapshot = await authManagementRef.get();
 
           if (authManagementSnapshot.exists) {
-            const authManagementData = authManagementSnapshot.data() as AuthManagementData;
+            const authManagementData =
+              authManagementSnapshot.data() as AuthManagementData;
             setAuthManagement(authManagementData);
           }
         }
@@ -79,7 +70,6 @@ function DetailDevices() {
 
     fetchDevice();
   }, [id]);
-
 
   return (
     <Layout className="layout">
@@ -98,22 +88,6 @@ function DetailDevices() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>

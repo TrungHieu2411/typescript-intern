@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  Col,
-  Input,
-  Layout,
-  Popover,
-  Row,
-  Space,
-  Table,
-} from "antd";
-import { BellFilled, SearchOutlined } from "@ant-design/icons";
+import { Card, Col, Input, Layout, Row, Space, Table } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import Column from "antd/es/table/Column";
 import { Link } from "react-router-dom";
 import SlideMain from "../../../containers/SlideMain";
@@ -21,15 +11,6 @@ import firebase from "firebase/compat/app";
 import { DocumentData } from "@firebase/firestore";
 
 const { Content } = Layout;
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 interface RoleManagementData {
   id: string;
@@ -58,7 +39,9 @@ function RoleManagement() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const authManagementRef = firebase.firestore().collection("authManagements");
+      const authManagementRef = firebase
+        .firestore()
+        .collection("authManagements");
       const roleManagementRef = firebase.firestore().collection("roles");
 
       const authManagementSnapshot = await authManagementRef.get();
@@ -89,13 +72,12 @@ function RoleManagement() {
         })
       );
 
-      const roleManagementData: RoleManagementData[] = roleManagementSnapshot.docs.map(
-        (doc) => {
+      const roleManagementData: RoleManagementData[] =
+        roleManagementSnapshot.docs.map((doc) => {
           const roleManagement = doc.data() as RoleManagementData;
           roleManagement.id = doc.id;
           return roleManagement;
-        }
-      );
+        });
 
       setAuthManagementData(authManagementData);
       setRoleManagementData(roleManagementData);
@@ -109,8 +91,8 @@ function RoleManagement() {
 
     roleManagementData.forEach((role) => {
       const { nameRole } = role;
-      const count = authManagementData.filter( 
-        (authManagement) => authManagement.role === nameRole 
+      const count = authManagementData.filter(
+        (authManagement) => authManagement.role === nameRole
       ).length;
       nameRoleCounts[nameRole] = count;
     });
@@ -123,7 +105,7 @@ function RoleManagement() {
   return (
     <Layout className="layout">
       <SlideMain />
-    
+
       <Layout>
         <Content style={{ margin: "16px" }}>
           <div className="container">
@@ -136,22 +118,6 @@ function RoleManagement() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -228,8 +194,7 @@ function RoleManagement() {
                     )}
                   />
                 </Table>
-                <div>
-                  </div>
+                <div></div>
               </div>
               <div className="col-1 mt-3">
                 <Link to={"/addRoleManagement"}>

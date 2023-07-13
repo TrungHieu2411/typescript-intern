@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   Badge,
-  Button,
   Card,
   DatePicker,
   Input,
   Layout,
-  Popover,
   Select,
   Space,
   Table,
 } from "antd";
-import { BellFilled, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import Column from "antd/es/table/Column";
 import { Link } from "react-router-dom";
 
@@ -25,15 +23,6 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 
 const { Content } = Layout;
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 const renderStatus = (status: string) => {
   let color = "";
@@ -120,8 +109,6 @@ function ListProgressives() {
 
     fetchProgressive();
   }, []);
-  
-
 
   return (
     <Layout className="layout">
@@ -135,22 +122,6 @@ function ListProgressives() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -314,7 +285,6 @@ function ListProgressives() {
                     title={<span className="table-title">Nguồn cấp</span>}
                     dataIndex="typeDevice"
                     key="typeDevice"
-                   
                   />
                   <Column
                     title=""

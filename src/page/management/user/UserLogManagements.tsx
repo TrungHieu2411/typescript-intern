@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
-  Button,
-  Card,
   Col,
   DatePicker,
   Input,
   Layout,
-  Popover,
   Row,
   Space,
   Table,
   message,
 } from "antd";
-import { BellFilled, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import Column from "antd/es/table/Column";
 
 import SlideMain from "../../../containers/SlideMain";
@@ -20,20 +17,10 @@ import BreadCrumbTwo from "../../../components/BreadCrumb/BreadCrumbTwo";
 import Account from "../../../components/User/Account";
 import "../../../assets/css/style.css";
 
-
 //firebase
 import firebase from "firebase/compat/app";
 
 const { Content } = Layout;
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 interface NoteUserData {
   userName: string;
@@ -52,7 +39,7 @@ function UserLogManagements() {
 
         const serviceData = snapshot.docs.map(async (doc) => {
           const service = doc.data() as NoteUserData;
-         
+
           return service;
         });
 
@@ -67,7 +54,6 @@ function UserLogManagements() {
     fetchNoteUser();
   }, []);
 
-  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -76,26 +62,13 @@ function UserLogManagements() {
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbTwo text="Cài đặt hệ thống" text2="Nhật ký hoạt động" />
+                <BreadCrumbTwo
+                  text="Cài đặt hệ thống"
+                  text2="Nhật ký hoạt động"
+                />
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -107,7 +80,7 @@ function UserLogManagements() {
                   <Col span={24} className="d-flex align-items-center">
                     <DatePicker size="large" style={{ width: 130 }} />
                     <img
-                      style={{ width: 15}}
+                      style={{ width: 15 }}
                       src="./assets/image/arrow-right.png"
                       alt=""
                     />
@@ -119,7 +92,8 @@ function UserLogManagements() {
                 <Row style={{ width: 275 }} className="ms-3">
                   <label htmlFor="">Từ khóa</label>
                   <Col span={24}>
-                    <Input size="large"
+                    <Input
+                      size="large"
                       placeholder="Nhập từ khóa"
                       suffix={
                         <Space>
@@ -139,10 +113,8 @@ function UserLogManagements() {
               <div className="col-11">
                 <Table
                   dataSource={noteUserData}
-                 
-                  pagination={{pageSize: 5}}
+                  pagination={{ pageSize: 5 }}
                   bordered
-
                   rowClassName={() => "table-row"}
                   className="mb-3"
                 >

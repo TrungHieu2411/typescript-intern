@@ -11,7 +11,6 @@ interface AuthManagementData {
 }
 
 const ConfirmPassword: React.FC = () => {
-
   const formRef = React.useRef<FormInstance>(null);
 
   //Lấy id trên params
@@ -19,7 +18,7 @@ const ConfirmPassword: React.FC = () => {
   const [passwordAuth, setPasswordAuth] = useState<AuthManagementData>({
     password: "",
   });
-//------------
+  //------------
   useEffect(() => {
     const fetchAuthManagement = async () => {
       try {
@@ -31,7 +30,8 @@ const ConfirmPassword: React.FC = () => {
           const authManagementSnapshot = await authManagementRef.get();
 
           if (authManagementSnapshot.exists) {
-            const authManagementData = authManagementSnapshot.data() as AuthManagementData;
+            const authManagementData =
+              authManagementSnapshot.data() as AuthManagementData;
             setPasswordAuth(authManagementData);
           } else {
             message.error("Không tìm thấy thông tin xác thực.");
@@ -48,7 +48,7 @@ const ConfirmPassword: React.FC = () => {
     fetchAuthManagement();
   }, [id]);
 
-//------------
+  //------------
   const onFinish = async (values: any) => {
     const { password } = values;
 
@@ -65,7 +65,6 @@ const ConfirmPassword: React.FC = () => {
 
       await authManagementRef.update({ password: password });
 
-    
       message.success("Thay đổi mật khẩu thành công!");
 
       setTimeout(() => {

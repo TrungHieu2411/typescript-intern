@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
   Badge,
-  Button,
   Card,
   Col,
   Input,
   Layout,
-  Popover,
   Row,
   Select,
   Space,
   Table,
 } from "antd";
-import { BellFilled, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 
 import Column from "antd/es/table/Column";
 import { Link } from "react-router-dom";
@@ -26,15 +24,6 @@ import "../../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 
 const { Content } = Layout;
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 const renderIsActive = (status: string) => {
   let color = "";
@@ -115,22 +104,6 @@ function AuthManagements() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>

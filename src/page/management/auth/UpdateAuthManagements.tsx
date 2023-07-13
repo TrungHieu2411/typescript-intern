@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Form, Input, Layout, Popover, Select } from "antd";
-import { BellFilled } from "@ant-design/icons";
-
+import { Button, Card, Form, Input, Layout, Select, message } from "antd";
 import SlideMain from "../../../containers/SlideMain";
 import Account from "../../../components/User/Account";
 import BreadCrumbThree from "../../../components/BreadCrumb/BreadCrumbThree";
@@ -15,15 +13,6 @@ import moment from "moment";
 
 const { Content } = Layout;
 
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
-
 interface AuthManagementData {
   id: string;
   fullName: string;
@@ -36,9 +25,9 @@ interface AuthManagementData {
 }
 function UpdateAuthManagements() {
   const { id } = useParams<{ id: string }>();
-  
-  //-------------
+
   const [authManagement, setAuthManagement] = useState<AuthManagementData>({
+    id: "",
     fullName: "",
     phone: "",
     email: "",
@@ -46,112 +35,90 @@ function UpdateAuthManagements() {
     isActive: "",
     userName: "",
     password: "",
-    id: "",
-  });
 
+  });
 
   useEffect(() => {
     const fetchAuthManagement = async () => {
-      const authManagementRef = firebase
-        .firestore()
-        .collection("authManagements")
-        .doc(id);
+      const authManagementRef = firebase.firestore().collection("authManagements").doc(id);
       const authManagementSnapshot = await authManagementRef.get();
 
       if (authManagementSnapshot.exists) {
-        const authManagementData =
-          authManagementSnapshot.data() as AuthManagementData;
-        setAuthManagement({
+        const authManagementData = authManagementSnapshot.data() as AuthManagementData;
+        setAuthManagement((prevAuthManagement) => ({
+          ...prevAuthManagement,
           ...authManagementData,
-          role: authManagementData.role || null, // Lấy id của DocumentReference
-        });
+          role: authManagementData.role || null,
+        }));
       }
     };
+
     fetchAuthManagement();
   }, [id]);
 
-//-------------
+  const addNoteToCollection = async (action: string) => {
+    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const ipAddress = await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => data.ip)
+      .catch((error) => {
+        console.error("Failed to fetch IP address:", error);
+        return "";
+      });
 
-const addNoteToCollection = async (action: string) => {
-  const noteUsersCollection = firebase.firestore().collection("noteUsers");
-  const ipAddress = await fetch("https://api.ipify.org?format=json")
-    .then((response) => response.json())
-    .then((data) => data.ip)
-    .catch((error) => {
-      console.error("Failed to fetch IP address:", error);
-      return "";
-    });
-
-  // Lấy userId từ localStorage
-  const userName = localStorage.getItem('userName');
-  try {
-    await noteUsersCollection.add({
-      action: action,
-      timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
-      ipAddress: ipAddress,
-      userName: userName,
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
+    const userName = localStorage.getItem("userName");
+    try {
+      await noteUsersCollection.add({
+        action: action,
+        timeAction: moment().format("DD/MM/YYYY HH:mm:ss"),
+        ipAddress: ipAddress,
+        userName: userName,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleUpdateAuthManagement = async () => {
     const userRef = firebase.firestore().collection("authManagements").doc(id);
-  const updatedUser: AuthManagementData = {
-    fullName: authManagement.fullName,
-    phone: authManagement.phone,
-    email: authManagement.email,
-    role: authManagement.role,
-    isActive: authManagement.isActive,
-    userName: authManagement.userName,
-    password: authManagement.password,
-    id: authManagement.id,
+    const updatedUser: AuthManagementData = {
+      ...authManagement,
+    };
+    message.success(`Cập nhật thông tin tài khoản: ${authManagement.userName} thành công!`)
+    await addNoteToCollection(`Cập nhật thông tin tài khoản: ${authManagement.userName}`);
+
+    userRef
+      .update(updatedUser)
+      .then(() => {
+        console.log("AuthManagement updated successfully!");
+        window.location.href = "/authManagement";
+      })
+      .catch((error) => {
+        console.error("Error updating AuthManagement:", error);
+      });
   };
- // Thêm ghi chú vào collection noteUsers
- await addNoteToCollection(`Cập nhật thông tin tài khoản: ${authManagement.userName}`);
 
-  userRef
-    .update(updatedUser)
-    .then(() => {
-      console.log("AuthManagement updated successfully!");
-    })
-    .catch((error) => {
-      console.error("Error updating AuthManagement:", error);
-    });
-};
-
-//-------------
   const [authManagementData, setAuthManagementData] = useState<AuthManagementData[]>([]);
 
- useEffect(() => {
-    const fetchAuthManagement = async () => {
+  useEffect(() => {
+    const fetchAuthManagementData = async () => {
       const authManagementRef = firebase.firestore().collection("authManagements");
       const snapshot = await authManagementRef.get();
-      setAuthManagementData(await Promise.all(snapshot.docs.map(async (doc) => {
+      const fetchedAuthManagementData: AuthManagementData[] = [];
+
+      snapshot.forEach((doc) => {
         const authManagement = doc.data() as AuthManagementData;
         authManagement.id = doc.id;
+        fetchedAuthManagementData.push(authManagement);
+      });
 
-        const roleRef = authManagement.role;
+      setAuthManagementData(fetchedAuthManagementData);
+    };
 
-        if (roleRef) {
-          const roleDoc = await roleRef.get();
-          if (roleDoc.exists) {
-            const roleData = roleDoc.data();
-            if (roleData && roleData.nameRole) {
-              const roleName = roleData.nameRole;
-              authManagement.role = roleName;
-            }
-          }
-        }
-        return authManagement;
-      })))
-    }
-    fetchAuthManagement();
+    fetchAuthManagementData();
   }, []);
 
-//-------------
-const [roleValue, setRoleValue] = useState<string | null>(null);
+  const [roleValue, setRoleValue] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRoleData = async () => {
@@ -173,7 +140,6 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
 
   const handleRoleChange = (value: string) => {
     setRoleValue(value);
-    // Update user.role here if necessary
   };
   return (
     <Layout className="layout">
@@ -192,22 +158,6 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -235,7 +185,7 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
                                   fullName: e.target.value,
                                 })
                               }
-                              placeholder="203"
+                              placeholder="Nhập họ và tên"
                             />
                           </Form.Item>
                         </div>
@@ -253,7 +203,7 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
                                   phone: e.target.value,
                                 })
                               }
-                              placeholder="Khám tim mạch"
+                              placeholder="Nhập số điện thoại"
                             />
                           </Form.Item>
                         </div>
@@ -270,7 +220,7 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
                                   email: e.target.value,
                                 })
                               }
-                              placeholder="Khám tim mạch"
+                              placeholder="Nhập email"
                             />
                           </Form.Item>
                         </div>
@@ -279,7 +229,7 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
                             Vai trò: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Select value={roleValue} onChange={handleRoleChange}>
+                            <Select placeholder="Chọn vai trò" value={roleValue} onChange={handleRoleChange}>
                               {authManagementData.map((authManagement) => (
                                 <Select.Option key={authManagement.id} value={authManagement.role}>
                                  
@@ -311,7 +261,7 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
                                   userName: e.target.value,
                                 })
                               }
-                              placeholder="203"
+                              placeholder="Nhập tên đăng nhập"
                             />
                           </Form.Item>
                         </div>
@@ -329,7 +279,7 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
                                   password: e.target.value,
                                 })
                               }
-                              placeholder="Khám tim mạch"
+                              placeholder="Nhập mật khẩu"
                             />
                           </Form.Item>
                         </div>
@@ -347,7 +297,7 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
                                   password: e.target.value,
                                 })
                               }
-                              placeholder="Khám tim mạch"
+                              placeholder="Nhập lại mật khẩu"
                             />
                           </Form.Item>
                         </div>
@@ -358,7 +308,7 @@ const [roleValue, setRoleValue] = useState<string | null>(null);
                           </label>
                           <Form.Item className="">
                             <Select
-                              defaultValue="all"
+                              placeholder="Chọn tình trạng"
                               value={authManagement.isActive}
                               onChange={(value) =>
                                 setAuthManagement({

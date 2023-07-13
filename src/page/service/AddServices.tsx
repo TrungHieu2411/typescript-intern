@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Checkbox, Form, Input, Layout, Popover } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Button, Card, Checkbox, Form, Input, Layout, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
@@ -12,15 +11,6 @@ import firebase from "firebase/compat/app";
 import Account from "../../components/User/Account";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import moment from "moment";
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 interface ServiceData {
   id: string;
@@ -35,7 +25,7 @@ function AddServices() {
 
   const handleAutoIncrementChange = (e: CheckboxChangeEvent) => {
     setIsAutoIncrement(e.target.checked);
-  };
+  }
 
   const generateProgressiveId = (
     currentNumber: number,
@@ -111,8 +101,9 @@ function AddServices() {
         nameService: newService.nameService,
         description: newService.description,
         progressiveId: generateProgressiveId(currentNumber, isAutoIncrement),
-      });
+      }); 
 
+      message.success(`Thêm mới một thiết bị ${newService.codeService} thành công!`)
       // Thêm ghi chú vào collection noteUsers
     await addNoteToCollection(`Thêm mới dịch vụ: ${newService.codeService}`);
 
@@ -145,6 +136,7 @@ function AddServices() {
         console.error("Validation failed:", error);
       });
   };
+  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -162,22 +154,6 @@ function AddServices() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>

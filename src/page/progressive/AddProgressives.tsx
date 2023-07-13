@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Form, Layout, Popover, Select, Modal } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { Button, Card, Form, Layout, Select, Modal, message } from "antd";
 import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
@@ -11,15 +10,6 @@ import { useParams } from "react-router-dom";
 import moment from "moment";
 
 const { Content } = Layout;
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 interface UserData {
   fullName: string;
@@ -38,7 +28,10 @@ function AddProgressives() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const serviceSnapshot = await firebase.firestore().collection("services").get();
+        const serviceSnapshot = await firebase
+          .firestore()
+          .collection("services")
+          .get();
         const serviceData: ServiceData[] = serviceSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
@@ -66,7 +59,10 @@ function AddProgressives() {
   const userId = localStorage.getItem("userId");
   useEffect(() => {
     const fetchUser = async () => {
-      const userRef = firebase.firestore().collection("authManagements").doc(userId || id);
+      const userRef = firebase
+        .firestore()
+        .collection("authManagements")
+        .doc(userId || id);
 
       const userSnapshot = await userRef.get();
 
@@ -80,7 +76,8 @@ function AddProgressives() {
 
   const [selectedService, setSelectedService] = useState("");
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedServiceData, setSelectedServiceData] = useState<ServiceData | null>(null);
+  const [selectedServiceData, setSelectedServiceData] =
+    useState<ServiceData | null>(null);
 
   const handleServiceChange = (value: string) => {
     setSelectedService(value);
@@ -88,9 +85,9 @@ function AddProgressives() {
     setSelectedServiceData(service || null);
   };
 
-  const handlePrintButtonClick = async () => {
+  const handlePrintButtonClick = () => {
     setShowPopup(true);
-    await handleAddProgressive();
+    handleAddProgressive();
   };
 
   const handlePopupClose = () => {
@@ -109,24 +106,13 @@ function AddProgressives() {
 
   const getExpirationTime = () => {
     const currentDate = new Date();
-    currentDate.setMinutes(currentDate.getMinutes() + 1);
+    currentDate.setSeconds(currentDate.getSeconds() + 30); // Thêm 30 giây vào thời gian hiện tại
     const expirationHour = currentDate.getHours();
     const expirationMinute = currentDate.getMinutes();
     const currentDay = currentDate.getDate();
     const currentMonth = currentDate.getMonth() + 1;
     const currentYear = currentDate.getFullYear();
     return `${expirationHour}:${expirationMinute} ${currentDay}/${currentMonth}/${currentYear}`;
-  };
-
-  const updateProgressiveStatus = async (progressiveId: string) => {
-    const progressiveRef = firebase.firestore().collection("progressives").doc(progressiveId);
-    try {
-      await progressiveRef.update({
-        status: "Đã sử dụng",
-      });
-    } catch (error) {
-      console.log(`Error updating document: ${error}`);
-    }
   };
 
   const addNoteToCollection = async (action: string) => {
@@ -138,9 +124,9 @@ function AddProgressives() {
         console.error("Failed to fetch IP address:", error);
         return "";
       });
-  
+
     // Lấy userId từ localStorage
-    const userName = localStorage.getItem('userName');
+    const userName = localStorage.getItem("userName");
     try {
       await noteUsersCollection.add({
         action: action,
@@ -152,14 +138,28 @@ function AddProgressives() {
       console.error(error);
     }
   };
-  
+
+  const [progressiveNumber, setProgressiveNumber] = useState<number>(0);
+
   const handleAddProgressive = async () => {
-    const progressiveCollection = firebase.firestore().collection("progressives");
-    const progressiveId = selectedServiceData?.progressiveId;
+    const progressiveCollection = firebase
+      .firestore()
+      .collection("progressives");
     const serviceRef = firebase.firestore().doc(`services/${selectedService}`);
     try {
+      const lastProgressiveSnapshot = await progressiveCollection
+        .orderBy("number", "desc")
+        .limit(1)
+        .get();
+      let lastProgressiveNumber = 0;
+      if (!lastProgressiveSnapshot.empty) {
+        const lastProgressiveData = lastProgressiveSnapshot.docs[0].data();
+        lastProgressiveNumber = lastProgressiveData.number;
+      }
+      const newProgressiveNumber = lastProgressiveNumber + 1;
+      setProgressiveNumber(newProgressiveNumber);
       await progressiveCollection.add({
-        number: progressiveId,
+        number: newProgressiveNumber,
         nameService: serviceRef,
         timeCreate: getCurrentTime(),
         deadLineUsed: getExpirationTime(),
@@ -169,10 +169,12 @@ function AddProgressives() {
         authManagementId: userId,
         status: "Đang chờ",
       });
+      message.success(`Thêm mới cấp số ${newProgressiveNumber} thành công!`)
+      // Thêm ghi chú vào collection noteUsers
+      await addNoteToCollection(`Thêm mới cấp số: ${newProgressiveNumber}`);
 
-
- // Thêm ghi chú vào collection noteUsers
- await addNoteToCollection(`Thêm mới cấp số: ${progressiveId}`);
+      localStorage.setItem("progressiveAddedTime", getCurrentTime());
+      localStorage.setItem("progressiveExpirationTime", getExpirationTime());
 
       window.location.href = "/progressive";
     } catch (error) {
@@ -197,22 +199,6 @@ function AddProgressives() {
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -232,7 +218,7 @@ function AddProgressives() {
                   <Form>
                     <Form.Item>
                       <Select
-                        style={{ width:300 }}
+                        style={{ width: 300 }}
                         className="text-start"
                         onChange={handleServiceChange}
                         value={selectedService}
@@ -299,7 +285,7 @@ function AddProgressives() {
                             className="text-center my-4 fw-bold"
                             style={{ color: "#FF9138" }}
                           >
-                            {selectedServiceData?.progressiveId}
+                            {progressiveNumber}
                           </h1>
 
                           <p className="text-center">

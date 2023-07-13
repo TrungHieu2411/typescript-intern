@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import {
   Badge,
-  Button,
   Card,
   Input,
   Layout,
@@ -10,7 +9,7 @@ import {
   Space,
   Table,
 } from "antd";
-import { BellFilled, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 import SlideMain from "../../containers/SlideMain";
@@ -23,15 +22,6 @@ import firebase from "firebase/compat/app";
 import { setData } from "../../redux/device/deviceSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-
-const popoverContent = (
-  <Card
-    title="Thông báo"
-    className="p-0 m-0"
-    bordered={false}
-    style={{ width: 270 }}
-  ></Card>
-);
 
 const renderIsActive = (status: string) => {
   let color = "";
@@ -73,7 +63,9 @@ interface DeviceData {
 
 function ListDevices() {
   const dispatch = useDispatch();
-  const deviceData = useSelector((state: RootState) => state.firestoreDeviceData.data);
+  const deviceData = useSelector(
+    (state: RootState) => state.firestoreDeviceData.data
+  );
 
   useEffect(() => {
     const fetchDevice = async () => {
@@ -85,7 +77,7 @@ function ListDevices() {
           snapshot.docs.map(async (doc) => {
             const device = doc.data() as DeviceData;
             device.id = doc.id;
-        
+
             const authManagementId = device.authManagementId;
             if (authManagementId) {
               const authManagementRef = firebase
@@ -93,7 +85,7 @@ function ListDevices() {
                 .collection("authManagements")
                 .doc(authManagementId);
               const authManagementSnapshot = await authManagementRef.get();
-        
+
               if (authManagementSnapshot.exists) {
                 const authManagementData = authManagementSnapshot.data();
                 if (authManagementData) {
@@ -127,22 +119,6 @@ function ListDevices() {
               </div>
               <div className="col-auto">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
                   <Account />
                 </span>
               </div>
@@ -244,9 +220,7 @@ function ListDevices() {
                     title="Trạng thái hoạt động"
                     dataIndex="isActive"
                     key="isActive"
-                    render={(isActive: string) =>
-                      renderIsActive(isActive)
-                    }
+                    render={(isActive: string) => renderIsActive(isActive)}
                   />
                   <Table.Column
                     title="Trạng thái kết nối"
