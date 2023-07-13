@@ -32,10 +32,10 @@ function RoleManagement() {
   const [authManagementData, setAuthManagementData] = useState<
     AuthManagementData[]
   >([]);
-
   const [roleManagementData, setRoleManagementData] = useState<
     RoleManagementData[]
   >([]);
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,7 +100,15 @@ function RoleManagement() {
     return nameRoleCounts;
   };
 
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+  };
+
   const nameRoleCounts = countNameRoleOccurrences();
+
+  const filteredRoleManagementData = roleManagementData.filter((role) =>
+    role.nameRole.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
 
   return (
     <Layout className="layout">
@@ -130,7 +138,7 @@ function RoleManagement() {
                   </Col>
                 </Row>
               </Col>
-              <Col lg={9}>
+            <Col lg={9}>
                 <Row style={{ maxWidth: 325 }} className="ms-3">
                   <label htmlFor="">Từ khóa</label>
                   <Col span={24}>
@@ -145,6 +153,7 @@ function RoleManagement() {
                           />
                         </Space>
                       }
+                      onChange={(e) => handleSearch(e.target.value)}
                     />
                   </Col>
                 </Row>
@@ -153,8 +162,8 @@ function RoleManagement() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={roleManagementData}
-                  pagination={{ pageSize: 5 }}
+                    dataSource={filteredRoleManagementData}
+                  pagination={{ pageSize: 4 }}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"

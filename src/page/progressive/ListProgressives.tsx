@@ -53,10 +53,70 @@ interface ProgressiveData {
   fullName: string;
   authManagementId: string;
   typeDevice: string;
-  nameService: firebase.firestore.DocumentReference | null;
+  nameService:
+    | firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
+    | string;
+}
+
+interface ServiceData {
+  id: string;
+  nameService: string;
+}
+
+interface DeviceData {
+  id: string;
+  typeDevice: string;
 }
 
 function ListProgressives() {
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filterNameService, setFilterNameService] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterTypeDevice, setFilterTypeDevice] = useState<string>("all");
+  //-------
+  const [serviceData, setServiceData] = useState<ServiceData[]>([]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      const serviceRef = firebase.firestore().collection("services");
+      const snapshot = await serviceRef.get();
+      setServiceData(
+        snapshot.docs.map((doc) => {
+          const service = doc.data() as ServiceData;
+          service.id = doc.id;
+          return service;
+        })
+      );
+    };
+
+    fetchServices();
+  }, []);
+  //------------
+
+  const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+      const deviceRef = firebase.firestore().collection("devices");
+      const snapshot = await deviceRef.get();
+      const uniqueDevices = new Set<string>();
+
+      snapshot.docs.forEach((doc) => {
+        const device = doc.data() as DeviceData;
+        device.id = doc.id;
+        uniqueDevices.add(device.typeDevice);
+      });
+
+      const devices = Array.from(uniqueDevices).map((typeDevice) => ({
+        id: typeDevice,
+        typeDevice: typeDevice,
+      }));
+
+      setDeviceData(devices);
+    };
+
+    fetchDevices();
+  }, []);
   //------------
   const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
 
@@ -65,50 +125,97 @@ function ListProgressives() {
       const progressiveRef = firebase.firestore().collection("progressives");
       const snapshot = await progressiveRef.get();
       setProgressiveData(
-        await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const progressive = doc.data() as ProgressiveData;
-            progressive.id = doc.id;
+        await (
+          await Promise.all(
+            snapshot.docs.map(async (doc) => {
+              const progressive = doc.data() as ProgressiveData;
+              progressive.id = doc.id;
 
-            const serviceRef = progressive.nameService;
-            if (
-              serviceRef &&
-              serviceRef instanceof firebase.firestore.DocumentReference
-            ) {
-              const serviceDoc = await serviceRef.get();
-              if (serviceDoc.exists) {
-                const serviceData = serviceDoc.data();
-                if (serviceData && serviceData.nameService) {
-                  const nameService = serviceData.nameService;
-                  progressive.nameService = nameService;
+              const serviceRef = progressive.nameService;
+              if (
+                serviceRef !== null &&
+                serviceRef instanceof firebase.firestore.DocumentReference
+              ) {
+                const serviceDoc = await serviceRef.get();
+                if (serviceDoc.exists) {
+                  const serviceData = serviceDoc.data();
+                  if (serviceData && serviceData.nameService) {
+                    const nameService = serviceData.nameService;
+                    progressive.nameService = nameService;
+                  }
                 }
               }
-            }
 
-            const authManagementId = progressive.authManagementId;
-            if (authManagementId) {
-              // Fetch the associated device document
-              const deviceRef = firebase
-                .firestore()
-                .collection("devices")
-                .where("authManagementId", "==", authManagementId);
-              const deviceSnapshot = await deviceRef.get();
+              const authManagementId = progressive.authManagementId;
+              if (authManagementId) {
+                // Fetch the associated device document
+                const deviceRef = firebase
+                  .firestore()
+                  .collection("devices")
+                  .where("authManagementId", "==", authManagementId);
+                const deviceSnapshot = await deviceRef.get();
 
-              if (!deviceSnapshot.empty) {
-                const deviceData = deviceSnapshot.docs[0].data();
-                const typeDevice = deviceData.typeDevice;
-                progressive.typeDevice = typeDevice;
+                if (!deviceSnapshot.empty) {
+                  const deviceData = deviceSnapshot.docs[0].data();
+                  const typeDevice = deviceData.typeDevice;
+                  progressive.typeDevice = typeDevice;
+                }
               }
-            }
 
-            return progressive;
-          })
-        )
+              return progressive;
+            })
+          )
+        ).sort((a, b) => Number(a.number) - Number(b.number)) // Sắp xếp theo STT tăng dần
       );
     };
 
     fetchProgressive();
   }, []);
+
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+  };
+
+  const filteredAuthManagementData = progressiveData
+    .filter((progressive) =>
+      progressive.nameService
+        .toString()
+        .toLowerCase()
+        .includes(searchKeyword.toLowerCase())
+    )
+    .filter((progressive) => {
+      if (filterNameService === "all") {
+        return true;
+      } else {
+        return progressive.nameService === filterNameService;
+      }
+    })
+    .filter((progressive) => {
+      if (filterStatus === "all") {
+        return true;
+      } else {
+        return progressive.status === filterStatus;
+      }
+    })
+    .filter((progressive) => {
+      if (filterTypeDevice === "all") {
+        return true;
+      } else {
+        return progressive.typeDevice === filterTypeDevice;
+      }
+    });
+
+  const handleFilterChangeNameService = (value: string) => {
+    setFilterNameService(value);
+  };
+
+  const handleFilterChangeStatus = (value: string) => {
+    setFilterStatus(value);
+  };
+
+  const handleFilterChangeTypeDevice = (value: string) => {
+    setFilterTypeDevice(value);
+  };
 
   return (
     <Layout className="layout">
@@ -140,17 +247,15 @@ function ListProgressives() {
                       size="large"
                       defaultValue="all"
                       style={{ width: 170 }}
+                      onChange={handleFilterChangeNameService}
+                      value={filterNameService} // Thêm giá trị value để đồng bộ giá trị hiển thị
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
-                      <Select.Option value="active">
-                        Khám sản - Phụ khoa
-                      </Select.Option>
-                      <Select.Option value="inactive">
-                        Khám răng hàm mặt
-                      </Select.Option>
-                      <Select.Option value="inactive">
-                        Khám tai mũi họng
-                      </Select.Option>
+                      {serviceData.map((service) => (
+                        <Select.Option key={service.id} value={service.nameService}>
+                          {service.nameService}
+                        </Select.Option>
+                      ))}
                     </Select>
                   </div>
                 </div>
@@ -166,13 +271,15 @@ function ListProgressives() {
                       size="large"
                       defaultValue="all"
                       style={{ width: 170 }}
+                      onChange={handleFilterChangeStatus}
+                      value={filterStatus} // Thêm giá trị value để đồng bộ giá trị hiển thị
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
-                      <Select.Option value="connected">Đang chờ</Select.Option>
-                      <Select.Option value="disconnected">
+                      <Select.Option value="Đang chờ">Đang chờ</Select.Option>
+                      <Select.Option value="Đã sử dụng">
                         Đã sử dụng
                       </Select.Option>
-                      <Select.Option value="disconnected">Bỏ qua</Select.Option>
+                      <Select.Option value="Bỏ qua">Bỏ qua</Select.Option>
                     </Select>
                   </div>
                 </div>
@@ -188,12 +295,18 @@ function ListProgressives() {
                       size="large"
                       defaultValue="all"
                       style={{ width: 170 }}
+                      onChange={handleFilterChangeTypeDevice}
+                      value={filterTypeDevice} // Thêm giá trị value để đồng bộ giá trị hiển thị
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
-                      <Select.Option value="connected">Kiosk</Select.Option>
-                      <Select.Option value="disconnected">
-                        Hệ thống
-                      </Select.Option>
+                      {deviceData.map((device) => (
+                        <Select.Option
+                          key={device.id}
+                          value={device.typeDevice}
+                        >
+                          {device.typeDevice}
+                        </Select.Option>
+                      ))}
                     </Select>
                   </div>
                 </div>
@@ -231,6 +344,7 @@ function ListProgressives() {
                           />
                         </Space>
                       }
+                      onChange={(e) => handleSearch(e.target.value)}
                     />
                   </div>
                 </div>
@@ -239,7 +353,7 @@ function ListProgressives() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={progressiveData}
+                  dataSource={filteredAuthManagementData}
                   pagination={{ pageSize: 5 }}
                   bordered
                   rowClassName={() => "table-row"}

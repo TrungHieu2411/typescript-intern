@@ -128,9 +128,6 @@ function AddDevices() {
       if (matchingData) {
         const authManagementId = matchingData.id;
 
-        // Hiển thị thông báo "Thiết bị đã được thêm thành công"
-        message.success("Thiết bị đã được thêm thành công");
-
         // Thực hiện thêm thiết bị và lưu trữ authManagementId
         const deviceCollection = firebase.firestore().collection("devices");
         await deviceCollection.add({

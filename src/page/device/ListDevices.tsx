@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Badge,
   Card,
@@ -62,10 +62,11 @@ interface DeviceData {
 }
 
 function ListDevices() {
-  const dispatch = useDispatch();
-  const deviceData = useSelector(
-    (state: RootState) => state.firestoreDeviceData.data
-  );
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filterIsActive, setFilterIsActive] = useState<string>("all");
+  const [filterIsConnected, setFilterIsConnected] = useState<string>("all");
+
+  const [deviceData, setdeviceData] = useState<DeviceData[]>([]);
 
   useEffect(() => {
     const fetchDevice = async () => {
@@ -97,15 +98,45 @@ function ListDevices() {
             return device;
           })
         );
-
-        dispatch(setData(deviceData));
+        setdeviceData(deviceData);
       } catch (error) {
         console.log(error);
       }
     };
 
     fetchDevice();
-  }, [dispatch]);
+  });
+
+
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+  };
+
+  const filteredDeviceData = deviceData
+  .filter((device) =>
+    device.nameDevice.toLowerCase().includes(searchKeyword.toLowerCase())
+  )
+  .filter((device) => {
+    if (filterIsActive === "all") {
+      return true;
+    } else {
+      return device.isActive === filterIsActive;
+    }
+  }).filter((device) => {
+    if (filterIsConnected === "all") {
+      return true;
+    } else {
+      return device.isConnected === filterIsConnected;
+    }
+  });
+
+  const handleFilterChangeActive = (value: string) => {
+    setFilterIsActive(value);
+  };
+
+  const handleFilterChangeConnected = (value: string) => {
+    setFilterIsConnected(value);
+  };
 
   return (
     <Layout className="layout">
@@ -137,10 +168,12 @@ function ListDevices() {
                       size="large"
                       defaultValue="all"
                       style={{ width: 280 }}
+                      onChange={handleFilterChangeActive}
+                      value={filterIsActive} // Thêm giá trị value để đồng bộ giá trị hiển thị
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
-                      <Select.Option value="active">Hoạt động</Select.Option>
-                      <Select.Option value="inactive">
+                      <Select.Option value="Hoạt động">Hoạt động</Select.Option>
+                      <Select.Option value="Ngưng hoạt động">
                         Ngưng hoạt động
                       </Select.Option>
                     </Select>
@@ -158,10 +191,12 @@ function ListDevices() {
                       size="large"
                       defaultValue="all"
                       style={{ width: 280 }}
+                      onChange={handleFilterChangeConnected}
+                      value={filterIsConnected} // Thêm giá trị value để đồng bộ giá trị hiển thị
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
-                      <Select.Option value="connected">Kết nối</Select.Option>
-                      <Select.Option value="disconnected">
+                      <Select.Option value="Kết nối">Kết nối</Select.Option>
+                      <Select.Option value="Mất kết nối">
                         Mất kết nối
                       </Select.Option>
                     </Select>
@@ -187,6 +222,7 @@ function ListDevices() {
                           />
                         </Space>
                       }
+                       onChange={(e) => handleSearch(e.target.value)}
                     />
                   </div>
                 </div>
@@ -195,8 +231,8 @@ function ListDevices() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={deviceData}
-                  pagination={{ pageSize: 5 }}
+                  dataSource={filteredDeviceData}
+                  pagination={{ pageSize: 4 }}
                   bordered
                   className="mb-3"
                   rowClassName={() => "table-row"}

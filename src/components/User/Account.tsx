@@ -81,10 +81,10 @@ const Account = () => {
   const popoverContent = (
     <div
       style={{
-        width: 340,
-        marginTop: -10,
+        width: 300,
+        marginTop: -11,
         marginLeft: -20,
-        marginRight: -75,
+        marginRight: -20,
         borderRadius: 5,
         maxHeight: 400, // Đặt chiều cao tối đa của phần tử
         overflowY: "auto", // Kích hoạt cuộn theo chiều dọc khi danh sách vượt quá chiều cao tối đa
@@ -97,7 +97,7 @@ const Account = () => {
           top: 0,
           backgroundColor: "white",
           zIndex: 1,
-          width: 270,
+          width: 283,
         }}
       >
         <h5 className="item-title ps-3">Thông báo</h5>

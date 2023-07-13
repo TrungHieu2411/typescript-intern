@@ -50,6 +50,9 @@ interface ServiceData {
 function ListService() {
   const [serviceData, setServiceData] = useState<ServiceData[]>([]);
 
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filterIsActive, setFilterIsActive] = useState<string>("all");
+
   useEffect(() => {
     const fetchServiceData = async () => {
       try {
@@ -105,6 +108,24 @@ function ListService() {
     fetchServiceData();
   }, []);
 
+
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+  };
+
+  const filteredRoleManagementData = serviceData.filter((service) =>
+  service.nameService.toLowerCase().includes(searchKeyword.toLowerCase())
+  ).filter((auth) => {
+    if (filterIsActive === "all") {
+      return true;
+    } else {
+      return auth.isActive === filterIsActive;
+    }
+  });
+
+const handleFilterChange = (value: string) => {
+  setFilterIsActive(value);
+};
   return (
     <Layout className="layout">
       <SlideMain />
@@ -131,14 +152,16 @@ function ListService() {
                     <label htmlFor="">Trạng thái hoạt động</label>
                   </div>
                   <div className="col-12">
-                    <Select
+                  <Select
                       size="large"
                       defaultValue="all"
                       style={{ width: 280 }}
+                      onChange={handleFilterChange}
+                      value={filterIsActive} // Thêm giá trị value để đồng bộ giá trị hiển thị
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
-                      <Select.Option value="active">Hoạt động</Select.Option>
-                      <Select.Option value="inactive">
+                      <Select.Option value="Hoạt động">Hoạt động</Select.Option>
+                      <Select.Option value="Ngưng hoạt động">
                         Ngưng hoạt động
                       </Select.Option>
                     </Select>
@@ -181,6 +204,7 @@ function ListService() {
                           />
                         </Space>
                       }
+                      onChange={(e) => handleSearch(e.target.value)}
                     />
                   </div>
                 </div>
@@ -189,9 +213,9 @@ function ListService() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={serviceData}
+                  dataSource={filteredRoleManagementData}
                  
-                  pagination={{pageSize: 5}}
+                  pagination={{pageSize: 3}}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"

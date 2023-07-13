@@ -23,6 +23,7 @@ interface ProgressiveData {
   phone: string;
   email: string;
   authManagementId: string;
+  status: string;
 }
 
 interface DeviceData {
@@ -43,6 +44,7 @@ function DetailProgressives() {
     email: "",
     authManagementId: "",
     id: "",
+    status: "",
   });
 
   const [typeDevice, setTypeDevice] = useState<string>("");
@@ -224,7 +226,7 @@ function DetailProgressives() {
                             <p className="me-5 fw-bold">Trạng thái:</p>{" "}
                           </td>
                           <td>
-                            <p>đâsdasd</p>
+                            <p>{progressive.status}</p>
                           </td>
                         </tr>
                         <tr>

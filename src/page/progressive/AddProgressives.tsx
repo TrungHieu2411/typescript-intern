@@ -24,6 +24,15 @@ interface ServiceData {
 }
 
 function AddProgressives() {
+  const determineCounter = (serviceId: string): number => {
+    const serviceIndex = nameService.findIndex(
+      (service) => service.id === serviceId
+    );
+  
+    return Math.floor(serviceIndex / 3) + 1;
+  };
+
+  //-------
   const [nameService, setService] = useState<ServiceData[]>([]);
   useEffect(() => {
     const fetchService = async () => {
@@ -106,7 +115,7 @@ function AddProgressives() {
 
   const getExpirationTime = () => {
     const currentDate = new Date();
-    currentDate.setSeconds(currentDate.getSeconds() + 30); // Thêm 30 giây vào thời gian hiện tại
+    currentDate.setHours(currentDate.getHours() + 5);   
     const expirationHour = currentDate.getHours();
     const expirationMinute = currentDate.getMinutes();
     const currentDay = currentDate.getDate();
@@ -291,17 +300,7 @@ function AddProgressives() {
                           <p className="text-center">
                             DV: {selectedServiceData?.nameService}{" "}
                             <span className="fw-bold">
-                              (tại quầy số{" "}
-                              {selectedService === "Khám tim mạch"
-                                ? 1
-                                : selectedService === "Khám sản - Phụ khoa"
-                                ? 2
-                                : selectedService === "Khám răng hàm mặt"
-                                ? 3
-                                : selectedService === "Khám tai mũi họng"
-                                ? 4
-                                : ""}
-                              )
+                              (tại quầy số {determineCounter(selectedService)})
                             </span>
                           </p>
                         </Modal>

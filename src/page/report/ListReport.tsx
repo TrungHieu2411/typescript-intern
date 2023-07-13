@@ -95,6 +95,48 @@ function ListReport() {
     fetchProgressive();
   }, []);
 
+  const handleTableChange = (pagination: any, filters: any, sorter: any) => {
+    const { order } = sorter;
+
+    let sortedData = [...progressiveData];
+
+    sortedData = [...progressiveData].sort((a, b) => {
+      if (sorter.field === "number") {
+        return Number(a.number) - Number(b.number);
+      } else if (sorter.field === "nameService") {
+        const nameA = a.nameService
+          ? a.nameService.toString().toLowerCase()
+          : "";
+        const nameB = b.nameService
+          ? b.nameService.toString().toLowerCase()
+          : "";
+        return nameA.localeCompare(nameB);
+      } else if (sorter.field === "timeCreate") {
+        const dateA = new Date(a.timeCreate).getTime();
+        const dateB = new Date(b.timeCreate).getTime();
+        return dateA - dateB;
+      } else if (sorter.field === "status") {
+        const statusA = a.status.toLowerCase();
+        const statusB = b.status.toLowerCase();
+        return statusA.localeCompare(statusB);
+      } else if (sorter.field === "typeDevice") {
+        const deviceA = a.typeDevice.toLowerCase();
+        const deviceB = b.typeDevice.toLowerCase();
+        return deviceA.localeCompare(deviceB);
+      }
+      return 0;
+    });
+
+
+    if (order === "descend") {
+      setProgressiveData(sortedData.reverse());
+    } else {
+      setProgressiveData(sortedData);
+    }
+  };
+
+
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -118,7 +160,8 @@ function ListReport() {
                     <label htmlFor="">Chọn thời gian</label>
                   </div>
                   <div className="col">
-                    <DatePicker size="large" style={{ width: 130 }} />
+                    <DatePicker size="large" style={{ width: 130 }} 
+                     />
                     <img
                       style={{ width: 15 }}
                       src="../assets/image/arrow-right.png"
@@ -137,36 +180,42 @@ function ListReport() {
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"
+                  onChange={handleTableChange}
                 >
                   <Column
                     title={<span className="table-title">Số thứ tự</span>}
                     dataIndex="number"
                     key="number"
                     render={(text: string) => <span>{text}</span>}
+                    sorter={{ multiple: 1 }}
                   />
                   <Column
                     title={<span className="table-title">Tên dịch vụ</span>}
                     dataIndex="nameService"
                     key="nameService"
                     render={(text: string) => <span>{text}</span>}
+                    sorter={{ multiple: 1 }}
                   />
                   <Column
                     title={<span className="table-title">Thời gian cấp</span>}
                     dataIndex="timeCreate"
                     key="timeCreate"
                     render={(text: string) => <span>{text}</span>}
+                    sorter={{ multiple: 1 }}
                   />
                   <Column
                     title={<span className="table-title">Trạng thái</span>}
                     dataIndex="status"
                     key="status"
                     render={(status: string) => renderStatus(status)}
+                    sorter={{ multiple: 1 }}
                   />
                   <Column
                     title={<span className="table-title">Nguồn cấp</span>}
                     dataIndex="typeDevice"
                     key="typeDevice"
                     render={(text: string) => <span>{text}</span>}
+                    sorter={{ multiple: 1 }}
                   />
                 </Table>
               </div>

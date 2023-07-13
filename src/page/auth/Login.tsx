@@ -112,14 +112,14 @@ const Login: React.FC = () => {
                     ]}
                     validateStatus={
                       showError &&
-                      formRef.current?.getFieldValue("email") &&
+                      formRef.current?.getFieldValue("userName") &&
                       formRef.current?.getFieldValue("password")
                         ? "error"
                         : ""
                     }
                     help={
                       showError &&
-                      formRef.current?.getFieldValue("email") &&
+                      formRef.current?.getFieldValue("userName") &&
                       formRef.current?.getFieldValue("password") ? (
                         <div className="mb-4 mt-2 d-flex align-items-center">
                           <ExclamationCircleOutlined className="me-1 fs-5" />

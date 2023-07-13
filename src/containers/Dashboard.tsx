@@ -253,7 +253,7 @@ function Dashboard() {
                         <p>
                           Xem theo{" "}
                           <Select style={{ width: 85 }}>
-                            {["Tháng", "Năm"].map((option) => (
+                            {["Ngày", "Tháng", "Năm"].map((option) => (
                               <Select.Option key={option}>
                                 {option}
                               </Select.Option>

@@ -41,6 +41,7 @@ const renderIsActive = (status: string) => {
 };
 
 interface AuthManagementData {
+  userName: string;
   id: string;
   fullName: string;
   phone: string;
@@ -52,6 +53,9 @@ function AuthManagements() {
   const [authManagementData, setAuthManagementData] = useState<
     AuthManagementData[]
   >([]);
+
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filterIsActive, setFilterIsActive] = useState<string>("all");
 
   useEffect(() => {
     const fetchAuthManagement = async () => {
@@ -89,6 +93,26 @@ function AuthManagements() {
     fetchAuthManagement();
   });
 
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+  };
+
+  const filteredAuthManagementData = authManagementData
+    .filter((auth) =>
+      auth.userName.toLowerCase().includes(searchKeyword.toLowerCase())
+    )
+    .filter((auth) => {
+      if (filterIsActive === "all") {
+        return true;
+      } else {
+        return auth.isActive === filterIsActive;
+      }
+    });
+
+  const handleFilterChange = (value: string) => {
+    setFilterIsActive(value);
+  };
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -114,16 +138,18 @@ function AuthManagements() {
             <Row justify="space-between" className="pt-2">
               <Col lg={5}>
                 <Row style={{ maxWidth: 200 }}>
-                  <label htmlFor="">Tên vai trò</label>
+                  <label htmlFor="">Trạng thái</label>
                   <Col span={24}>
                     <Select
                       size="large"
                       defaultValue="all"
                       style={{ width: 325 }}
+                      onChange={handleFilterChange}
+                      value={filterIsActive} // Thêm giá trị value để đồng bộ giá trị hiển thị
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
-                      <Select.Option value="active">Hoạt động</Select.Option>
-                      <Select.Option value="inactive">
+                      <Select.Option value="Hoạt động">Hoạt động</Select.Option>
+                      <Select.Option value="Ngưng hoạt động">
                         Ngưng hoạt động
                       </Select.Option>
                     </Select>
@@ -145,6 +171,7 @@ function AuthManagements() {
                           />
                         </Space>
                       }
+                      onChange={(e) => handleSearch(e.target.value)}
                     />
                   </Col>
                 </Row>
@@ -154,9 +181,8 @@ function AuthManagements() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={authManagementData}
-                  
-                  pagination={{pageSize: 5}}
+                  dataSource={filteredAuthManagementData}
+                  pagination={{ pageSize: 5 }}
                   bordered
                   className="mb-3"
                 >
@@ -210,7 +236,6 @@ function AuthManagements() {
                     )}
                   />
                 </Table>
-                
               </div>
               <div className="col-1 mt-3">
                 <Link to={"/addAuthManagement"}>
