@@ -30,19 +30,15 @@ interface UserData {
   email: string;
   role: firebase.firestore.DocumentReference | null;
   isActive: string;
-  image: string;
+  image: string; // Thêm trường image vào đây
   userName: string;
   password: string;
 }
 
+
 function Admin() {
-  // Ảnh
-  const [loadingImage, setLoadingImage] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<any>(null);
-  // Vai trò
+  
   const [roleValue, setRoleValue] = useState<string | null>(null);
-  // -------
   const { id } = useParams<{ id: string }>();
   const [user, setUser] = useState<UserData>({
     id: "",
@@ -55,10 +51,16 @@ function Admin() {
     userName: "",
     password: "",
   });
-  // Cập nhật tài khoản
-  const handleUpdateAuthManagement = async () => {
+
+
+  const [loadingImage, setLoadingImage] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<any>(null);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleUpdateAuthManagement = () => {
     const userRef = firebase.firestore().collection("authManagements").doc(id);
-    const updatedUser: UserData = {
+    const updatedUser = {
       fullName: user.fullName,
       phone: user.phone,
       email: user.email,
@@ -67,22 +69,19 @@ function Admin() {
       image: imageUrl || user.image,
       userName: user.userName,
       password: user.password,
-      id: user.id,
     };
 
-    try {
-      await userRef.update(updatedUser);
-      console.log("AuthManagement updated successfully!");
-    } catch (error) {
-      console.error("Error updating AuthManagement:", error);
-    }
+    userRef
+      .update(updatedUser)
+      .then(() => {
+        console.log("AuthManagement updated successfully!");
+      })
+      .catch((error) => {
+        console.error("Error updating AuthManagement:", error);
+      });
   };
-
-  // Lưu userName vào localStorage
-  useEffect(() => {
-    localStorage.setItem("userName", user.userName);
-  }, [user.userName]);
-
+  
+  
   const handleImageUpload = async (file: any) => {
     setLoadingImage(true);
     setImageFile(file);
@@ -96,24 +95,24 @@ function Admin() {
       setImageUrl(imageUrl);
       setLoadingImage(false);
   
-      // Gọi hàm cập nhật tài khoản sau khi ảnh đã được upload
-      handleUpdateAuthManagement();
+      // Cập nhật trường 'image' của đối tượng 'user'
+      setUser({
+        ...user,
+        image: imageUrl,
+      });
     } catch (error) {
       setLoadingImage(false);
       console.error("Error uploading image:", error);
     }
   };
-
-  // Lấy id tài khoản
+  
+  
+//------------
   const storedUserId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userRef = firebase
-        .firestore()
-        .collection("authManagements")
-        .doc(storedUserId || id);
-
+      const userRef = firebase.firestore().collection("authManagements").doc(storedUserId || id);
       const userSnapshot = await userRef.get();
 
       if (userSnapshot.exists) {
@@ -126,12 +125,25 @@ function Admin() {
     fetchUser();
   }, [storedUserId, id]);
 
-  // Liên kết bảng authManagements với bảng roles
+  //--------------
+  useEffect(() => {
+    const updateAuthManagement = () => {
+      if (imageUrl) {
+        handleUpdateAuthManagement();
+      }
+    };
+
+    updateAuthManagement();
+  }, [handleUpdateAuthManagement, imageUrl]);
+
+  //---------------
   const [authManagementData, setAuthManagementData] = useState<UserData[]>([]);
+
   useEffect(() => {
     const fetchAuthManagement = async () => {
       const authManagementRef = firebase.firestore().collection("authManagements");
       const snapshot = await authManagementRef.get();
+
       setAuthManagementData(
         await Promise.all(
           snapshot.docs.map(async (doc) => {
@@ -150,15 +162,16 @@ function Admin() {
                 }
               }
             }
+
             return authManagement;
           })
         )
       );
     };
+
     fetchAuthManagement();
   }, []);
 
-  // Lấy tên vai trò
   useEffect(() => {
     const fetchRoleData = async () => {
       if (user.role) {

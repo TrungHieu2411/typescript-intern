@@ -22,6 +22,7 @@ interface AuthManagementData {
   role: string; // Thay đổi kiểu dữ liệu của role thành DocumentReference
   isActive: string;
   userName: string;
+  image: string;
   password: string;
   confirmPassword: string;
 }
@@ -61,6 +62,7 @@ function AddAuthManagements() {
       email: "",
       role: "", // Khởi tạo role ban đầu là null
       isActive: "",
+      image: "",
       userName: "",
       password: "",
       confirmPassword: "",
@@ -111,6 +113,7 @@ function AddAuthManagements() {
         isActive: newAuthManagement.isActive,
         userName: newAuthManagement.userName,
         password: newAuthManagement.password,
+        image: "",
       });
       message.success(`Thêm mới tài khoản ${newAuthManagement.userName} thành công!`)
 
