@@ -117,7 +117,7 @@ function DetailServices() {
             </div>
             <div className="row mt-3">
               <div className="col-4 mt-3">
-                <Card style={{ height: 550 }}>
+                <Card style={{ height: 530 }}>
                   <h6 style={{ color: "#FF7506" }}>Thông tin dịch vụ</h6>
                   <Form className="mt-3">
                     <table>
@@ -211,7 +211,7 @@ function DetailServices() {
                 </Card>
               </div>
               <div className="col-7 mt-3">
-                <Card style={{ height: 550 }}>
+                <Card style={{ height: 530 }}>
                   <div className="row">
                     <div className="col-3">
                       <label htmlFor="">Trạng thái</label>
@@ -259,10 +259,10 @@ function DetailServices() {
                   <div className="row mt-3">
                     <Table
                       dataSource={progressiveData}
-                        pagination={{ pageSize: 5 }}
+                        pagination={{ pageSize: 8 }}
                       size="small"
                       rowClassName={() => "table-row"}
-                      className="custom-table mb-4 pb-3"
+                      className="custom-table"
                     >
                       <Table.Column
                         title={<span className="table-title">Số thứ tự</span>}

@@ -151,6 +151,8 @@ function AddAuthManagements() {
     }));
     setPasswordMatchError(passwordMatchError);
   };
+
+  
   return (
     <Layout className="layout">
       <SlideMain />

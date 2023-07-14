@@ -25,6 +25,7 @@ interface ServiceData {
   codeService: string;
   nameService: string;
   description: string;
+  isActive: string;
 }
 function UpdateServices() {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +34,7 @@ function UpdateServices() {
     codeService: "",
     nameService: "",
     description: "",
+    isActive: "",
   });
 
   useEffect(() => {
@@ -80,8 +82,9 @@ function UpdateServices() {
       codeService: service.codeService,
       nameService: service.nameService,
       description: service.description,
+      isActive: "Hoạt động"
     };
-    message.success(`Thêm mới một ${service.codeService} thành công!`);
+    message.success(`Cập nhật thông tin ${service.codeService} thành công!`);
     // Thêm ghi chú vào collection noteUsers
     await addNoteToCollection(`Cập nhật dịch vụ: ${service.codeService}`);
 

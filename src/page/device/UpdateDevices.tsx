@@ -112,8 +112,8 @@ function UpdateDevices() {
       codeDevice: device.codeDevice,
       nameDevice: device.nameDevice,
       ipAddress: device.ipAddress,
-      isActive: device.isActive,
-      isConnected: device.isConnected,
+      isActive: "Hoạt động",
+      isConnected: "Kết nối",
       service: device.service,
       typeDevice: device.typeDevice,
       authManagementId: device.authManagementId,
@@ -126,7 +126,8 @@ function UpdateDevices() {
     await addNoteToCollection(
       `Cập nhật thông tin thiết bị: ${device.codeDevice}`
     );
-
+    // Thực hiện điều hướng đến trang danh sách sản phẩm
+    window.location.href = "/device";
     const authManagementInfo = {
       userName: authManagement.userName,
       password: authManagement.password,
@@ -165,11 +166,12 @@ function UpdateDevices() {
                 <Form className="mt-3">
                   <div className="row">
                     <div className="col-6">
-                      <label htmlFor="" className="mb-2">
+                      <label htmlFor="codeDevice" className="mb-2">
                         Mã thiết bị: <span style={{ color: "#FF7506" }}></span>
                       </label>
-                      <Form.Item className="">
+                      <Form.Item className="" id="codeDevice">
                         <Input
+                          id="codeDevice"
                           value={device.codeDevice}
                           onChange={(e) =>
                             setDevice({
@@ -181,8 +183,9 @@ function UpdateDevices() {
                         />
                       </Form.Item>
                     </div>
+
                     <div className="col-6">
-                      <label htmlFor="" className="mb-2">
+                      <label htmlFor="typeDevice" className="mb-2">
                         Loại thiết bị:{" "}
                         <span style={{ color: "#FF7506" }}></span>
                       </label>
@@ -208,16 +211,17 @@ function UpdateDevices() {
                       </Form.Item>
                     </div>
                     <div className="col-6">
-                      <label htmlFor="" className="mb-2">
+                      <label htmlFor="nameDevice" className="mb-2">
                         Tên thiết bị: <span style={{ color: "#FF7506" }}></span>
                       </label>
-                      <Form.Item className="">
+                      <Form.Item className="" id="nameDevice">
                         <Input
+                          id="nameDevice"
                           value={device.nameDevice}
                           onChange={(e) =>
                             setDevice({
                               ...device,
-                              codeDevice: e.target.value,
+                              nameDevice: e.target.value,
                             })
                           }
                           placeholder="Nhập tên thiết bị"
@@ -231,14 +235,14 @@ function UpdateDevices() {
                       </label>
                       <Form.Item className="">
                         <Input
-                          placeholder="Nhập tài khoản"
-                          value={authManagement.userName}
+                          value={device.ipAddress}
                           onChange={(e) =>
-                            setAuthManagement({
-                              ...authManagement,
-                              userName: e.target.value,
+                            setDevice({
+                              ...device,
+                              ipAddress: e.target.value,
                             })
                           }
+                          placeholder="Nhập địa chỉ IP"
                         />
                       </Form.Item>
                     </div>
@@ -264,7 +268,7 @@ function UpdateDevices() {
                         Mật khẩu: <span style={{ color: "#FF7506" }}></span>
                       </label>
                       <Form.Item className="">
-                        <Input
+                        <Input.Password
                           placeholder="Nhập mật khẩu"
                           value={authManagement.password}
                           onChange={(e) =>

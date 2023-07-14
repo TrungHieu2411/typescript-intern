@@ -134,7 +134,7 @@ function AddDevices() {
           codeDevice: newDevice.codeDevice,
           nameDevice: newDevice.nameDevice,
           ipAddress: newDevice.ipAddress,
-          isActive: newDevice.isActive,
+          isActive: "Hoạt động",
           isConnected: "Kết nối",
           service: newDevice.service,
           typeDevice: newDevice.typeDevice,

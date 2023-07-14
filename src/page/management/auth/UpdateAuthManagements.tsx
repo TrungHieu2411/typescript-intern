@@ -14,6 +14,7 @@ import moment from "moment";
 const { Content } = Layout;
 
 interface AuthManagementData {
+  nameRole: any;
   id: string;
   fullName: string;
   phone: string;
@@ -35,16 +36,20 @@ function UpdateAuthManagements() {
     isActive: "",
     userName: "",
     password: "",
-
+    nameRole: "",
   });
 
   useEffect(() => {
     const fetchAuthManagement = async () => {
-      const authManagementRef = firebase.firestore().collection("authManagements").doc(id);
+      const authManagementRef = firebase
+        .firestore()
+        .collection("authManagements")
+        .doc(id);
       const authManagementSnapshot = await authManagementRef.get();
 
       if (authManagementSnapshot.exists) {
-        const authManagementData = authManagementSnapshot.data() as AuthManagementData;
+        const authManagementData =
+          authManagementSnapshot.data() as AuthManagementData;
         setAuthManagement((prevAuthManagement) => ({
           ...prevAuthManagement,
           ...authManagementData,
@@ -84,8 +89,12 @@ function UpdateAuthManagements() {
     const updatedUser: AuthManagementData = {
       ...authManagement,
     };
-    message.success(`Cập nhật thông tin tài khoản: ${authManagement.userName} thành công!`)
-    await addNoteToCollection(`Cập nhật thông tin tài khoản: ${authManagement.userName}`);
+    message.success(
+      `Cập nhật thông tin tài khoản: ${authManagement.userName} thành công!`
+    );
+    await addNoteToCollection(
+      `Cập nhật thông tin tài khoản: ${authManagement.userName}`
+    );
 
     userRef
       .update(updatedUser)
@@ -98,28 +107,67 @@ function UpdateAuthManagements() {
       });
   };
 
+  useEffect(() => {
+  const fetchAuthManagement = async () => {
+    const authManagementRef = firebase
+      .firestore()
+      .collection("authManagements")
+      .doc(id);
+    const authManagementSnapshot = await authManagementRef.get();
+
+    if (authManagementSnapshot.exists) {
+      const authManagementData =
+        authManagementSnapshot.data() as AuthManagementData;
+      setAuthManagement((prevAuthManagement) => ({
+        ...prevAuthManagement,
+        ...authManagementData,
+        role: authManagementData.role || null,
+      }));
+
+    }
+  };
+
+  fetchAuthManagement();
+}, [id]);
+
+  //----------------------
+
   const [authManagementData, setAuthManagementData] = useState<AuthManagementData[]>([]);
 
   useEffect(() => {
-    const fetchAuthManagementData = async () => {
+    const fetchAuthManagement = async () => {
       const authManagementRef = firebase.firestore().collection("authManagements");
       const snapshot = await authManagementRef.get();
-      const fetchedAuthManagementData: AuthManagementData[] = [];
 
-      snapshot.forEach((doc) => {
-        const authManagement = doc.data() as AuthManagementData;
-        authManagement.id = doc.id;
-        fetchedAuthManagementData.push(authManagement);
-      });
+      setAuthManagementData(
+        await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const authManagement = doc.data() as AuthManagementData;
+            authManagement.id = doc.id;
 
-      setAuthManagementData(fetchedAuthManagementData);
+            const roleRef = authManagement.role;
+
+            if (roleRef) {
+              const roleDoc = await roleRef.get();
+              if (roleDoc.exists) {
+                const roleData = roleDoc.data();
+                if (roleData && roleData.nameRole) {
+                  const roleName = roleData.nameRole;
+                  authManagement.role = roleName;
+                }
+              }
+            }
+
+            return authManagement;
+          })
+        )
+      );
     };
 
-    fetchAuthManagementData();
+    fetchAuthManagement();
   }, []);
 
   const [roleValue, setRoleValue] = useState<string | null>(null);
-
   useEffect(() => {
     const fetchRoleData = async () => {
       if (authManagement.role) {
@@ -138,9 +186,6 @@ function UpdateAuthManagements() {
     fetchRoleData();
   }, [authManagement]);
 
-  const handleRoleChange = (value: string) => {
-    setRoleValue(value);
-  };
   return (
     <Layout className="layout">
       <SlideMain />
@@ -229,10 +274,10 @@ function UpdateAuthManagements() {
                             Vai trò: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                            <Select placeholder="Chọn vai trò" value={roleValue} onChange={handleRoleChange}>
+                          <Select value={roleValue}>
                               {authManagementData.map((authManagement) => (
                                 <Select.Option key={authManagement.id} value={authManagement.role}>
-                                 
+                                  
                                 </Select.Option>
                               ))}
                             </Select>

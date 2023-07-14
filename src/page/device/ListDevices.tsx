@@ -78,23 +78,6 @@ function ListDevices() {
           snapshot.docs.map(async (doc) => {
             const device = doc.data() as DeviceData;
             device.id = doc.id;
-
-            const authManagementId = device.authManagementId;
-            if (authManagementId) {
-              const authManagementRef = firebase
-                .firestore()
-                .collection("authManagements")
-                .doc(authManagementId);
-              const authManagementSnapshot = await authManagementRef.get();
-
-              if (authManagementSnapshot.exists) {
-                const authManagementData = authManagementSnapshot.data();
-                if (authManagementData) {
-                  const isActive = authManagementData.isActive;
-                  device.isActive = isActive;
-                }
-              }
-            }
             return device;
           })
         );

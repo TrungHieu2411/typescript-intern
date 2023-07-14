@@ -38,7 +38,6 @@ interface UserData {
 
 function Admin() {
   
-  const [roleValue, setRoleValue] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
   const [user, setUser] = useState<UserData>({
     id: "",
@@ -172,6 +171,9 @@ function Admin() {
     fetchAuthManagement();
   }, []);
 
+
+
+  const [roleValue, setRoleValue] = useState<string | null>(null);
   useEffect(() => {
     const fetchRoleData = async () => {
       if (user.role) {

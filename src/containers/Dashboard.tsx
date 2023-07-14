@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Badge,
   Button,
@@ -19,30 +19,42 @@ import Account from "../components/User/Account";
 import "../assets/css/style.css";
 import { Area } from "@ant-design/charts";
 
+import firebase from "firebase/compat/app";
 // Sử dụng WaveChart trong component của bạn
 
 const { Content } = Layout;
 
-const data = [
+const dataByDay = [
   { day: "1", "Cấp số": 2500 },
-  { day: "2", "Cấp số": 3500 },
-  { day: "3", "Cấp số": 2000 },
-  { day: "4", "Cấp số": 3000 },
-  { day: "5", "Cấp số": 3500 },
-  { day: "6", "Cấp số": 2500 },
-  { day: "7", "Cấp số": 4500 },
-  { day: "8", "Cấp số": 3500 },
-  { day: "9", "Cấp số": 5500 },
-  { day: "10", "Cấp số": 5000 },
-  { day: "11", "Cấp số": 6000 },
-  { day: "12", "Cấp số": 3500 },
+  { day: "13", "Cấp số": 3500 },
+  { day: "19", "Cấp số": 2000 },
+  { day: "31", "Cấp số": 3000 },
 ];
 
-const config = {
-  data: data,
+const dataByWeek = [
+  { week: "1", "Cấp số": 2500 },
+  { week: "2", "Cấp số": 3500 },
+  { week: "3", "Cấp số": 2500 },
+  { week: "4", "Cấp số": 3000 },
+];
+
+const dataByMonth = [
+  { month: "1", "Cấp số": 3000 },
+  { month: "2", "Cấp số": 4000 },
+  { month: "3", "Cấp số": 2500 },
+  { month: "4", "Cấp số": 4800 },
+  { month: "5", "Cấp số": 3500 },
+  { month: "6", "Cấp số": 5200 },
+  { month: "7", "Cấp số": 2200 },
+  { month: "8", "Cấp số": 5000 },
+  { month: "9", "Cấp số": 2300 },
+  { month: "10", "Cấp số": 4500 },
+  { month: "11", "Cấp số": 5100 },
+  { month: "12", "Cấp số": 2800 },
+];
+
+const config: any = {
   autoFit: false,
-  xField: "day",
-  yField: "Cấp số",
   animation: {
     appear: {
       animation: "path-in",
@@ -59,7 +71,285 @@ const config = {
     };
   },
 };
+
+type DataItem = {
+  day?: string;
+  week?: string;
+  month?: string;
+  "Cấp số": number;
+};
 function Dashboard() {
+  const [selectedView, setSelectedView] = useState("Ngày");
+
+  const handleViewChange = (value: any) => {
+    setSelectedView(value);
+  };
+
+  const getDataBySelectedView = (): DataItem[] => {
+    if (selectedView === "Ngày") {
+      config.xField = "day";
+      config.yField = "Cấp số";
+      return dataByDay;
+    } else if (selectedView === "Tuần") {
+      config.xField = "week";
+      config.yField = "Cấp số";
+      return dataByWeek;
+    } else if (selectedView === "Tháng") {
+      config.xField = "month";
+      config.yField = "Cấp số";
+      return dataByMonth;
+    }
+    return [];
+  };
+  //--------------------------------------------------------------------------------------------------
+  const [columnCount, setColumnCount] = useState(0);
+
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("progressives");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columnCount = snapshot.empty
+          ? 0
+          : Object.keys(snapshot.docs[0].data()).length;
+        setColumnCount(columnCount);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  //--------------------------
+  const [usedingCount, setUsedingCount] = useState(0);
+
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("progressives");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCount = columns.length;
+        setColumnCount(columnCount);
+
+        // Đếm số lượng cột có trạng thái "Đã sử dụng"
+        const usedingColumns = columns.filter(
+          (column) => column.status === "Đã sử dụng"
+        );
+        const usedingCount = usedingColumns.length;
+        setUsedingCount(usedingCount);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  //--------------------------
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("progressives");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCount = columns.length;
+        setColumnCount(columnCount);
+
+        // Đếm số lượng cột có trạng thái "Đang chờ"
+        const pendingColumns = columns.filter(
+          (column) => column.status === "Đang chờ"
+        );
+        const pendingCount = pendingColumns.length;
+        setPendingCount(pendingCount);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  //--------------------------
+  const [skipCount, setSkipCount] = useState(0);
+
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("progressives");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCount = columns.length;
+        setColumnCount(columnCount);
+
+        // Đếm số lượng cột có trạng thái "Bỏ qua"
+        const skipColumns = columns.filter(
+          (column) => column.status === "Bỏ qua"
+        );
+        const skipCount = skipColumns.length;
+        setSkipCount(skipCount);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  //--------------------------------------------------------------------------------------------------
+  const [deviceCount, setDeviceCount] = useState(0);
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("devices");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columnCountDevice = snapshot.empty
+          ? 0
+          : Object.keys(snapshot.docs[0].data()).length;
+        setDeviceCount(columnCountDevice);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  useEffect(() => {
+    const collectionRef = firebase.firestore().collection("devices");
+
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCountDevice = columns.length;
+        setDeviceCount(columnCountDevice);
+
+        // Đếm số lượng cột có trạng thái "Bỏ qua"
+        const deviceCount = columns;
+        const deviceCountNumber = deviceCount.length;
+        setDeviceCount(deviceCountNumber);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+//------------------------------
+  const [isActive, setIsActive] = useState(0);
+
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("devices");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCountDevice = columns.length;
+        setDeviceCount(columnCountDevice);
+
+        // Đếm số lượng cột có trạng thái "Bỏ qua"
+        const activeColumns = columns.filter(
+          (column) => column.isActive === "Hoạt động"
+        );
+        const isActive = activeColumns.length;
+        setIsActive(isActive);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  //------------------------------
+  const [isNotActive, setIsNotActive] = useState(0);
+
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("devices");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCountDevice = columns.length;
+        setDeviceCount(columnCountDevice);
+
+        // Đếm số lượng cột có trạng thái "Bỏ qua"
+        const activeColumns = columns.filter(
+          (column) => column.isActive === "Ngưng hoạt động"
+        );
+        const isNotActive = activeColumns.length;
+        setIsNotActive(isNotActive);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  //------------------------
+  const [serviceCount, setServiceCount] = useState(0);
+  useEffect(() => {
+    const serviceCollectionRef = firebase.firestore().collection("services");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    // Đếm số lượng cột trong bảng "services"
+    serviceCollectionRef
+      .get()
+      .then((snapshot) => {
+        const columnCountService = snapshot.empty
+          ? 0
+          : Object.keys(snapshot.docs[0].data()).length;
+        setServiceCount(columnCountService);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore (services): ", error);
+      });
+
+    serviceCollectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCountService = columns.length;
+        setServiceCount(columnCountService);
+
+        // Đếm số lượng cột có trạng thái "Bỏ qua"
+        const serviceCount = columns;
+        const serviceCountNumber = serviceCount.length;
+        setServiceCount(serviceCountNumber);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  //---------------
+
+  //--------------------------
   return (
     <Layout className="layout">
       <SlideMain />
@@ -79,7 +369,12 @@ function Dashboard() {
                     <div className="row align-items-center">
                       <div className="col-4 p-0">
                         <Button
-                          style={{ width: 45, height: 45, color: "#6695FB", background: "#00F5FF"}}
+                          style={{
+                            width: 45,
+                            height: 45,
+                            color: "#6695FB",
+                            background: "#00F5FF",
+                          }}
                           className="sttdacap"
                           shape="circle"
                           icon={
@@ -97,7 +392,7 @@ function Dashboard() {
                       </div>
 
                       <div className="col-6 p-0 my-3 pt-1 text-start">
-                        <h4 style={{ fontSize: 25 }}>3.452</h4>
+                        <h4 style={{ fontSize: 25 }}>{columnCount}</h4>
                       </div>
                       <div className="col-6 ps-4 my-3 text-end">
                         <Tag
@@ -120,7 +415,12 @@ function Dashboard() {
                     <div className="row align-items-center">
                       <div className="col-4 p-0">
                         <Button
-                          style={{ width: 45, height: 45, color: "#35C75A", background: "#FAF0E6" }}
+                          style={{
+                            width: 45,
+                            height: 45,
+                            color: "#35C75A",
+                            background: "#FAF0E6",
+                          }}
                           shape="circle"
                           icon={
                             <img
@@ -137,7 +437,7 @@ function Dashboard() {
                       </div>
 
                       <div className="col-6 p-0 my-3 pt-1 text-start">
-                        <h4 style={{ fontSize: 25 }}>3.452</h4>
+                        <h4 style={{ fontSize: 25 }}>{usedingCount}</h4>
                       </div>
                       <div className="col-6 ps-4 my-3 text-end">
                         <Tag
@@ -162,7 +462,12 @@ function Dashboard() {
                     <div className="row align-items-center">
                       <div className="col-4 p-0">
                         <Button
-                          style={{ width: 45, height: 45, color: "#FFAC6A", background: "#EEEED1" }}
+                          style={{
+                            width: 45,
+                            height: 45,
+                            color: "#FFAC6A",
+                            background: "#EEEED1",
+                          }}
                           shape="circle"
                           icon={
                             <img
@@ -179,7 +484,7 @@ function Dashboard() {
                       </div>
 
                       <div className="col-6 p-0 my-3 pt-1 text-start">
-                        <h4 style={{ fontSize: 25 }}>3.452</h4>
+                        <h4 style={{ fontSize: 25 }}>{pendingCount}</h4>
                       </div>
                       <div className="col-6 ps-4 my-3 text-end">
                         <Tag
@@ -202,7 +507,12 @@ function Dashboard() {
                     <div className="row align-items-center">
                       <div className="col-4 p-0">
                         <Button
-                          style={{ width: 45, height: 45, color: "#F86D6D", background: "#FFFFE0" }}
+                          style={{
+                            width: 45,
+                            height: 45,
+                            color: "#F86D6D",
+                            background: "#FFFFE0",
+                          }}
                           shape="circle"
                           icon={
                             <img
@@ -219,7 +529,7 @@ function Dashboard() {
                       </div>
 
                       <div className="col-6 p-0 my-3 pt-1 text-start">
-                        <h4 style={{ fontSize: 25 }}>3.452</h4>
+                        <h4 style={{ fontSize: 25 }}>{skipCount}</h4>
                       </div>
                       <div className="col-6 ps-4 my-3 text-end">
                         <Tag
@@ -252,9 +562,13 @@ function Dashboard() {
                       <div className="col text-end">
                         <p>
                           Xem theo{" "}
-                          <Select style={{ width: 85 }}>
-                            {["Ngày", "Tháng", "Năm"].map((option) => (
-                              <Select.Option key={option}>
+                          <Select
+                            style={{ width: 85 }}
+                            value={selectedView}
+                            onChange={handleViewChange}
+                          >
+                            {["Ngày", "Tuần", "Tháng"].map((option) => (
+                              <Select.Option key={option} value={option}>
                                 {option}
                               </Select.Option>
                             ))}
@@ -263,7 +577,12 @@ function Dashboard() {
                       </div>
                     </div>
                     {/* ...Nội dung Card... */}
-                    <Area {...config} />
+                    <Area
+                      data={getDataBySelectedView()}
+                      xField={selectedView.toLowerCase()}
+                      yField="Cấp số"
+                      {...config}
+                    />
                   </Card>
                 </div>
               </div>
@@ -289,7 +608,12 @@ function Dashboard() {
                   <div className="col-3">
                     <div className="progress-container">
                       <div className="outer-progress">
-                        <Progress type="circle" strokeColor={"#FF7506"} size={60} percent={90} />
+                        <Progress
+                          type="circle"
+                          strokeColor={"#FF7506"}
+                          size={60}
+                          percent={90}
+                        />
                         <div className="inner-progress">
                           <Progress
                             type="circle"
@@ -308,7 +632,7 @@ function Dashboard() {
                           className="ms-3 me-2 mt-1 fw-bold"
                           style={{ fontSize: 20 }}
                         >
-                          4.221
+                          {deviceCount}
                         </h4>
                       </div>
                       <div className="col-12 p-0">
@@ -336,7 +660,7 @@ function Dashboard() {
                           className="text-end fw-bold"
                           style={{ color: "#FF7506" }}
                         >
-                          276
+                          {isActive}
                         </span>
                       </div>
                       <div className="col-9 p-0">
@@ -347,7 +671,7 @@ function Dashboard() {
                           className="text-end fw-bold"
                           style={{ color: "#FF7506" }}
                         >
-                          4.221
+                          {isNotActive}
                         </span>
                       </div>
                     </div>
@@ -365,7 +689,12 @@ function Dashboard() {
                   <div className="col-3">
                     <div className="progress-container">
                       <div className="outer-progress">
-                        <Progress type="circle" strokeColor={"#4277FF"} size={60} percent={76} />
+                        <Progress
+                          type="circle"
+                          strokeColor={"#4277FF"}
+                          size={60}
+                          percent={76}
+                        />
                         <div className="inner-progress">
                           <Progress
                             type="circle"
@@ -384,7 +713,7 @@ function Dashboard() {
                           className="ms-3 me-2 mt-1 fw-bold"
                           style={{ fontSize: 20 }}
                         >
-                          4.324
+                          {serviceCount}
                         </h4>
                       </div>
                       <div className="col-12 p-0">
@@ -441,11 +770,26 @@ function Dashboard() {
                   <div className="col-3">
                     <div className="progress-container">
                       <div className="outer-progress">
-                        <Progress type="circle" strokeColor={"#35C75A"} size={60} percent={86} />
+                        <Progress
+                          type="circle"
+                          strokeColor={"#35C75A"}
+                          size={60}
+                          percent={86}
+                        />
                         <div className="inner-progress">
-                          <Progress type="circle" strokeColor={"#7E7D88"} size={50} percent={20} />
+                          <Progress
+                            type="circle"
+                            strokeColor={"#7E7D88"}
+                            size={50}
+                            percent={20}
+                          />
                           <div className="inner-progress">
-                            <Progress type="circle" strokeColor={"#F178B6"} size={40} percent={10} />
+                            <Progress
+                              type="circle"
+                              strokeColor={"#F178B6"}
+                              size={40}
+                              percent={10}
+                            />
                           </div>
                         </div>
                       </div>
@@ -458,7 +802,7 @@ function Dashboard() {
                           className="ms-3 me-2 mt-1 fw-bold"
                           style={{ fontSize: 20 }}
                         >
-                          4.324
+                          {columnCount}
                         </h4>
                       </div>
                       <div className="col-12 p-0">

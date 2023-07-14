@@ -113,7 +113,7 @@ function UserLogManagements() {
               <div className="col-11">
                 <Table
                   dataSource={noteUserData}
-                  pagination={{ pageSize: 5 }}
+                  pagination={{ pageSize: 7 }}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"
