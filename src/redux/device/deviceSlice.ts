@@ -81,10 +81,7 @@ export const createDevice =
     newDevice: DeviceData,
     authManagementInfo: { userName: string; password: string }
   ): ThunkAction<void, RootState, unknown, Action<string>> =>
-  async (
-    dispatch: ThunkDispatch<RootState, unknown, Action<string>>,
-    getState
-  ) => {
+  async (dispatch: ThunkDispatch<RootState, unknown, Action<string>>) => {
     try {
       // Kiểm tra thông tin đăng nhập
       const authManagementCollection = firebase
@@ -140,51 +137,24 @@ export const createDevice =
 
 export const updateDevice =
   (
-    updatedDevice: DeviceData,
-    authManagementInfo: { userName: string; password: string }
+    id: string,
+    data: any,
   ): ThunkAction<void, RootState, unknown, Action<string>> =>
-  async (
-    dispatch: ThunkDispatch<RootState, unknown, Action<string>>,
-    getState: () => RootState
-  ) => {
+  async (dispatch) => {
     try {
-      // Kiểm tra thông tin đăng nhập
-      const authManagementCollection = firebase
-        .firestore()
-        .collection("authManagements");
-      const snapshot = await authManagementCollection
-        .where("userName", "==", authManagementInfo.userName)
-        .where("password", "==", authManagementInfo.password)
-        .get();
-
-      if (!snapshot.empty) {
-        const matchingData = snapshot.docs[0].data();
-        const authManagementId = matchingData.authManagementId;
-
         // Cập nhật thiết bị
-        const deviceRef = firebase
-          .firestore()
-          .collection("devices")
-          .doc(updatedDevice.id);
-        const deviceData = {
-          codeDevice: updatedDevice.codeDevice,
-          nameDevice: updatedDevice.nameDevice,
-          ipAddress: updatedDevice.ipAddress,
-          isConnected: updatedDevice.isConnected,
-          service: updatedDevice.service,
-          authManagementId: authManagementId,
-        };
-        await deviceRef.update(deviceData);
-
-        // Cập nhật state trong Redux
-        dispatch(setData([updatedDevice]));
-
-        // Hiển thị thông báo "Thiết bị đã được cập nhật thành công"
-        message.success("Thiết bị đã được cập nhật thành công");
-      } else {
-        message.error("Tên đăng nhập hoặc mật khẩu không chính xác");
-      }
+        await firebase.firestore().collection("devices").doc(id).update({
+          codeDevice: data.codeDevice,
+          nameDevice: data.nameDevice,
+          ipAddress: data.ipAddress,
+          isConnected: data.isConnected,
+          service: data.service,
+          isActive: data.isActive,
+        });
+      
+      // Cập nhật state trong Redux
+      dispatch(getDevice);
     } catch (error) {
-      console.error("Failed to update device:", error);
+      console.log(error);
     }
   };

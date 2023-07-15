@@ -19,6 +19,10 @@ import "../../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../redux/store";
+import { ThunkDispatch } from "redux-thunk";
+import { getNoteUser } from "../../../redux/userLogManagement/noteUserSlice";
 
 const { Content } = Layout;
 
@@ -29,30 +33,15 @@ interface NoteUserData {
   action: string;
 }
 function UserLogManagements() {
-  const [noteUserData, setNoteUserData] = useState<NoteUserData[]>([]);
+//----------------------------------------
+const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+const noteUserData = useSelector(
+  (state: RootState) => state.firestoreNoteUserManagementData.data
+) as NoteUserData[];
 
-  useEffect(() => {
-    const fetchNoteUser = async () => {
-      try {
-        const serviceRef = firebase.firestore().collection("noteUsers");
-        const snapshot = await serviceRef.get();
-
-        const serviceData = snapshot.docs.map(async (doc) => {
-          const service = doc.data() as NoteUserData;
-
-          return service;
-        });
-
-        const resolvedServiceData = await Promise.all(serviceData);
-        setNoteUserData(resolvedServiceData);
-      } catch (error) {
-        console.log(error);
-        message.error("Failed to fetch service data.");
-      }
-    };
-
-    fetchNoteUser();
-  }, []);
+useEffect(() => {
+  dispatch(getNoteUser());
+}, [dispatch]);
 
   return (
     <Layout className="layout">

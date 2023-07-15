@@ -11,6 +11,8 @@ import "../../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
 import moment from "moment";
+import { useDispatch } from "react-redux";
+import { createAuthManagement } from "../../../redux/authManagement/authManagementSlice";
 
 const { Content } = Layout;
 
@@ -92,42 +94,6 @@ function AddAuthManagements() {
     }
   };
 
-  const onFinish = async () => {
-    try {
-      // Save the user's information in Firestore
-
-      const authManagementCollection = firebase
-        .firestore()
-        .collection("authManagements");
-
-      // Lấy DocumentReference của vai trò (role)
-      const roleRef = firebase
-        .firestore()
-        .doc(`roles/${newAuthManagement.role}`);
-
-      await authManagementCollection.doc().set({
-        fullName: newAuthManagement.fullName,
-        phone: newAuthManagement.phone,
-        email: newAuthManagement.email,
-        role: roleRef, // Lưu DocumentReference vào Firestore
-        isActive: newAuthManagement.isActive,
-        userName: newAuthManagement.userName,
-        password: newAuthManagement.password,
-        image: "",
-      });
-      message.success(`Thêm mới tài khoản ${newAuthManagement.userName} thành công!`)
-
-      // Thêm ghi chú vào collection noteUsers
-      await addNoteToCollection(
-        `Thêm mới tài khoản: ${newAuthManagement.userName}`
-      );
-
-      window.location.href = "/authManagement";
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const [passwordMatchError, setPasswordMatchError] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,7 +101,7 @@ function AddAuthManagements() {
     const passwordMatchError = password !== newAuthManagement.confirmPassword;
     setNewAuthManagement((prevState) => ({
       ...prevState,
-      password,
+      password: password,
     }));
     setPasswordMatchError(passwordMatchError);
   };
@@ -147,9 +113,20 @@ function AddAuthManagements() {
     const passwordMatchError = confirmPassword !== newAuthManagement.password;
     setNewAuthManagement((prevState) => ({
       ...prevState,
-      confirmPassword,
+      confirmPassword: confirmPassword,
     }));
     setPasswordMatchError(passwordMatchError);
+  };
+
+  const dispath = useDispatch();
+  const onFinish = async () => {
+      message.success(`Thêm mới tài khoản ${newAuthManagement.userName} thành công!`)
+      await dispath(createAuthManagement(newAuthManagement) as any);
+      // Thêm ghi chú vào collection noteUsers
+      await addNoteToCollection(
+        `Thêm mới tài khoản: ${newAuthManagement.userName}`
+      );
+      window.location.href = "/authManagement";
   };
 
   const [form] = Form.useForm();
@@ -336,17 +313,19 @@ function AddAuthManagements() {
                         </div>
                         <div>
                           <div className="col-12">
-                            <label htmlFor="" className="mb-2">
+                          <label htmlFor="" className="mb-2">
                               Mật khẩu:{" "}
                               <span style={{ color: "#FF7506" }}>*</span>
                             </label>
-                            <Form.Item name="password"
-                          rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng nhập mật khẩu!",
-                              },
-                            ]}>
+                            <Form.Item
+                              name="password"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Vui lòng nhập mật khẩu!",
+                                },
+                              ]}
+                            >
                               <Input.Password
                                 value={newAuthManagement.password}
                                 onChange={handlePasswordChange}
@@ -355,27 +334,26 @@ function AddAuthManagements() {
                             </Form.Item>
                           </div>
                           <div className="col-12">
-                            <label htmlFor="" className="mb-2">
+                          <label htmlFor="" className="mb-2">
                               Nhập lại mật khẩu:{" "}
                               <span style={{ color: "#FF7506" }}>*</span>
                             </label>
-                            <Form.Item name="confirmPassword"
+                            <Form.Item
+                              name="confirmPassword"
                               rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng nhập lại mật khẩu!",
-                              },
-                            ]}>
+                                {
+                                  required: true,
+                                  message: "Vui lòng nhập lại mật khẩu!",
+                                },
+                              ]}
+                              validateStatus={passwordMatchError ? "error" : ""}
+                              help={passwordMatchError && "Mật khẩu không khớp. Vui lòng nhập lại."}
+                            >
                               <Input.Password
                                 value={newAuthManagement.confirmPassword}
                                 onChange={handleConfirmPasswordChange}
                                 placeholder="Nhập lại mật khẩu"
                               />
-                              {passwordMatchError && (
-                                <div style={{ color: "red" }}>
-                                  Mật khẩu không khớp. Vui lòng nhập lại.
-                                </div>
-                              )}
                             </Form.Item>
                           </div>
                         </div>

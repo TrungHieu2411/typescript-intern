@@ -5,8 +5,6 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { message } from "antd";
-
 //firebase
 import firebase from "firebase/compat/app";
 
@@ -22,7 +20,6 @@ export const serviceSlice = createSlice({
     },
   },
 });
-
 
 interface ServiceData {
   id: string;
@@ -52,6 +49,44 @@ export const getService =
       dispatch(setData(serviceData));
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu:", error);
-      message.error("Failed to fetch service data.");
+    }
+  };
+
+export const createService =
+  (newService: ServiceData): ThunkAction<void, RootState, null, any> =>
+  async (dispatch) => {
+    try {
+      await firebase.firestore().collection("services").add({
+        codeService: newService.codeService,
+        nameService: newService.nameService,
+        description: newService.description,
+        progressiveId: newService.progressiveId,
+        isActive: "Hoạt động"
+      });
+      window.location.href = "/service"
+      dispatch(getService());
+    
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+export const updateService =
+  (
+    id: string,
+    data: any
+  ): ThunkAction<void, RootState, null, Action<string>> =>
+  async (dispatch) => {
+    try {
+      await firebase
+        .firestore()
+        .collection("services")
+        .doc(id)
+        .update({
+          ...data,
+        });
+      dispatch(getService);
+    } catch (error) {
+      console.log(error);
     }
   };

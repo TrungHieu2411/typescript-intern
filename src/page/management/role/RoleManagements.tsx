@@ -9,6 +9,11 @@ import Account from "../../../components/User/Account";
 import "../../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import { DocumentData } from "@firebase/firestore";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../redux/store";
+import { ThunkDispatch } from "redux-thunk";
+import { getRoleManagement } from "../../../redux/roleManagement/roleManagementSlice";
+import { getAuthMangement } from "../../../redux/authManagement/authManagementSlice";
 
 const { Content } = Layout;
 
@@ -29,62 +34,21 @@ interface AuthManagementData {
   isActive: string;
 }
 function RoleManagement() {
-  const [authManagementData, setAuthManagementData] = useState<
-    AuthManagementData[]
-  >([]);
-  const [roleManagementData, setRoleManagementData] = useState<
-    RoleManagementData[]
-  >([]);
   const [searchKeyword, setSearchKeyword] = useState<string>("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const authManagementRef = firebase
-        .firestore()
-        .collection("authManagements");
-      const roleManagementRef = firebase.firestore().collection("roles");
+//----------------------------------------
+const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
 
-      const authManagementSnapshot = await authManagementRef.get();
-      const roleManagementSnapshot = await roleManagementRef.get();
-
-      const authManagementData: AuthManagementData[] = await Promise.all(
-        authManagementSnapshot.docs.map(async (doc) => {
-          const authManagement = doc.data() as AuthManagementData;
-          authManagement.id = doc.id;
-
-          const roleRef = authManagement.role;
-
-          if (
-            roleRef &&
-            roleRef instanceof firebase.firestore.DocumentReference
-          ) {
-            const roleDoc = await roleRef.get();
-            if (roleDoc.exists) {
-              const roleData = roleDoc.data();
-              if (roleData && roleData.nameRole) {
-                const roleName = roleData.nameRole;
-                authManagement.role = roleName;
-              }
-            }
-          }
-
-          return authManagement;
-        })
-      );
-
-      const roleManagementData: RoleManagementData[] =
-        roleManagementSnapshot.docs.map((doc) => {
-          const roleManagement = doc.data() as RoleManagementData;
-          roleManagement.id = doc.id;
-          return roleManagement;
-        });
-
-      setAuthManagementData(authManagementData);
-      setRoleManagementData(roleManagementData);
-    };
-
-    fetchData();
-  }, []);
+const roleManagementData = useSelector(
+  (state: RootState) => state.firestoreRoleManagementData.data
+) as RoleManagementData[];
+const authManagementData = useSelector(
+  (state: RootState) => state.firestoreAuthManagementData.data
+) as AuthManagementData[];
+useEffect(() => {
+  dispatch(getRoleManagement());
+  dispatch(getAuthMangement());
+}, [dispatch]);
 
   const countNameRoleOccurrences = () => {
     const nameRoleCounts: { [key: string]: number } = {};

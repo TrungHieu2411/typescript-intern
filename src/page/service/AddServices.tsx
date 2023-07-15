@@ -11,6 +11,8 @@ import firebase from "firebase/compat/app";
 import Account from "../../components/User/Account";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import moment from "moment";
+import { createService } from "../../redux/service/serviceSlice";
+import { useDispatch } from "react-redux";
 
 interface ServiceData {
   id: string;
@@ -25,7 +27,7 @@ function AddServices() {
 
   const handleAutoIncrementChange = (e: CheckboxChangeEvent) => {
     setIsAutoIncrement(e.target.checked);
-  }
+  };
 
   const generateProgressiveId = (
     currentNumber: number,
@@ -41,6 +43,7 @@ function AddServices() {
   };
   //------------
   const [currentNumber, setCurrentNumber] = useState<number>(200000);
+
   useEffect(() => {
     const fetchNextProgressiveId = async () => {
       const serviceCollection = firebase.firestore().collection("services");
@@ -77,9 +80,9 @@ function AddServices() {
         console.error("Failed to fetch IP address:", error);
         return "";
       });
-  
+
     // Lấy userId từ localStorage
-    const userName = localStorage.getItem('userName');
+    const userName = localStorage.getItem("userName");
     try {
       await noteUsersCollection.add({
         action: action,
@@ -91,27 +94,15 @@ function AddServices() {
       console.error(error);
     }
   };
-  
+
+  const dispatch = useDispatch();
   const onFinish = async () => {
-    const serviceCollection = firebase.firestore().collection("services");
-
-    try {
-      await serviceCollection.add({
-        codeService: newService.codeService,
-        nameService: newService.nameService,
-        description: newService.description,
-        progressiveId: generateProgressiveId(currentNumber, isAutoIncrement),
-      }); 
-
-      message.success(`Thêm mới một thiết bị ${newService.codeService} thành công!`)
-      // Thêm ghi chú vào collection noteUsers
+    message.success(
+      `Thêm mới thiết bị ${newService.codeService} thành công!`
+    );
+    await dispatch(createService(newService) as any);
+    // Thêm ghi chú vào collection noteUsers
     await addNoteToCollection(`Thêm mới dịch vụ: ${newService.codeService}`);
-
-      // Thực hiện điều hướng đến trang danh sách sản phẩm
-      window.location.href = "/service";
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   //------------
@@ -128,7 +119,7 @@ function AddServices() {
         console.error("Validation failed:", error);
       });
   };
-  
+
   return (
     <Layout className="layout">
       <SlideMain />

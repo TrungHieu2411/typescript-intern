@@ -10,14 +10,11 @@ import { useParams } from "react-router-dom";
 import { updateDevice } from "../../redux/device/deviceSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
+import { ThunkDispatch } from "redux-thunk";
+import { RootState } from "../../redux/store";
 
 const tags = [
-  " Khám tim mạch",
-  " Khám Sản - Phụ khoa",
-  " Khám răng hàm mặt",
-  " Khám tai mũi họng",
-  " Khám hô hấp",
-  " Khám tổng quát",
+  "", 
 ];
 
 interface DeviceData {
@@ -51,8 +48,6 @@ function UpdateDevices() {
     userName: "",
     password: "",
   });
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchDevice = async () => {
@@ -106,36 +101,31 @@ function UpdateDevices() {
     }
   };
 
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const handleUpdateDevice = async () => {
-    const updatedDevice = {
-      id: device.authManagementId,
-      codeDevice: device.codeDevice,
-      nameDevice: device.nameDevice,
-      ipAddress: device.ipAddress,
-      isActive: "Hoạt động",
-      isConnected: "Kết nối",
-      service: device.service,
-      typeDevice: device.typeDevice,
-      authManagementId: device.authManagementId,
-    };
-
-    message.success(
-      `Cập nhật thông tin thiết bị ${device.nameDevice} thành công!`
-    );
-    // Thêm ghi chú vào collection noteUsers
-    await addNoteToCollection(
-      `Cập nhật thông tin thiết bị: ${device.codeDevice}`
-    );
-    // Thực hiện điều hướng đến trang danh sách sản phẩm
-    window.location.href = "/device";
-    const authManagementInfo = {
-      userName: authManagement.userName,
-      password: authManagement.password,
-    };
-
-    dispatch(updateDevice(updatedDevice, authManagementInfo) as any);
+    if (typeof id === "string") {
+      const deviceData = {
+        id: id,
+        codeDevice: device.codeDevice,
+        nameDevice: device.nameDevice,
+        ipAddress: device.ipAddress,
+        isActive: device.isActive,
+        isConnected: device.isConnected,
+        service: device.service,
+        typeDevice: device.typeDevice,
+      };
+      message.success(`Cập nhật thông tin ${device.codeDevice} thành công!`);
+      await addNoteToCollection(`Cập nhật dịch vụ: ${device.codeDevice}`);
+      try {
+    dispatch(updateDevice(id, deviceData));
+    console.log("Service updated successfully!");
+        window.location.href = "/device";
+      } catch (error) {
+        console.error("Error updating service:", error);
+      }
+    }
   };
-
+  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -235,11 +225,11 @@ function UpdateDevices() {
                       </label>
                       <Form.Item className="">
                         <Input
-                          value={device.ipAddress}
+                          value={authManagement.userName}
                           onChange={(e) =>
-                            setDevice({
-                              ...device,
-                              ipAddress: e.target.value,
+                            setAuthManagement({
+                              ...authManagement,
+                              userName: e.target.value,
                             })
                           }
                           placeholder="Nhập địa chỉ IP"
@@ -256,7 +246,7 @@ function UpdateDevices() {
                           onChange={(e) =>
                             setDevice({
                               ...device,
-                              codeDevice: e.target.value,
+                              ipAddress: e.target.value,
                             })
                           }
                           placeholder="Nhập địa chỉ IP"

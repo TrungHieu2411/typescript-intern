@@ -11,6 +11,10 @@ import "../../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
 import moment from "moment";
+import { useDispatch } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import { RootState } from "../../../redux/store";
+import { updateRoleManagement } from "../../../redux/roleManagement/roleManagementSlice";
 
 const { Content } = Layout;
 
@@ -74,31 +78,27 @@ function UpdateRoleManagements() {
     }
   };
 
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const handleUpdateRoleManagement = async () => {
-    const roleManagementRef = firebase.firestore().collection("roles").doc(id);
-    const updatedRoleManagement = {
-      nameRole: roleManagement.nameRole,
-      description: roleManagement.description,
-      permissions: {
-        groupA,
-        groupB,
-      },
-    };
-    message.success(
-      `Cập nhật thông tin vai trò ${roleManagement.nameRole} thành công!`
-    );
-    // Thêm ghi chú vào collection noteUsers
-    await addNoteToCollection(`Cập nhật vai trò: ${roleManagement.nameRole}`);
-
-    roleManagementRef
-      .update(updatedRoleManagement)
-      .then(() => {
-        console.log("RoleManagement updated successfully!");
+    if (typeof id === "string") {
+      const roleManagementData = {
+        id: id,
+        nameRole: roleManagement.nameRole,
+        description: roleManagement.description,
+      };
+      message.success(
+        `Cập nhật thông tin vai trò ${roleManagement.nameRole} thành công!`
+      );
+      // Thêm ghi chú vào collection noteUsers
+      await addNoteToCollection(`Cập nhật vai trò: ${roleManagement.nameRole}`);
+      try {
+        dispatch(updateRoleManagement(id, roleManagementData));
+        console.log("Service updated successfully!");
         window.location.href = "/roleManagement";
-      })
-      .catch((error) => {
-        console.error("Error updating RoleManagement:", error);
-      });
+      } catch (error) {
+        console.error("Error updating service:", error);
+      }
+    }
   };
 
   return (

@@ -10,14 +10,15 @@ import {
   Select,
   Upload,
 } from "antd";
-import {
-  BellFilled,
-  CameraOutlined,
-} from "@ant-design/icons";
+import { BellFilled, CameraOutlined } from "@ant-design/icons";
 import SlideMain from "./SlideMain";
 import "../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
+import { updateAuthManagement } from "../redux/authManagement/authManagementSlice";
+import { RootState } from "../redux/store";
+import { ThunkDispatch } from "redux-thunk";
+import { useDispatch } from "react-redux";
 
 const { Content } = Layout;
 
@@ -35,9 +36,7 @@ interface UserData {
   password: string;
 }
 
-
 function Admin() {
-  
   const { id } = useParams<{ id: string }>();
   const [user, setUser] = useState<UserData>({
     id: "",
@@ -51,49 +50,37 @@ function Admin() {
     password: "",
   });
 
-
   const [loadingImage, setLoadingImage] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<any>(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleUpdateAuthManagement = () => {
-    const userRef = firebase.firestore().collection("authManagements").doc(id);
-    const updatedUser = {
-      fullName: user.fullName,
-      phone: user.phone,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      image: imageUrl || user.image,
-      userName: user.userName,
-      password: user.password,
-    };
-
-    userRef
-      .update(updatedUser)
-      .then(() => {
-        console.log("AuthManagement updated successfully!");
-      })
-      .catch((error) => {
-        console.error("Error updating AuthManagement:", error);
-      });
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const handleUpdateAuthManagement = async () => {
+    if (typeof id === "string") {
+      try {
+        dispatch(updateAuthManagement(id, authManagementData));
+        console.log("Service updated successfully!");
+        window.location.href = "/authManagement";
+      } catch (error) {
+        console.error("Error updating service:", error);
+      }
+    }
   };
-  
-  
+
   const handleImageUpload = async (file: any) => {
     setLoadingImage(true);
     setImageFile(file);
-  
+
     try {
       const storageRef = firebase.storage().ref();
       const imageRef = storageRef.child(`authManagements/${file.name}`);
       const uploadTaskSnapshot = await imageRef.put(file);
       const imageUrl = await uploadTaskSnapshot.ref.getDownloadURL();
-  
+
       setImageUrl(imageUrl);
       setLoadingImage(false);
-  
+
       // Cập nhật trường 'image' của đối tượng 'user'
       setUser({
         ...user,
@@ -104,14 +91,16 @@ function Admin() {
       console.error("Error uploading image:", error);
     }
   };
-  
-  
-//------------
+
+  //------------
   const storedUserId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userRef = firebase.firestore().collection("authManagements").doc(storedUserId || id);
+      const userRef = firebase
+        .firestore()
+        .collection("authManagements")
+        .doc(storedUserId || id);
       const userSnapshot = await userRef.get();
 
       if (userSnapshot.exists) {
@@ -140,7 +129,9 @@ function Admin() {
 
   useEffect(() => {
     const fetchAuthManagement = async () => {
-      const authManagementRef = firebase.firestore().collection("authManagements");
+      const authManagementRef = firebase
+        .firestore()
+        .collection("authManagements");
       const snapshot = await authManagementRef.get();
 
       setAuthManagementData(
@@ -171,8 +162,6 @@ function Admin() {
     fetchAuthManagement();
   }, []);
 
-
-
   const [roleValue, setRoleValue] = useState<string | null>(null);
   useEffect(() => {
     const fetchRoleData = async () => {
@@ -192,7 +181,6 @@ function Admin() {
     fetchRoleData();
   }, [user]);
 
-  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -383,12 +371,12 @@ function Admin() {
                           </label>
                           <Form.Item className="">
                             <Select value={roleValue}>
-                              {authManagementData.map((authManagement) => (
-                                <Select.Option key={authManagement.id} value={authManagement.role}>
-                                  
-                                </Select.Option>
-                              ))}
-                            </Select>
+                                {authManagementData.map((authManagement) => (
+                                  <Select.Option key={authManagement.id} value={authManagement.role}>
+                                    
+                                  </Select.Option>
+                                ))}
+                              </Select>
                           </Form.Item>
                         </div>
                       </div>

@@ -9,7 +9,6 @@ import { message } from "antd";
 
 //firebase
 import firebase from "firebase/compat/app";
-
 export const progressiveSlice = createSlice({
   name: "progressive",
   initialState: { data: [] },
@@ -39,21 +38,11 @@ interface ProgressiveData {
     | string;
 }
 
-interface ServiceData {
-  id: string;
-  nameService: string;
-}
-
-interface DeviceData {
-  id: string;
-  typeDevice: string;
-}
-
 export const { setData } = progressiveSlice.actions;
 
 export const getProgressive =
   (): ThunkAction<void, RootState, null, Action<string>> =>
-  async (dispatch: ThunkDispatch<RootState, null, Action<string>>) => {
+  async (dispatch) => {
     try {
       const progressiveRef = firebase.firestore().collection("progressives");
       const snapshot = await progressiveRef.get();
@@ -106,3 +95,4 @@ export const getProgressive =
       message.error("Failed to fetch service data.");
     }
   };
+  

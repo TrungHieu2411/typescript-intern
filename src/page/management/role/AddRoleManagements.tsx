@@ -10,12 +10,16 @@ import "../../../assets/css/style.css";
 // firebase
 import firebase from "firebase/compat/app";
 import moment from "moment";
+import { useDispatch } from "react-redux";
+import { createRoleManagement } from "../../../redux/roleManagement/roleManagementSlice";
 
 const { Content } = Layout;
 
 interface RoleManagementData {
+  id: string;
   nameRole: string;
   description: string;
+  userNumber: number;
 }
 
 function AddRoleManagements() {
@@ -24,6 +28,8 @@ function AddRoleManagements() {
     useState<RoleManagementData>({
       nameRole: "",
       description: "",
+      userNumber: 0,
+      id: "",
     });
   const [groupA, setGroupA] = useState<boolean[]>([]);
   const [groupB, setGroupB] = useState<boolean[]>([]);
@@ -54,29 +60,16 @@ function AddRoleManagements() {
     }
   };
 
+  const dispatch = useDispatch();
   const onFinish = async () => {
-    const roleManagementCollection = firebase.firestore().collection("roles");
-
-    try {
-      await roleManagementCollection.add({
-        nameRole: newRoleManagement.nameRole,
-        description: newRoleManagement.description,
-        permissions: {
-          groupA,
-          groupB,
-        },
-      });
-      message.success(`Thêm mới vai trò ${newRoleManagement.nameRole} thành công!`)
-      // Thêm ghi chú vào collection noteUsers
-      await addNoteToCollection(
-        `Thêm mới vai trò: ${newRoleManagement.nameRole}`
-      );
-
-      // Thực hiện điều hướng đến trang danh sách vai trò
-      window.location.href = "/roleManagement";
-    } catch (error) {
-      console.error(error);
-    }
+    message.success(
+      `Thêm mới vai trò ${newRoleManagement.nameRole} thành công!`
+    );
+    await dispatch(createRoleManagement(newRoleManagement) as any);
+    // Thêm ghi chú vào collection noteUsers
+    await addNoteToCollection(
+      `Thêm mới vai trò: ${newRoleManagement.nameRole}`
+    );
   };
 
   const [form] = Form.useForm();
@@ -92,7 +85,7 @@ function AddRoleManagements() {
         console.error("Validation failed:", error);
       });
   };
-  
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -129,14 +122,15 @@ function AddRoleManagements() {
                             Tên vai trò:{" "}
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item name="nameRole"
+                          <Form.Item
+                            name="nameRole"
                             rules={[
                               {
                                 required: true,
                                 message: "Vui lòng nhập tên vai trò!",
                               },
                             ]}
-                            >
+                          >
                             <Input
                               value={newRoleManagement.nameRole}
                               onChange={(e) =>
@@ -153,13 +147,15 @@ function AddRoleManagements() {
                           <label htmlFor="" className="mb-2">
                             Mô tả: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item name="description"
-                           rules={[
-                            {
-                              required: true,
-                              message: "Vui lòng nhập mô tả vai trò!",
-                            },
-                          ]}>
+                          <Form.Item
+                            name="description"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập mô tả vai trò!",
+                              },
+                            ]}
+                          >
                             <TextArea
                               rows={5}
                               placeholder="Mô tả vai trò"

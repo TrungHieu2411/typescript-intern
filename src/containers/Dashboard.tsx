@@ -211,6 +211,7 @@ function Dashboard() {
   }, []);
   //--------------------------------------------------------------------------------------------------
   const [deviceCount, setDeviceCount] = useState(0);
+  
   useEffect(() => {
     // Lấy tham chiếu đến collection "progressives"
     const collectionRef = firebase.firestore().collection("devices");
@@ -407,12 +408,6 @@ function Dashboard() {
       });
   }, []);
   // --------------------------
-
-  const [selectedViewDate, setSelectedViewDate] = useState("Ngày");
-
-  const handleViewChangeDate = (value: string) => {
-    setSelectedViewDate(value);
-  };
 
   const getCurrentMonthYear = () => {
     const currentDate = new Date();

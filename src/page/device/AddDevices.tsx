@@ -28,7 +28,6 @@ interface AuthManagementData {
 }
 
 function AddDevices() {
-  const dispatch = useDispatch();
   //------------
   const [service, setService] = useState<{ id: String; nameService: string }[]>(
     []
@@ -73,16 +72,6 @@ function AddDevices() {
   });
 
   //------------
-  const onFinish = async () => {
-    const authManagementInfo = {
-      userName: authManagement.userName,
-      password: authManagement.password,
-    };
-    await dispatch(createDevice(newDevice, authManagementInfo) as any);
-  };
-
-  //------------
-  const [form] = Form.useForm();
 
   const addNoteToCollection = async (action: string) => {
     const noteUsersCollection = firebase.firestore().collection("noteUsers");
@@ -107,8 +96,20 @@ function AddDevices() {
       console.error(error);
     }
   };
-
+  //-------------
+  const dispatch = useDispatch();
   const handleAddDevice = async () => {
+    const authManagementInfo = {
+      userName: authManagement.userName,
+      password: authManagement.password,
+    };
+    await dispatch(createDevice(newDevice, authManagementInfo) as any);
+  };
+
+  //------------
+  const [form] = Form.useForm();
+
+  const onFinish = async () => {
     try {
       // Kiểm tra và submit form
       await form.validateFields();

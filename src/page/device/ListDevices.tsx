@@ -19,9 +19,10 @@ import "../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
-import { setData } from "../../redux/device/deviceSlice";
+import { getDevice, setData } from "../../redux/device/deviceSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { ThunkDispatch } from "redux-thunk";
 
 const renderIsActive = (status: string) => {
   let color = "";
@@ -66,49 +67,15 @@ function ListDevices() {
   const [filterIsActive, setFilterIsActive] = useState<string>("all");
   const [filterIsConnected, setFilterIsConnected] = useState<string>("all");
 
-  const dispatch = useDispatch();
-  const deviceData = useSelector((state: RootState) => state.firestoreDeviceData.data) as DeviceData[];
-
+  //-------------
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const deviceData = useSelector(
+    (state: RootState) => state.firestoreDeviceData.data
+  ) as DeviceData[];
   useEffect(() => {
-    const fetchDevice = async () => {
-      try {
-        const deviceRef = firebase.firestore().collection("devices");
-        const snapshot = await deviceRef.get();
-
-        const deviceData = await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const device = doc.data() as DeviceData;
-            device.id = doc.id;
-        
-            const authManagementId = device.authManagementId;
-            if (authManagementId) {
-              const authManagementRef = firebase
-                .firestore()
-                .collection("authManagements")
-                .doc(authManagementId);
-              const authManagementSnapshot = await authManagementRef.get();
-        
-              if (authManagementSnapshot.exists) {
-                const authManagementData = authManagementSnapshot.data();
-                if (authManagementData) {
-                  const isActive = authManagementData.isActive;
-                  device.isActive = isActive;
-                }
-              }
-            }
-            return device;
-          })
-        );
-
-        dispatch(setData(deviceData));
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchDevice();
-  }, [dispatch]);
-
+    dispatch(getDevice());
+  }, []);
+  //------------
 
   const handleSearch = (value: string) => {
     setSearchKeyword(value);

@@ -22,6 +22,10 @@ import "../../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
+import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import { RootState } from "../../../redux/store";
+import { getAuthMangement } from "../../../redux/authManagement/authManagementSlice";
 
 const { Content } = Layout;
 
@@ -50,48 +54,20 @@ interface AuthManagementData {
   isActive: string;
 }
 function AuthManagements() {
-  const [authManagementData, setAuthManagementData] = useState<
-    AuthManagementData[]
-  >([]);
 
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [filterIsActive, setFilterIsActive] = useState<string>("all");
 
-  useEffect(() => {
-    const fetchAuthManagement = async () => {
-      const authManagementRef = firebase
-        .firestore()
-        .collection("authManagements");
-      const snapshot = await authManagementRef.get();
-      setAuthManagementData(
-        await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const authManagement = doc.data() as AuthManagementData;
-            authManagement.id = doc.id;
+  
+//----------------------------------------
+const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+const authManagementData = useSelector(
+  (state: RootState) => state.firestoreAuthManagementData.data
+) as AuthManagementData[];
+useEffect(() => {
+  dispatch(getAuthMangement());
+}, [dispatch]);
 
-            const roleRef = authManagement.role;
-
-            if (
-              roleRef &&
-              roleRef instanceof firebase.firestore.DocumentReference
-            ) {
-              const roleDoc = await roleRef.get();
-              if (roleDoc.exists) {
-                const roleData = roleDoc.data();
-                if (roleData && roleData.nameRole) {
-                  const roleName = roleData.nameRole;
-                  authManagement.role = roleName;
-                }
-              }
-            }
-
-            return authManagement;
-          })
-        )
-      );
-    };
-    fetchAuthManagement();
-  });
 
   const handleSearch = (value: string) => {
     setSearchKeyword(value);

@@ -10,6 +10,10 @@ import firebase from "firebase/compat/app";
 
 import { useParams } from "react-router-dom";
 import moment from "moment";
+import { useDispatch } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import { RootState } from "../../../redux/store";
+import { updateAuthManagement } from "../../../redux/authManagement/authManagementSlice";
 
 const { Content } = Layout;
 
@@ -84,27 +88,23 @@ function UpdateAuthManagements() {
     }
   };
 
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const handleUpdateAuthManagement = async () => {
-    const userRef = firebase.firestore().collection("authManagements").doc(id);
-    const updatedUser: AuthManagementData = {
-      ...authManagement,
-    };
-    message.success(
-      `Cập nhật thông tin tài khoản: ${authManagement.userName} thành công!`
-    );
-    await addNoteToCollection(
-      `Cập nhật thông tin tài khoản: ${authManagement.userName}`
-    );
-
-    userRef
-      .update(updatedUser)
-      .then(() => {
-        console.log("AuthManagement updated successfully!");
+    if (typeof id === "string") {
+      message.success(
+        `Cập nhật thông tin tài khoản: ${authManagement.userName} thành công!`
+      );
+      await addNoteToCollection(
+        `Cập nhật thông tin tài khoản: ${authManagement.userName}`
+      );
+try {
+        dispatch(updateAuthManagement(id, authManagement));
+        console.log("Service updated successfully!");
         window.location.href = "/authManagement";
-      })
-      .catch((error) => {
-        console.error("Error updating AuthManagement:", error);
-      });
+      } catch (error) {
+        console.error("Error updating service:", error);
+      }
+    }
   };
 
   useEffect(() => {

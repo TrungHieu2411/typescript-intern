@@ -20,6 +20,10 @@ import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
 import BreadCrumbFour from "../../components/BreadCrumb/BreadCrumbFour";
 import moment from "moment";
+import { useDispatch } from "react-redux";
+import { updateService } from "../../redux/service/serviceSlice";
+import { ThunkDispatch } from "redux-thunk";
+import { RootState } from "../../redux/store";
 
 interface ServiceData {
   codeService: string;
@@ -76,28 +80,31 @@ function UpdateServices() {
     }
   };
 
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const handleUpdateService = async () => {
-    const serviceRef = firebase.firestore().collection("services").doc(id);
-    const updateService = {
-      codeService: service.codeService,
-      nameService: service.nameService,
-      description: service.description,
-      isActive: "Hoạt động"
-    };
-    message.success(`Cập nhật thông tin ${service.codeService} thành công!`);
-    // Thêm ghi chú vào collection noteUsers
-    await addNoteToCollection(`Cập nhật dịch vụ: ${service.codeService}`);
-
-    serviceRef
-      .update(updateService)
-      .then(() => {
+    if (typeof id === "string") {
+      const serviceData = {
+        id: id,
+        codeService: service.codeService,
+        nameService: service.nameService,
+        description: service.description,
+        isActive: "Hoạt động",
+      };
+  
+      message.success(`Cập nhật thông tin ${service.codeService} thành công!`);
+      await addNoteToCollection(`Cập nhật dịch vụ: ${service.codeService}`);
+  
+      try {
+        dispatch(updateService(id, serviceData));
         console.log("Service updated successfully!");
         window.location.href = "/service";
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error updating service:", error);
-      });
+      }
+    }
   };
+  
+
 
   return (
     <Layout className="layout">
