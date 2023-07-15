@@ -21,6 +21,10 @@ import "../../assets/css/style.css";
 
 //firebase
 import firebase from "firebase/compat/app";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { getService, setData } from "../../redux/service/serviceSlice";
+import { ThunkDispatch } from "redux-thunk";
 
 const renderIsActive = (status: string) => {
   let color = "";
@@ -48,84 +52,39 @@ interface ServiceData {
   description: string;
 }
 function ListService() {
-  const [serviceData, setServiceData] = useState<ServiceData[]>([]);
 
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [filterIsActive, setFilterIsActive] = useState<string>("all");
 
+//----------------------------------------
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const serviceData = useSelector(
+    (state: RootState) => state.firestoreServiceData.data
+  ) as ServiceData[];
   useEffect(() => {
-    const fetchServiceData = async () => {
-      try {
-        const serviceRef = firebase.firestore().collection("services");
-        const snapshot = await serviceRef.get();
-
-        const serviceData = await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const service = doc.data() as ServiceData;
-            service.id = doc.id;
-
-            const progressiveId = service.progressiveId;
-            if (progressiveId) {
-              const progressiveRef = firebase
-                .firestore()
-                .collection("progressives")
-                .where("number", "==", progressiveId);
-              const progressiveSnapshot = await progressiveRef.get();
-
-              if (!progressiveSnapshot.empty) {
-                const progressiveData = progressiveSnapshot.docs[0].data();
-                const authManagementId = progressiveData.authManagementId;
-
-                if (authManagementId) {
-                  const authManagementRef = firebase
-                    .firestore()
-                    .collection("authManagements")
-                    .doc(authManagementId);
-                  const authManagementSnapshot = await authManagementRef.get();
-
-                  if (authManagementSnapshot.exists) {
-                    const authManagementData = authManagementSnapshot.data();
-                    if (authManagementData) {
-                      const isActive = authManagementData.isActive;
-                      service.isActive = isActive;
-                    }
-                  }
-                }
-              }
-            }
-
-            return service;
-          })
-        );
-
-        setServiceData(serviceData);
-      } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu:", error);
-        message.error("Failed to fetch service data.");
-      }
-    };
-
-    fetchServiceData();
-  }, []);
-
-
+    dispatch(getService());
+  }, [dispatch]);
+ 
+//----------------------------------------
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
   };
 
-  const filteredRoleManagementData = serviceData.filter((service) =>
-  service.nameService.toLowerCase().includes(searchKeyword.toLowerCase())
-  ).filter((auth) => {
-    if (filterIsActive === "all") {
-      return true;
-    } else {
-      return auth.isActive === filterIsActive;
-    }
-  });
+  const filteredRoleManagementData = serviceData
+    .filter((service) =>
+      service.nameService.toLowerCase().includes(searchKeyword.toLowerCase())
+    )
+    .filter((auth) => {
+      if (filterIsActive === "all") {
+        return true;
+      } else {
+        return auth.isActive === filterIsActive;
+      }
+    });
 
-const handleFilterChange = (value: string) => {
-  setFilterIsActive(value);
-};
+  const handleFilterChange = (value: string) => {
+    setFilterIsActive(value);
+  };
   return (
     <Layout className="layout">
       <SlideMain />
@@ -152,7 +111,7 @@ const handleFilterChange = (value: string) => {
                     <label htmlFor="">Trạng thái hoạt động</label>
                   </div>
                   <div className="col-12">
-                  <Select
+                    <Select
                       size="large"
                       defaultValue="all"
                       style={{ width: 280 }}
@@ -214,11 +173,10 @@ const handleFilterChange = (value: string) => {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={filteredRoleManagementData}
-                 
-                  pagination={{pageSize: 3}}
+                  pagination={{ pageSize: 3 }}
                   bordered
                   rowClassName={() => "table-row"}
-                  className="mb-3"
+                  className="mb-2"
                 >
                   <Table.Column
                     title={<span className="table-title">Mã dịch vụ</span>}

@@ -107,14 +107,6 @@ function AddServices() {
       // Thêm ghi chú vào collection noteUsers
     await addNoteToCollection(`Thêm mới dịch vụ: ${newService.codeService}`);
 
-      setNewService({
-        id: "",
-        codeService: "",
-        nameService: "",
-        description: "",
-        progressiveId: 0,
-      });
-
       // Thực hiện điều hướng đến trang danh sách sản phẩm
       window.location.href = "/service";
     } catch (error) {

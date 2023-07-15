@@ -21,6 +21,12 @@ import "../../assets/css/style.css";
 //firebase
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { getService, setData } from "../../redux/service/serviceSlice";
+import { ThunkDispatch } from "redux-thunk";
+import { getProgressive } from "../../redux/progressive/progressiveSlice";
+import { getDevice } from "../../redux/device/deviceSlice";
 
 const { Content } = Layout;
 
@@ -73,104 +79,32 @@ function ListProgressives() {
   const [filterNameService, setFilterNameService] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterTypeDevice, setFilterTypeDevice] = useState<string>("all");
-  //-------
-  const [serviceData, setServiceData] = useState<ServiceData[]>([]);
 
+  //--------------------------------------------
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const serviceData = useSelector(
+    (state: RootState) => state.firestoreServiceData.data
+  ) as ServiceData[];
   useEffect(() => {
-    const fetchServices = async () => {
-      const serviceRef = firebase.firestore().collection("services");
-      const snapshot = await serviceRef.get();
-      setServiceData(
-        snapshot.docs.map((doc) => {
-          const service = doc.data() as ServiceData;
-          service.id = doc.id;
-          return service;
-        })
-      );
-    };
+    dispatch(getService());
+  }, [dispatch]);
+  //------------
 
-    fetchServices();
+  const deviceData = useSelector(
+    (state: RootState) => state.firestoreDeviceData.data
+  ) as DeviceData[];
+  useEffect(() => {
+    dispatch(getDevice());
   }, []);
   //------------
 
-  const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
-
+  const progressiveData = useSelector(
+    (state: RootState) => state.firestoreProgressiveData.data
+  ) as ProgressiveData[];
   useEffect(() => {
-    const fetchDevices = async () => {
-      const deviceRef = firebase.firestore().collection("devices");
-      const snapshot = await deviceRef.get();
-      const uniqueDevices = new Set<string>();
-
-      snapshot.docs.forEach((doc) => {
-        const device = doc.data() as DeviceData;
-        device.id = doc.id;
-        uniqueDevices.add(device.typeDevice);
-      });
-
-      const devices = Array.from(uniqueDevices).map((typeDevice) => ({
-        id: typeDevice,
-        typeDevice: typeDevice,
-      }));
-
-      setDeviceData(devices);
-    };
-
-    fetchDevices();
+    dispatch(getProgressive());
   }, []);
-  //------------
-  const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
-
-  useEffect(() => {
-    const fetchProgressive = async () => {
-      const progressiveRef = firebase.firestore().collection("progressives");
-      const snapshot = await progressiveRef.get();
-      setProgressiveData(
-        await (
-          await Promise.all(
-            snapshot.docs.map(async (doc) => {
-              const progressive = doc.data() as ProgressiveData;
-              progressive.id = doc.id;
-
-              const serviceRef = progressive.nameService;
-              if (
-                serviceRef !== null &&
-                serviceRef instanceof firebase.firestore.DocumentReference
-              ) {
-                const serviceDoc = await serviceRef.get();
-                if (serviceDoc.exists) {
-                  const serviceData = serviceDoc.data();
-                  if (serviceData && serviceData.nameService) {
-                    const nameService = serviceData.nameService;
-                    progressive.nameService = nameService;
-                  }
-                }
-              }
-
-              const authManagementId = progressive.authManagementId;
-              if (authManagementId) {
-                // Fetch the associated device document
-                const deviceRef = firebase
-                  .firestore()
-                  .collection("devices")
-                  .where("authManagementId", "==", authManagementId);
-                const deviceSnapshot = await deviceRef.get();
-
-                if (!deviceSnapshot.empty) {
-                  const deviceData = deviceSnapshot.docs[0].data();
-                  const typeDevice = deviceData.typeDevice;
-                  progressive.typeDevice = typeDevice;
-                }
-              }
-
-              return progressive;
-            })
-          )
-        ).sort((a, b) => Number(a.number) - Number(b.number)) // Sắp xếp theo STT tăng dần
-      );
-    };
-
-    fetchProgressive();
-  }, []);
+  //--------------------------------------------
 
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
@@ -252,7 +186,10 @@ function ListProgressives() {
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
                       {serviceData.map((service) => (
-                        <Select.Option key={service.id} value={service.nameService}>
+                        <Select.Option
+                          key={service.id}
+                          value={service.nameService}
+                        >
                           {service.nameService}
                         </Select.Option>
                       ))}
@@ -354,10 +291,10 @@ function ListProgressives() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={filteredAuthManagementData}
-                  pagination={{ pageSize: 5 }}
+                  pagination={{ pageSize: 6 }}
                   bordered
                   rowClassName={() => "table-row"}
-                  className="mb-3"
+                  className="mb-2"
                 >
                   <Column
                     title={<span className="table-title">STT</span>}

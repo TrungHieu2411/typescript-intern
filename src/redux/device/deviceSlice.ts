@@ -35,13 +35,14 @@ interface DeviceData {
 
 export const { setData } = deviceSlice.actions;
 
-export const getDevice = (): ThunkAction<
-  void,
-  RootState,
-  null,
-  Action<string>
-> => {
-  return async (dispatch) => {
+export const getDevice =
+  (): ThunkAction<
+    void,
+    RootState,
+    null, // Thay đổi từ `undefined` thành `null` ở đây
+    Action<string>
+  > =>
+  async (dispatch) => {
     try {
       const deviceRef = firebase.firestore().collection("devices");
       const snapshot = await deviceRef.get();
@@ -74,7 +75,6 @@ export const getDevice = (): ThunkAction<
       console.log(error);
     }
   };
-};
 
 export const createDevice =
   (
@@ -138,11 +138,12 @@ export const createDevice =
     }
   };
 
-export const updateDevice = (
-  updatedDevice: DeviceData,
-  authManagementInfo: { userName: string; password: string }
-): ThunkAction<void, RootState, unknown, Action<string>> => {
-  return async (
+export const updateDevice =
+  (
+    updatedDevice: DeviceData,
+    authManagementInfo: { userName: string; password: string }
+  ): ThunkAction<void, RootState, unknown, Action<string>> =>
+  async (
     dispatch: ThunkDispatch<RootState, unknown, Action<string>>,
     getState: () => RootState
   ) => {
@@ -187,4 +188,3 @@ export const updateDevice = (
       console.error("Failed to update device:", error);
     }
   };
-};

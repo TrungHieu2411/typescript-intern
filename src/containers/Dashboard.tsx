@@ -32,10 +32,10 @@ const dataByDay = [
 ];
 
 const dataByWeek = [
-  { week: "1", "Cấp số": 2500 },
-  { week: "2", "Cấp số": 3500 },
-  { week: "3", "Cấp số": 2500 },
-  { week: "4", "Cấp số": 3000 },
+  { week: "tuần 1", "Cấp số": 2500 },
+  { week: "tuần 2", "Cấp số": 3500 },
+  { week: "tuần 3", "Cấp số": 2500 },
+  { week: "tuần 4", "Cấp số": 3000 },
 ];
 
 const dataByMonth = [
@@ -251,7 +251,7 @@ function Dashboard() {
         console.error("Lỗi truy vấn Firestore: ", error);
       });
   }, []);
-//------------------------------
+  //------------------------------
   const [isActive, setIsActive] = useState(0);
 
   useEffect(() => {
@@ -348,8 +348,93 @@ function Dashboard() {
       });
   }, []);
   //---------------
+  //------------------------------
+  const [isActiveService, setIsActiveService] = useState(0);
 
-  //--------------------------
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("services");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCountDevice = columns.length;
+        setServiceCount(columnCountDevice);
+
+        // Đếm số lượng cột có trạng thái "Bỏ qua"
+        const activeColumns = columns.filter(
+          (column) => column.isActive === "Hoạt động"
+        );
+        const isActiveService = activeColumns.length;
+        setIsActiveService(isActiveService);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  //------------------------------
+  const [isNotActiveService, setIsNotActiveService] = useState(0);
+
+  useEffect(() => {
+    // Lấy tham chiếu đến collection "progressives"
+    const collectionRef = firebase.firestore().collection("services");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef
+      .get()
+      .then((snapshot) => {
+        // Đếm số lượng cột từ snapshot
+        const columns = snapshot.empty
+          ? []
+          : snapshot.docs.map((doc) => doc.data());
+        const columnCountDevice = columns.length;
+        setServiceCount(columnCountDevice);
+
+        // Đếm số lượng cột có trạng thái "Bỏ qua"
+        const activeColumns = columns.filter(
+          (column) => column.isActive === "Ngưng hoạt động"
+        );
+        const isNotActiveService = activeColumns.length;
+        setIsNotActiveService(isNotActiveService);
+      })
+      .catch((error) => {
+        console.error("Lỗi truy vấn Firestore: ", error);
+      });
+  }, []);
+  // --------------------------
+
+  const [selectedViewDate, setSelectedViewDate] = useState("Ngày");
+
+  const handleViewChangeDate = (value: string) => {
+    setSelectedViewDate(value);
+  };
+
+  const getCurrentMonthYear = () => {
+    const currentDate = new Date();
+    const monthsInVietnamese = [
+      "Tháng 1",
+      "Tháng 2",
+      "Tháng 3",
+      "Tháng 4",
+      "Tháng 5",
+      "Tháng 6",
+      "Tháng 7",
+      "Tháng 8",
+      "Tháng 9",
+      "Tháng 10",
+      "Tháng 11",
+      "Tháng 12"
+    ];
+    const month = monthsInVietnamese[currentDate.getMonth()];
+    const year = currentDate.getFullYear();
+    return `${month} ${year}`;
+  };
+
   return (
     <Layout className="layout">
       <SlideMain />
@@ -552,12 +637,28 @@ function Dashboard() {
                 <div className="col-12 mt-4">
                   <Card
                     className="shadow card-container"
-                    style={{ width: 770, height: 445 }}
+                    style={{ width: 770, height: 420 }}
                   >
                     <div className="row">
                       <div className="col">
-                        <h4>Bảng thống kê theo tháng</h4>
-                        <p>Năm 2023</p>
+                        {selectedView === "Ngày" && (
+                          <>
+                            <h4>Bảng thống kê theo ngày</h4>
+                            <p>{getCurrentMonthYear()}</p>
+                          </>
+                        )}
+                        {selectedView === "Tuần" && (
+                          <>
+                            <h4>Bảng thống kê theo tuần</h4>
+                            <p>{getCurrentMonthYear()}</p>
+                          </>
+                        )}
+                        {selectedView === "Tháng" && (
+                          <>
+                            <h4>Bảng thống kê theo tháng</h4>
+                            <p>Năm {new Date().getFullYear()}</p>
+                          </>
+                        )}
                       </div>
                       <div className="col text-end">
                         <p>
@@ -576,6 +677,7 @@ function Dashboard() {
                         </p>
                       </div>
                     </div>
+
                     {/* ...Nội dung Card... */}
                     <Area
                       data={getDataBySelectedView()}
@@ -589,14 +691,14 @@ function Dashboard() {
             </div>
           </div>
         </Content>
-        <Sider width={410} theme="light">
+        <Sider width={400} theme="light">
           <div className="row mt-2">
             <div className="col-12">
               <span className="d-flex align-items-center justify-content-center">
                 <Account />
               </span>
             </div>
-            <div className="col mt-3  pb-2 ms-3">
+            <div className="col mt-3 pb-2 ms-3">
               <h4 style={{ color: "#FF7506" }}>Tổng quan</h4>
             </div>
             <div className="col-12">
@@ -607,7 +709,7 @@ function Dashboard() {
                 <div className="row">
                   <div className="col-3">
                     <div className="progress-container">
-                      <div className="outer-progress">
+                      <div className="outer-progress mt-1">
                         <Progress
                           type="circle"
                           strokeColor={"#FF7506"}
@@ -626,7 +728,7 @@ function Dashboard() {
                     </div>
                   </div>
                   <div className="col-3 p-0">
-                    <div className="row ">
+                    <div className="row mt-1">
                       <div className="col-12 p-0">
                         <h4
                           className="ms-3 me-2 mt-1 fw-bold"
@@ -688,7 +790,7 @@ function Dashboard() {
                 <div className="row">
                   <div className="col-3">
                     <div className="progress-container">
-                      <div className="outer-progress">
+                      <div className="outer-progress mt-1">
                         <Progress
                           type="circle"
                           strokeColor={"#4277FF"}
@@ -707,7 +809,7 @@ function Dashboard() {
                     </div>
                   </div>
                   <div className="col-3 p-0">
-                    <div className="row">
+                    <div className="row mt-1">
                       <div className="col-12 p-0">
                         <h4
                           className="ms-3 me-2 mt-1 fw-bold"
@@ -741,7 +843,7 @@ function Dashboard() {
                           className="text-end fw-bold"
                           style={{ color: "#FF7506" }}
                         >
-                          3.444
+                          {isActiveService}
                         </span>
                       </div>
                       <div className="col-9 p-0">
@@ -752,7 +854,7 @@ function Dashboard() {
                           className="text-end fw-bold"
                           style={{ color: "#FF7506" }}
                         >
-                          3.44
+                          {isNotActiveService}
                         </span>
                       </div>
                     </div>
@@ -769,7 +871,7 @@ function Dashboard() {
                 <div className="row">
                   <div className="col-3">
                     <div className="progress-container">
-                      <div className="outer-progress">
+                      <div className="outer-progress mt-1">
                         <Progress
                           type="circle"
                           strokeColor={"#35C75A"}
@@ -796,7 +898,7 @@ function Dashboard() {
                     </div>
                   </div>
                   <div className="col-3 p-0">
-                    <div className="row">
+                    <div className="row mt-1">
                       <div className="col-12 p-0">
                         <h4
                           className="ms-3 me-2 mt-1 fw-bold"
@@ -830,7 +932,7 @@ function Dashboard() {
                           className="text-end fw-bold"
                           style={{ color: "#FF7506" }}
                         >
-                          3.444
+                          {pendingCount}
                         </span>
                       </div>
                       <div className="col-9 p-0">
@@ -841,7 +943,7 @@ function Dashboard() {
                           className="text-end fw-bold"
                           style={{ color: "#FF7506" }}
                         >
-                          3.444
+                          {usedingCount}
                         </span>
                       </div>
                       <div className="col-9 p-0">
@@ -852,7 +954,7 @@ function Dashboard() {
                           className="text-end fw-bold"
                           style={{ color: "#FF7506" }}
                         >
-                          3.44
+                          {skipCount}
                         </span>
                       </div>
                     </div>
@@ -864,7 +966,7 @@ function Dashboard() {
               <DatePicker
                 className="hide-datepicker"
                 open
-                style={{ position: "absolute", bottom: -0 }}
+                style={{ position: "absolute", bottom: -8 }}
               />
             </div>
           </div>

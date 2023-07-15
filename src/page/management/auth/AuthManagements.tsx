@@ -182,9 +182,9 @@ function AuthManagements() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={filteredAuthManagementData}
-                  pagination={{ pageSize: 5 }}
+                  pagination={{ pageSize: 6 }}
                   bordered
-                  className="mb-3"
+                  className=""
                 >
                   <Column
                     title={<span className="table-title">Tên đăng nhập</span>}

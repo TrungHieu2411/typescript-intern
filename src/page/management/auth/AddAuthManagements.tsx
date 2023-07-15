@@ -92,7 +92,7 @@ function AddAuthManagements() {
     }
   };
 
-  const handleAddAuthManagement = async () => {
+  const onFinish = async () => {
     try {
       // Save the user's information in Firestore
 
@@ -152,6 +152,19 @@ function AddAuthManagements() {
     setPasswordMatchError(passwordMatchError);
   };
 
+  const [form] = Form.useForm();
+
+  const handleAddAuthManagement = () => {
+    // Kiểm tra và submit form
+    form
+      .validateFields()
+      .then(() => {
+        form.submit();
+      })
+      .catch((error) => {
+        console.error("Validation failed:", error);
+      });
+  };
   
   return (
     <Layout className="layout">
@@ -180,7 +193,7 @@ function AddAuthManagements() {
             <div className="pt-3">
               <Card style={{ width: 1140 }}>
                 <h6 style={{ color: "#FF7506" }}>Thông tin tài khoản</h6>
-                <Form className="mt-3">
+                <Form className="mt-3" form={form} onFinish={onFinish}>
                   <div className="row">
                     <div className="col-6">
                       <div className="row">
@@ -188,7 +201,13 @@ function AddAuthManagements() {
                           <label htmlFor="" className="mb-2">
                             Họ tên: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item name="fullName"
+                           rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập họ và tên!",
+                              },
+                            ]}>
                             <Input
                               value={newAuthManagement.fullName}
                               onChange={(e) =>
@@ -206,7 +225,13 @@ function AddAuthManagements() {
                             Số điện thoại:{" "}
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item name="phone" 
+                          rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập số điện thoại!",
+                              },
+                            ]}>
                             <Input
                               value={newAuthManagement.phone}
                               onChange={(e) =>
@@ -223,7 +248,17 @@ function AddAuthManagements() {
                           <label htmlFor="" className="mb-2">
                             Email: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item name="email" 
+                          rules={[
+                              {
+                                type: "email", // Kiểm tra định dạng email
+                                message: "Vui lòng nhập đúng định dạng email!",
+                              },
+                              {
+                                required: true,
+                                message: "Vui lòng nhập email!",
+                              },
+                            ]}>
                             <Input
                               value={newAuthManagement.email}
                               onChange={(e) =>
@@ -241,7 +276,13 @@ function AddAuthManagements() {
                           <label htmlFor="" className="mb-2">
                             Vai trò: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item name="role"
+                           rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập vai trò!",
+                              },
+                            ]}>
                             <Select
                               value={newAuthManagement.role}
                               onChange={(value) =>
@@ -274,7 +315,13 @@ function AddAuthManagements() {
                             Tên đăng nhập:{" "}
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item name="userName"
+                          rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập tên đăng nhập!",
+                              },
+                            ]}>
                             <Input
                               value={newAuthManagement.userName}
                               onChange={(e) =>
@@ -293,7 +340,13 @@ function AddAuthManagements() {
                               Mật khẩu:{" "}
                               <span style={{ color: "#FF7506" }}>*</span>
                             </label>
-                            <Form.Item className="">
+                            <Form.Item name="password"
+                          rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập mật khẩu!",
+                              },
+                            ]}>
                               <Input.Password
                                 value={newAuthManagement.password}
                                 onChange={handlePasswordChange}
@@ -306,7 +359,13 @@ function AddAuthManagements() {
                               Nhập lại mật khẩu:{" "}
                               <span style={{ color: "#FF7506" }}>*</span>
                             </label>
-                            <Form.Item className="">
+                            <Form.Item name="confirmPassword"
+                              rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập lại mật khẩu!",
+                              },
+                            ]}>
                               <Input.Password
                                 value={newAuthManagement.confirmPassword}
                                 onChange={handleConfirmPasswordChange}
@@ -325,9 +384,14 @@ function AddAuthManagements() {
                             Tình trạng:{" "}
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item name="isActive"
+                           rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập trạng thái!",
+                              },
+                            ]}>
                             <Select
-                              defaultValue="all"
                               value={newAuthManagement.isActive}
                               onChange={(value) =>
                                 setNewAuthManagement({
@@ -337,12 +401,13 @@ function AddAuthManagements() {
                               }
                               placeholder="Chọn trạng thái"
                             >
-                              <Select.Option value="Hoạt động">
+                              <Option value="Hoạt động">
                                 Hoạt động
-                              </Select.Option>
-                              <Select.Option value="Ngưng hoạt động">
+                              </Option>
+                              <Option value="Ngưng hoạt động">
                                 Ngưng hoạt động
-                              </Select.Option>
+                              </Option>
+
                             </Select>
                           </Form.Item>
                         </div>

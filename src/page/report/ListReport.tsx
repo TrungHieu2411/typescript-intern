@@ -176,7 +176,7 @@ function ListReport() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={progressiveData}
-                  pagination={{ pageSize: 5 }}
+                  pagination={{ pageSize: 6 }}
                   bordered
                   rowClassName={() => "table-row"}
                   className="mb-3"

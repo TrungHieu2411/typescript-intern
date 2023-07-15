@@ -54,7 +54,7 @@ function AddRoleManagements() {
     }
   };
 
-  const handleAddRoleManagement = async () => {
+  const onFinish = async () => {
     const roleManagementCollection = firebase.firestore().collection("roles");
 
     try {
@@ -79,6 +79,20 @@ function AddRoleManagements() {
     }
   };
 
+  const [form] = Form.useForm();
+
+  const handleAddRoleManagement = () => {
+    // Kiểm tra và submit form
+    form
+      .validateFields()
+      .then(() => {
+        form.submit();
+      })
+      .catch((error) => {
+        console.error("Validation failed:", error);
+      });
+  };
+  
   return (
     <Layout className="layout">
       <SlideMain />
@@ -106,7 +120,7 @@ function AddRoleManagements() {
             <div className="mt-4 pt-2">
               <Card>
                 <h6 style={{ color: "#FF7506" }}>Thông tin vai trò</h6>
-                <Form className="mt-3 mb-2">
+                <Form className="mt-3 mb-2" form={form} onFinish={onFinish}>
                   <div className="row">
                     <div className="col-6">
                       <div className="row">
@@ -115,7 +129,14 @@ function AddRoleManagements() {
                             Tên vai trò:{" "}
                             <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item name="nameRole"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập tên vai trò!",
+                              },
+                            ]}
+                            >
                             <Input
                               value={newRoleManagement.nameRole}
                               onChange={(e) =>
@@ -132,7 +153,13 @@ function AddRoleManagements() {
                           <label htmlFor="" className="mb-2">
                             Mô tả: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
-                          <Form.Item className="">
+                          <Form.Item name="description"
+                           rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập mô tả vai trò!",
+                            },
+                          ]}>
                             <TextArea
                               rows={5}
                               placeholder="Mô tả vai trò"

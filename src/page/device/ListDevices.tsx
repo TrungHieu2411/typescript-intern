@@ -66,7 +66,8 @@ function ListDevices() {
   const [filterIsActive, setFilterIsActive] = useState<string>("all");
   const [filterIsConnected, setFilterIsConnected] = useState<string>("all");
 
-  const [deviceData, setdeviceData] = useState<DeviceData[]>([]);
+  const dispatch = useDispatch();
+  const deviceData = useSelector((state: RootState) => state.firestoreDeviceData.data) as DeviceData[];
 
   useEffect(() => {
     const fetchDevice = async () => {
@@ -78,17 +79,35 @@ function ListDevices() {
           snapshot.docs.map(async (doc) => {
             const device = doc.data() as DeviceData;
             device.id = doc.id;
+        
+            const authManagementId = device.authManagementId;
+            if (authManagementId) {
+              const authManagementRef = firebase
+                .firestore()
+                .collection("authManagements")
+                .doc(authManagementId);
+              const authManagementSnapshot = await authManagementRef.get();
+        
+              if (authManagementSnapshot.exists) {
+                const authManagementData = authManagementSnapshot.data();
+                if (authManagementData) {
+                  const isActive = authManagementData.isActive;
+                  device.isActive = isActive;
+                }
+              }
+            }
             return device;
           })
         );
-        setdeviceData(deviceData);
+
+        dispatch(setData(deviceData));
       } catch (error) {
         console.log(error);
       }
     };
 
     fetchDevice();
-  });
+  }, [dispatch]);
 
 
   const handleSearch = (value: string) => {
@@ -215,7 +234,7 @@ function ListDevices() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={filteredDeviceData}
-                  pagination={{ pageSize: 4 }}
+                  pagination={{ pageSize: 3 }}
                   bordered
                   className="mb-3"
                   rowClassName={() => "table-row"}

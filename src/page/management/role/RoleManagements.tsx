@@ -166,7 +166,7 @@ function RoleManagement() {
                   pagination={{ pageSize: 4 }}
                   bordered
                   rowClassName={() => "table-row"}
-                  className="mb-3"
+                  className="mb-2"
                 >
                   <Column
                     title={<span className="table-title">Tên vai trò</span>}

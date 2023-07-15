@@ -116,7 +116,7 @@ function UserLogManagements() {
                   pagination={{ pageSize: 7 }}
                   bordered
                   rowClassName={() => "table-row"}
-                  className="mb-3"
+                  className=""
                 >
                   <Column
                     title={<span className="table-title">Tên đăng nhập</span>}
