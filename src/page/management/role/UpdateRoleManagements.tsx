@@ -78,6 +78,7 @@ function UpdateRoleManagements() {
     }
   };
 
+  //----------------------------------------
   const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const handleUpdateRoleManagement = async () => {
     if (typeof id === "string") {
@@ -100,7 +101,7 @@ function UpdateRoleManagements() {
       }
     }
   };
-
+  //----------------------------------------
   return (
     <Layout className="layout">
       <SlideMain />

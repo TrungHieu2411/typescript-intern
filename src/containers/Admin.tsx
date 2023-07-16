@@ -8,6 +8,7 @@ import {
   Layout,
   Popover,
   Select,
+  Spin,
   Upload,
 } from "antd";
 import { BellFilled, CameraOutlined } from "@ant-design/icons";
@@ -15,10 +16,6 @@ import SlideMain from "./SlideMain";
 import "../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
-import { updateAuthManagement } from "../redux/authManagement/authManagementSlice";
-import { RootState } from "../redux/store";
-import { ThunkDispatch } from "redux-thunk";
-import { useDispatch } from "react-redux";
 
 const { Content } = Layout;
 
@@ -55,17 +52,27 @@ function Admin() {
   const [imageFile, setImageFile] = useState<any>(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
-  const handleUpdateAuthManagement = async () => {
-    if (typeof id === "string") {
-      try {
-        dispatch(updateAuthManagement(id, authManagementData));
-        console.log("Service updated successfully!");
-        window.location.href = "/authManagement";
-      } catch (error) {
-        console.error("Error updating service:", error);
-      }
-    }
+  const handleUpdateAuthManagement = () => {
+    const userRef = firebase.firestore().collection("authManagements").doc(id);
+    const updatedUser = {
+      fullName: user.fullName,
+      phone: user.phone,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      image: imageUrl || user.image,
+      userName: user.userName,
+      password: user.password,
+    };
+
+    userRef
+      .update(updatedUser)
+      .then(() => {
+        console.log("AuthManagement updated successfully!");
+      })
+      .catch((error) => {
+        console.error("Error updating AuthManagement:", error);
+      });
   };
 
   const handleImageUpload = async (file: any) => {
@@ -240,12 +247,22 @@ function Admin() {
                       <div className="col-12" style={{ position: "relative" }}>
                         <Image
                           src={imageUrl || "../assets/image/logo.jpg"}
-                          preview={false}
+                          preview={true}
                           style={{
                             borderRadius: "50%",
                             width: 285,
                             height: 285,
                           }}
+                          placeholder={
+                            loadingImage ? (
+                              <Spin />
+                            ) : (
+                              <img
+                                src={imageUrl || "../assets/image/logo.jpg"}
+                                alt=""
+                              />
+                            )
+                          }
                         />
                         <div
                           style={{
@@ -371,12 +388,15 @@ function Admin() {
                           </label>
                           <Form.Item className="">
                             <Select value={roleValue}>
-                                {authManagementData.map((authManagement) => (
-                                  <Select.Option key={authManagement.id} value={authManagement.role}>
-                                    
-                                  </Select.Option>
-                                ))}
-                              </Select>
+                              {authManagementData.map((authManagement) => (
+                                <Select.Option
+                                key={authManagement.id}
+                                value={authManagement.role}
+                              >
+                                
+                              </Select.Option>
+                              ))}
+                            </Select>
                           </Form.Item>
                         </div>
                       </div>

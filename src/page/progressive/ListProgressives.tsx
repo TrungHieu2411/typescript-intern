@@ -27,6 +27,9 @@ import { getService, setData } from "../../redux/service/serviceSlice";
 import { ThunkDispatch } from "redux-thunk";
 import { getProgressive } from "../../redux/progressive/progressiveSlice";
 import { getDevice } from "../../redux/device/deviceSlice";
+import moment from "moment";
+import "moment/locale/vi"; // Thay 'vi' bằng mã ngôn ngữ tương ứng nếu bạn muốn sử dụng ngôn ngữ khác
+moment.locale("vi"); // Thay 'vi' bằng mã ngôn ngữ tương ứng nếu bạn muốn sử dụng ngôn ngữ khác
 
 const { Content } = Layout;
 
@@ -110,6 +113,7 @@ function ListProgressives() {
     setSearchKeyword(value);
   };
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const filteredAuthManagementData = progressiveData
     .filter((progressive) =>
       progressive.nameService
@@ -136,6 +140,19 @@ function ListProgressives() {
         return true;
       } else {
         return progressive.typeDevice === filterTypeDevice;
+      }
+    })
+    .filter((progressive) => {
+      if (selectedDate === null) {
+        return true;
+      } else {
+        // Lọc theo ngày đã chọn
+        const selectedDateTime = selectedDate.getTime();
+        const progressiveTime = new Date(progressive.timeCreate).getTime();
+        return (
+          progressiveTime >= selectedDateTime &&
+          progressiveTime < selectedDateTime + 24 * 60 * 60 * 1000
+        );
       }
     });
 
@@ -254,13 +271,30 @@ function ListProgressives() {
                     <label htmlFor="">Chọn thời gian</label>
                   </div>
                   <div className="col">
-                    <DatePicker size="large" style={{ width: 130 }} />
+                    <DatePicker
+                      size="large"
+                      style={{ width: 130 }}
+                      // value={selectedDate ? moment(selectedDate) : null}
+                      onChange={(date) =>
+                        setSelectedDate(date ? date.toDate() : null)
+                      }
+                      format="DD/MM/YYYY" // Định dạng ngày tháng năm
+                    />
+
                     <img
                       style={{ width: 15 }}
                       src="../assets/image/arrow-right.png"
                       alt=""
                     />
-                    <DatePicker size="large" style={{ width: 130 }} />
+                    <DatePicker
+                      size="large"
+                      style={{ width: 130 }}
+                      // value={selectedDate ? moment(selectedDate) : null}
+                      onChange={(date) =>
+                        setSelectedDate(date ? date.toDate() : null)
+                      }
+                      format="DD/MM/YYYY" // Định dạng ngày tháng năm
+                    />
                   </div>
                 </div>
               </div>

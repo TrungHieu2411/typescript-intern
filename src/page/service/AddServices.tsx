@@ -19,7 +19,6 @@ interface ServiceData {
   codeService: string;
   nameService: string;
   description: string;
-  progressiveId: number;
 }
 
 function AddServices() {
@@ -42,33 +41,12 @@ function AddServices() {
     return progressiveId;
   };
   //------------
-  const [currentNumber, setCurrentNumber] = useState<number>(200000);
-
-  useEffect(() => {
-    const fetchNextProgressiveId = async () => {
-      const serviceCollection = firebase.firestore().collection("services");
-      const snapshot = await serviceCollection.get();
-
-      if (snapshot.docs.length > 0) {
-        const lastService = snapshot.docs[
-          snapshot.docs.length - 1
-        ].data() as ServiceData;
-        setCurrentNumber(lastService.progressiveId);
-      } else {
-        setCurrentNumber(200000);
-      }
-    };
-
-    fetchNextProgressiveId();
-  }, []);
-
   //------------
   const [newService, setNewService] = useState<ServiceData>({
     id: "",
     codeService: "",
     nameService: "",
     description: "",
-    progressiveId: 0,
   });
 
   const addNoteToCollection = async (action: string) => {

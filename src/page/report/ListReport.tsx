@@ -48,6 +48,7 @@ interface ProgressiveData {
 
 function ListReport() {
   
+//----------------------------------------
   const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const progressiveData = useSelector(
     (state: RootState) => state.firestoreProgressiveData.data
@@ -55,6 +56,7 @@ function ListReport() {
   useEffect(() => {
     dispatch(getProgressive());
   }, []);
+//----------------------------------------
 
   const [filteredData, setFilteredData] = useState<ProgressiveData[]>([]);
   useEffect(() => {

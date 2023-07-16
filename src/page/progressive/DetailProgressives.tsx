@@ -47,8 +47,8 @@ function DetailProgressives() {
     status: "",
   });
 
+  //----------------------------------------
   const [typeDevice, setTypeDevice] = useState<string>("");
-
   useEffect(() => {
     const fetchProgressive = async () => {
       const progressiveRef = firebase
@@ -83,9 +83,8 @@ function DetailProgressives() {
     fetchProgressive();
   }, [id]);
 
-  //-------------
+  //----------------------------------------
   const [nameServiceValue, setNameServiceValue] = useState<string | null>(null);
-
   useEffect(() => {
     const fetchProgressive = async () => {
       const progressiveRef = firebase.firestore().collection("progressives");

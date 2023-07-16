@@ -10,7 +10,7 @@ import { RootState } from "../store";
 
 export const deviceSlice = createSlice({
   name: "device",
-  initialState: { data: [] },
+  initialState: { data: []},
   reducers: {
     setData: (state, action) => {
       state.data = action.payload.map((device: any) => ({
@@ -31,6 +31,12 @@ interface DeviceData {
   service: string;
   typeDevice: string;
   authManagementId: string;
+}
+
+interface AuthManagementData {
+  id: string;
+  userName: string;
+  password: string;
 }
 
 export const { setData } = deviceSlice.actions;
@@ -77,28 +83,26 @@ export const getDevice =
   };
 
 export const createDevice =
-  (
-    newDevice: DeviceData,
-    authManagementInfo: { userName: string; password: string }
-  ): ThunkAction<void, RootState, unknown, Action<string>> =>
-  async (dispatch: ThunkDispatch<RootState, unknown, Action<string>>) => {
+  (newDevice: any): ThunkAction<void, RootState, unknown, Action<string>> =>
+  async (dispatch) => {
     try {
+      let password: string;
+      let userName: string;
       // Kiểm tra thông tin đăng nhập
       const authManagementCollection = firebase
         .firestore()
         .collection("authManagements");
-      const snapshot = await authManagementCollection
-        .where("userName", "==", authManagementInfo.userName)
-        .where("password", "==", authManagementInfo.password)
-        .get();
+      const snapshot = await authManagementCollection.get();
+      const matchingData = snapshot.docs.find((doc) => {
+        const data = doc.data() as AuthManagementData;
+        return data.userName === userName && data.password === password;
+      });
 
-      if (!snapshot.empty) {
-        const matchingData = snapshot.docs[0].data();
-        const authManagementId = matchingData.authManagementId;
+      if (matchingData) {
+        const authManagementId = matchingData.id;
 
         // Thực hiện thêm thiết bị và lưu trữ authManagementId
-        const deviceCollection = firebase.firestore().collection("devices");
-        const deviceRef = await deviceCollection.add({
+        await firebase.firestore().collection("devices").add({
           codeDevice: newDevice.codeDevice,
           nameDevice: newDevice.nameDevice,
           ipAddress: newDevice.ipAddress,
@@ -107,23 +111,8 @@ export const createDevice =
           authManagementId: authManagementId,
         });
 
-        // Lấy ID của thiết bị vừa thêm
-        const newDeviceId = deviceRef.id;
-
         // Cập nhật state trong Redux
-        dispatch(
-          setData([
-            {
-              id: newDeviceId,
-              codeDevice: newDevice.codeDevice,
-              nameDevice: newDevice.nameDevice,
-              ipAddress: newDevice.ipAddress,
-              isConnected: newDevice.isConnected,
-              service: newDevice.service,
-              authManagementId: authManagementId,
-            },
-          ])
-        );
+        dispatch(getDevice);
 
         // Hiển thị thông báo "Thiết bị đã được thêm thành công"
         message.success("Thiết bị đã được thêm thành công");
@@ -138,20 +127,19 @@ export const createDevice =
 export const updateDevice =
   (
     id: string,
-    data: any,
+    data: any
   ): ThunkAction<void, RootState, unknown, Action<string>> =>
   async (dispatch) => {
     try {
-        // Cập nhật thiết bị
-        await firebase.firestore().collection("devices").doc(id).update({
-          codeDevice: data.codeDevice,
-          nameDevice: data.nameDevice,
-          ipAddress: data.ipAddress,
-          isConnected: data.isConnected,
-          service: data.service,
-          isActive: data.isActive,
+      // Cập nhật thiết bị
+      await firebase
+        .firestore()
+        .collection("devices")
+        .doc(id)
+        .update({
+          ...data,
         });
-      
+
       // Cập nhật state trong Redux
       dispatch(getDevice);
     } catch (error) {

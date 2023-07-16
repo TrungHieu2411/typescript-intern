@@ -14,7 +14,12 @@ import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../redux/store";
 
 const tags = [
-  "", 
+  " Khám tim mạch",
+  " Khám Sản - Phụ khoa",
+  " Khám răng hàm mặt",
+  " Khám tai mũi họng",
+  " Khám hô hấp",
+  " Khám tổng quát",
 ];
 
 interface DeviceData {
@@ -113,19 +118,22 @@ function UpdateDevices() {
         isConnected: device.isConnected,
         service: device.service,
         typeDevice: device.typeDevice,
+        userName: authManagement.userName,
+        password: authManagement.password,
       };
+
       message.success(`Cập nhật thông tin ${device.codeDevice} thành công!`);
       await addNoteToCollection(`Cập nhật dịch vụ: ${device.codeDevice}`);
+      dispatch(updateDevice(id, deviceData));
       try {
-    dispatch(updateDevice(id, deviceData));
-    console.log("Service updated successfully!");
+        console.log("Service updated successfully!");
         window.location.href = "/device";
       } catch (error) {
         console.error("Error updating service:", error);
       }
     }
   };
-  
+
   return (
     <Layout className="layout">
       <SlideMain />

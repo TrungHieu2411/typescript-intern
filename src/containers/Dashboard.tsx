@@ -24,168 +24,135 @@ import firebase from "firebase/compat/app";
 
 const { Content } = Layout;
 
-const dataByDay = [
-  { day: "1", "Cấp số": 2500 },
-  { day: "13", "Cấp số": 3500 },
-  { day: "19", "Cấp số": 2000 },
-  { day: "31", "Cấp số": 3000 },
-];
+  const dataByDay = [
+    { day: "1", "Cấp số": 2500 },
+    { day: "13", "Cấp số": 3500 },
+    { day: "19", "Cấp số": 2000 },
+    { day: "31", "Cấp số": 3000 },
+  ];
 
-const dataByWeek = [
-  { week: "tuần 1", "Cấp số": 2500 },
-  { week: "tuần 2", "Cấp số": 3500 },
-  { week: "tuần 3", "Cấp số": 2500 },
-  { week: "tuần 4", "Cấp số": 3000 },
-];
+  const dataByWeek = [
+    { week: "tuần 1", "Cấp số": 2500 },
+    { week: "tuần 2", "Cấp số": 3500 },
+    { week: "tuần 3", "Cấp số": 2500 },
+    { week: "tuần 4", "Cấp số": 3000 },
+  ];
 
-const dataByMonth = [
-  { month: "1", "Cấp số": 3000 },
-  { month: "2", "Cấp số": 4000 },
-  { month: "3", "Cấp số": 2500 },
-  { month: "4", "Cấp số": 4800 },
-  { month: "5", "Cấp số": 3500 },
-  { month: "6", "Cấp số": 5200 },
-  { month: "7", "Cấp số": 2200 },
-  { month: "8", "Cấp số": 5000 },
-  { month: "9", "Cấp số": 2300 },
-  { month: "10", "Cấp số": 4500 },
-  { month: "11", "Cấp số": 5100 },
-  { month: "12", "Cấp số": 2800 },
-];
+  const dataByMonth = [
+    { month: "1", "Cấp số": 3000 },
+    { month: "2", "Cấp số": 4000 },
+    { month: "3", "Cấp số": 2500 },
+    { month: "4", "Cấp số": 4800 },
+    { month: "5", "Cấp số": 3500 },
+    { month: "6", "Cấp số": 5200 },
+    { month: "7", "Cấp số": 2200 },
+    { month: "8", "Cấp số": 5000 },
+    { month: "9", "Cấp số": 2300 },
+    { month: "10", "Cấp số": 4500 },
+    { month: "11", "Cấp số": 5100 },
+    { month: "12", "Cấp số": 2800 },
+  ];
 
-const config: any = {
-  autoFit: false,
-  animation: {
-    appear: {
-      animation: "path-in",
-      duration: 3000,
+  const config: any = {
+    autoFit: false,
+    animation: {
+      appear: {
+        animation: "path-in",
+        duration: 3000,
+      },
     },
-  },
-  xAxis: {
-    range: [0, 1],
-  },
-  smooth: true,
-  areaStyle: () => {
-    return {
-      fill: "l(270) 0:#ffffff 0.5:#6e92f6 1:#0a4bff",
+    xAxis: {
+      range: [0, 1],
+    },
+    smooth: true,
+    areaStyle: () => {
+      return {
+        fill: "l(270) 0:#ffffff 0.5:#6e92f6 1:#0a4bff",
+      };
+    },
+  };
+
+  type DataItem = {
+    day?: string;
+    week?: string;
+    month?: string;
+    "Cấp số": number;
+  };
+  function Dashboard() {
+    const [selectedView, setSelectedView] = useState("Ngày");
+
+    const handleViewChange = (value: any) => {
+      setSelectedView(value);
     };
-  },
-};
 
-type DataItem = {
-  day?: string;
-  week?: string;
-  month?: string;
-  "Cấp số": number;
-};
-function Dashboard() {
-  const [selectedView, setSelectedView] = useState("Ngày");
-
-  const handleViewChange = (value: any) => {
-    setSelectedView(value);
-  };
-
-  const getDataBySelectedView = (): DataItem[] => {
-    if (selectedView === "Ngày") {
-      config.xField = "day";
-      config.yField = "Cấp số";
-      return dataByDay;
-    } else if (selectedView === "Tuần") {
-      config.xField = "week";
-      config.yField = "Cấp số";
-      return dataByWeek;
-    } else if (selectedView === "Tháng") {
-      config.xField = "month";
-      config.yField = "Cấp số";
-      return dataByMonth;
-    }
-    return [];
-  };
+    const getDataBySelectedView = (): DataItem[] => {
+      if (selectedView === "Ngày") {
+        config.xField = "day";
+        config.yField = "Cấp số";
+        return dataByDay;
+      } else if (selectedView === "Tuần") {
+        config.xField = "week";
+        config.yField = "Cấp số";
+        return dataByWeek;
+      } else if (selectedView === "Tháng") {
+        config.xField = "month";
+        config.yField = "Cấp số";
+        return dataByMonth;
+      }
+      return [];
+    };
   //--------------------------------------------------------------------------------------------------
   const [columnCount, setColumnCount] = useState(0);
-
-  useEffect(() => {
-    // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("progressives");
-
-    // Lấy dữ liệu từ Firestore và đếm số lượng cột
-    collectionRef
-      .get()
-      .then((snapshot) => {
-        // Đếm số lượng cột từ snapshot
-        const columnCount = snapshot.empty
-          ? 0
-          : Object.keys(snapshot.docs[0].data()).length;
-        setColumnCount(columnCount);
-      })
-      .catch((error) => {
-        console.error("Lỗi truy vấn Firestore: ", error);
-      });
-  }, []);
-  //--------------------------
   const [usedingCount, setUsedingCount] = useState(0);
-
-  useEffect(() => {
-    // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("progressives");
-
-    // Lấy dữ liệu từ Firestore và đếm số lượng cột
-    collectionRef
-      .get()
-      .then((snapshot) => {
-        // Đếm số lượng cột từ snapshot
-        const columns = snapshot.empty
-          ? []
-          : snapshot.docs.map((doc) => doc.data());
-        const columnCount = columns.length;
-        setColumnCount(columnCount);
-
-        // Đếm số lượng cột có trạng thái "Đã sử dụng"
-        const usedingColumns = columns.filter(
-          (column) => column.status === "Đã sử dụng"
-        );
-        const usedingCount = usedingColumns.length;
-        setUsedingCount(usedingCount);
-      })
-      .catch((error) => {
-        console.error("Lỗi truy vấn Firestore: ", error);
-      });
-  }, []);
-  //--------------------------
   const [pendingCount, setPendingCount] = useState(0);
-
-  useEffect(() => {
-    // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("progressives");
-
-    // Lấy dữ liệu từ Firestore và đếm số lượng cột
-    collectionRef
-      .get()
-      .then((snapshot) => {
-        // Đếm số lượng cột từ snapshot
-        const columns = snapshot.empty
-          ? []
-          : snapshot.docs.map((doc) => doc.data());
-        const columnCount = columns.length;
-        setColumnCount(columnCount);
-
-        // Đếm số lượng cột có trạng thái "Đang chờ"
-        const pendingColumns = columns.filter(
-          (column) => column.status === "Đang chờ"
-        );
-        const pendingCount = pendingColumns.length;
-        setPendingCount(pendingCount);
-      })
-      .catch((error) => {
-        console.error("Lỗi truy vấn Firestore: ", error);
-      });
-  }, []);
-  //--------------------------
   const [skipCount, setSkipCount] = useState(0);
 
   useEffect(() => {
     // Lấy tham chiếu đến collection "progressives"
     const collectionRef = firebase.firestore().collection("progressives");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef.get().then((snapshot) => {
+      // Đếm số lượng cột từ snapshot
+      const columnCount = snapshot.empty
+        ? 0
+        : Object.keys(snapshot.docs[0].data()).length;
+      setColumnCount(columnCount);
+    });
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef.get().then((snapshot) => {
+      // Đếm số lượng cột từ snapshot
+      const columns = snapshot.empty
+        ? []
+        : snapshot.docs.map((doc) => doc.data());
+      const columnCount = columns.length;
+      setColumnCount(columnCount);
+
+      // Đếm số lượng cột có trạng thái "Đã sử dụng"
+      const usedingColumns = columns.filter(
+        (column) => column.status === "Đã sử dụng"
+      );
+      const usedingCount = usedingColumns.length;
+      setUsedingCount(usedingCount);
+    });
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef.get().then((snapshot) => {
+      // Đếm số lượng cột từ snapshot
+      const columns = snapshot.empty
+        ? []
+        : snapshot.docs.map((doc) => doc.data());
+      const columnCount = columns.length;
+      setColumnCount(columnCount);
+
+      // Đếm số lượng cột có trạng thái "Đang chờ"
+      const pendingColumns = columns.filter(
+        (column) => column.status === "Đang chờ"
+      );
+      const pendingCount = pendingColumns.length;
+      setPendingCount(pendingCount);
+    });
 
     // Lấy dữ liệu từ Firestore và đếm số lượng cột
     collectionRef
@@ -205,88 +172,59 @@ function Dashboard() {
         const skipCount = skipColumns.length;
         setSkipCount(skipCount);
       })
+
       .catch((error) => {
         console.error("Lỗi truy vấn Firestore: ", error);
       });
   }, []);
   //--------------------------------------------------------------------------------------------------
   const [deviceCount, setDeviceCount] = useState(0);
-  
-  useEffect(() => {
-    // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("devices");
-
-    // Lấy dữ liệu từ Firestore và đếm số lượng cột
-    collectionRef
-      .get()
-      .then((snapshot) => {
-        // Đếm số lượng cột từ snapshot
-        const columnCountDevice = snapshot.empty
-          ? 0
-          : Object.keys(snapshot.docs[0].data()).length;
-        setDeviceCount(columnCountDevice);
-      })
-      .catch((error) => {
-        console.error("Lỗi truy vấn Firestore: ", error);
-      });
-  }, []);
-  useEffect(() => {
-    const collectionRef = firebase.firestore().collection("devices");
-
-    collectionRef
-      .get()
-      .then((snapshot) => {
-        // Đếm số lượng cột từ snapshot
-        const columns = snapshot.empty
-          ? []
-          : snapshot.docs.map((doc) => doc.data());
-        const columnCountDevice = columns.length;
-        setDeviceCount(columnCountDevice);
-
-        // Đếm số lượng cột có trạng thái "Bỏ qua"
-        const deviceCount = columns;
-        const deviceCountNumber = deviceCount.length;
-        setDeviceCount(deviceCountNumber);
-      })
-      .catch((error) => {
-        console.error("Lỗi truy vấn Firestore: ", error);
-      });
-  }, []);
-  //------------------------------
   const [isActive, setIsActive] = useState(0);
-
-  useEffect(() => {
-    // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("devices");
-
-    // Lấy dữ liệu từ Firestore và đếm số lượng cột
-    collectionRef
-      .get()
-      .then((snapshot) => {
-        // Đếm số lượng cột từ snapshot
-        const columns = snapshot.empty
-          ? []
-          : snapshot.docs.map((doc) => doc.data());
-        const columnCountDevice = columns.length;
-        setDeviceCount(columnCountDevice);
-
-        // Đếm số lượng cột có trạng thái "Bỏ qua"
-        const activeColumns = columns.filter(
-          (column) => column.isActive === "Hoạt động"
-        );
-        const isActive = activeColumns.length;
-        setIsActive(isActive);
-      })
-      .catch((error) => {
-        console.error("Lỗi truy vấn Firestore: ", error);
-      });
-  }, []);
-  //------------------------------
   const [isNotActive, setIsNotActive] = useState(0);
 
   useEffect(() => {
     // Lấy tham chiếu đến collection "progressives"
     const collectionRef = firebase.firestore().collection("devices");
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef.get().then((snapshot) => {
+      // Đếm số lượng cột từ snapshot
+      const columnCountDevice = snapshot.empty
+        ? 0
+        : Object.keys(snapshot.docs[0].data()).length;
+      setDeviceCount(columnCountDevice);
+    });
+
+    collectionRef.get().then((snapshot) => {
+      // Đếm số lượng cột từ snapshot
+      const columns = snapshot.empty
+        ? []
+        : snapshot.docs.map((doc) => doc.data());
+      const columnCountDevice = columns.length;
+      setDeviceCount(columnCountDevice);
+
+      // Đếm số lượng cột có trạng thái "Bỏ qua"
+      const deviceCount = columns;
+      const deviceCountNumber = deviceCount.length;
+      setDeviceCount(deviceCountNumber);
+    });
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    collectionRef.get().then((snapshot) => {
+      // Đếm số lượng cột từ snapshot
+      const columns = snapshot.empty
+        ? []
+        : snapshot.docs.map((doc) => doc.data());
+      const columnCountDevice = columns.length;
+      setDeviceCount(columnCountDevice);
+
+      // Đếm số lượng cột có trạng thái "Bỏ qua"
+      const activeColumns = columns.filter(
+        (column) => column.isActive === "Hoạt động"
+      );
+      const isActive = activeColumns.length;
+      setIsActive(isActive);
+    });
 
     // Lấy dữ liệu từ Firestore và đếm số lượng cột
     collectionRef
@@ -310,8 +248,11 @@ function Dashboard() {
         console.error("Lỗi truy vấn Firestore: ", error);
       });
   }, []);
-  //------------------------
+  //--------------------------------------------------------------------------------------------------
   const [serviceCount, setServiceCount] = useState(0);
+  const [isActiveService, setIsActiveService] = useState(0);
+  const [isNotActiveService, setIsNotActiveService] = useState(0);
+
   useEffect(() => {
     const serviceCollectionRef = firebase.firestore().collection("services");
 
@@ -329,64 +270,38 @@ function Dashboard() {
         console.error("Lỗi truy vấn Firestore (services): ", error);
       });
 
+    serviceCollectionRef.get().then((snapshot) => {
+      // Đếm số lượng cột từ snapshot
+      const columns = snapshot.empty
+        ? []
+        : snapshot.docs.map((doc) => doc.data());
+      const columnCountService = columns.length;
+      setServiceCount(columnCountService);
+
+      const serviceCount = columns;
+      const serviceCountNumber = serviceCount.length;
+      setServiceCount(serviceCountNumber);
+    });
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
+    serviceCollectionRef.get().then((snapshot) => {
+      // Đếm số lượng cột từ snapshot
+      const columns = snapshot.empty
+        ? []
+        : snapshot.docs.map((doc) => doc.data());
+      const columnCountDevice = columns.length;
+      setServiceCount(columnCountDevice);
+
+      // Đếm số lượng cột có trạng thái "Bỏ qua"
+      const activeColumns = columns.filter(
+        (column) => column.isActive === "Hoạt động"
+      );
+      const isActiveService = activeColumns.length;
+      setIsActiveService(isActiveService);
+    });
+
+    // Lấy dữ liệu từ Firestore và đếm số lượng cột
     serviceCollectionRef
-      .get()
-      .then((snapshot) => {
-        // Đếm số lượng cột từ snapshot
-        const columns = snapshot.empty
-          ? []
-          : snapshot.docs.map((doc) => doc.data());
-        const columnCountService = columns.length;
-        setServiceCount(columnCountService);
-
-        // Đếm số lượng cột có trạng thái "Bỏ qua"
-        const serviceCount = columns;
-        const serviceCountNumber = serviceCount.length;
-        setServiceCount(serviceCountNumber);
-      })
-      .catch((error) => {
-        console.error("Lỗi truy vấn Firestore: ", error);
-      });
-  }, []);
-  //---------------
-  //------------------------------
-  const [isActiveService, setIsActiveService] = useState(0);
-
-  useEffect(() => {
-    // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("services");
-
-    // Lấy dữ liệu từ Firestore và đếm số lượng cột
-    collectionRef
-      .get()
-      .then((snapshot) => {
-        // Đếm số lượng cột từ snapshot
-        const columns = snapshot.empty
-          ? []
-          : snapshot.docs.map((doc) => doc.data());
-        const columnCountDevice = columns.length;
-        setServiceCount(columnCountDevice);
-
-        // Đếm số lượng cột có trạng thái "Bỏ qua"
-        const activeColumns = columns.filter(
-          (column) => column.isActive === "Hoạt động"
-        );
-        const isActiveService = activeColumns.length;
-        setIsActiveService(isActiveService);
-      })
-      .catch((error) => {
-        console.error("Lỗi truy vấn Firestore: ", error);
-      });
-  }, []);
-  //------------------------------
-  const [isNotActiveService, setIsNotActiveService] = useState(0);
-
-  useEffect(() => {
-    // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("services");
-
-    // Lấy dữ liệu từ Firestore và đếm số lượng cột
-    collectionRef
       .get()
       .then((snapshot) => {
         // Đếm số lượng cột từ snapshot
@@ -407,7 +322,7 @@ function Dashboard() {
         console.error("Lỗi truy vấn Firestore: ", error);
       });
   }, []);
-  // --------------------------
+  //--------------------------------------------------------------------------------------------------
 
   const getCurrentMonthYear = () => {
     const currentDate = new Date();
@@ -423,7 +338,7 @@ function Dashboard() {
       "Tháng 9",
       "Tháng 10",
       "Tháng 11",
-      "Tháng 12"
+      "Tháng 12",
     ];
     const month = monthsInVietnamese[currentDate.getMonth()];
     const year = currentDate.getFullYear();

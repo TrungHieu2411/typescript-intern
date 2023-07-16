@@ -34,22 +34,21 @@ interface AuthManagementData {
   isActive: string;
 }
 function RoleManagement() {
+  //----------------------------------------
+  const roleManagementData = useSelector(
+    (state: RootState) => state.firestoreRoleManagementData.data
+  ) as RoleManagementData[];
+  const authManagementData = useSelector(
+    (state: RootState) => state.firestoreAuthManagementData.data
+  ) as AuthManagementData[];
+
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  useEffect(() => {
+    dispatch(getRoleManagement());
+    dispatch(getAuthMangement());
+  }, [dispatch]);
+  //-------------
   const [searchKeyword, setSearchKeyword] = useState<string>("");
-
-//----------------------------------------
-const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
-
-const roleManagementData = useSelector(
-  (state: RootState) => state.firestoreRoleManagementData.data
-) as RoleManagementData[];
-const authManagementData = useSelector(
-  (state: RootState) => state.firestoreAuthManagementData.data
-) as AuthManagementData[];
-useEffect(() => {
-  dispatch(getRoleManagement());
-  dispatch(getAuthMangement());
-}, [dispatch]);
-
   const countNameRoleOccurrences = () => {
     const nameRoleCounts: { [key: string]: number } = {};
 
@@ -73,7 +72,6 @@ useEffect(() => {
   const filteredRoleManagementData = roleManagementData.filter((role) =>
     role.nameRole.toLowerCase().includes(searchKeyword.toLowerCase())
   );
-
   return (
     <Layout className="layout">
       <SlideMain />
@@ -102,7 +100,7 @@ useEffect(() => {
                   </Col>
                 </Row>
               </Col>
-            <Col lg={9}>
+              <Col lg={9}>
                 <Row style={{ maxWidth: 325 }} className="ms-3">
                   <label htmlFor="">Từ khóa</label>
                   <Col span={24}>
@@ -126,7 +124,7 @@ useEffect(() => {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                    dataSource={filteredRoleManagementData}
+                  dataSource={filteredRoleManagementData}
                   pagination={{ pageSize: 4 }}
                   bordered
                   rowClassName={() => "table-row"}

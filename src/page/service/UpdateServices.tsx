@@ -93,9 +93,9 @@ function UpdateServices() {
   
       message.success(`Cập nhật thông tin ${service.codeService} thành công!`);
       await addNoteToCollection(`Cập nhật dịch vụ: ${service.codeService}`);
-  
+  dispatch(updateService(id, serviceData));
       try {
-        dispatch(updateService(id, serviceData));
+        
         console.log("Service updated successfully!");
         window.location.href = "/service";
       } catch (error) {

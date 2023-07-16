@@ -148,6 +148,7 @@ function AddProgressives() {
     }
   };
 
+//----------------------------------------
   const [progressiveNumber, setProgressiveNumber] = useState<number>(0);
 
   const handleAddProgressive = async () => {
@@ -191,6 +192,7 @@ function AddProgressives() {
     }
   };
 
+//----------------------------------------
   return (
     <Layout className="layout">
       <SlideMain />

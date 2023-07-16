@@ -72,7 +72,6 @@ function AddDevices() {
   });
 
   //------------
-
   const addNoteToCollection = async (action: string) => {
     const noteUsersCollection = firebase.firestore().collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
@@ -96,20 +95,20 @@ function AddDevices() {
       console.error(error);
     }
   };
-  //-------------
+
+//----------------------------------------
   const dispatch = useDispatch();
-  const handleAddDevice = async () => {
-    const authManagementInfo = {
-      userName: authManagement.userName,
-      password: authManagement.password,
-    };
-    await dispatch(createDevice(newDevice, authManagementInfo) as any);
-  };
-
-  //------------
-  const [form] = Form.useForm();
-
   const onFinish = async () => {
+    message.success(
+      `Thêm mới thiết bị ${newDevice.codeDevice} thành công!`
+    );
+    await dispatch(createDevice(newDevice) as any);
+    // Thêm ghi chú vào collection noteUsers
+    await addNoteToCollection(`Thêm mới dịch vụ: ${newDevice.codeDevice}`);
+  };
+//----------------------------------------
+  const [form] = Form.useForm();
+  const handleAddDevice = async () => {
     try {
       // Kiểm tra và submit form
       await form.validateFields();

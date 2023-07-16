@@ -60,6 +60,7 @@ function AddRoleManagements() {
     }
   };
 
+  //----------------------------------------
   const dispatch = useDispatch();
   const onFinish = async () => {
     message.success(
@@ -71,7 +72,7 @@ function AddRoleManagements() {
       `Thêm mới vai trò: ${newRoleManagement.nameRole}`
     );
   };
-
+  //----------------------------------------
   const [form] = Form.useForm();
 
   const handleAddRoleManagement = () => {

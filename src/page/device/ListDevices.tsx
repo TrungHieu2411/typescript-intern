@@ -68,6 +68,7 @@ function ListDevices() {
   const [filterIsConnected, setFilterIsConnected] = useState<string>("all");
 
   //-------------
+  //Danh sach thiet bi
   const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const deviceData = useSelector(
     (state: RootState) => state.firestoreDeviceData.data

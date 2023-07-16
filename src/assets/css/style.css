@@ -2,36 +2,58 @@ html,
 body,
 #root {
   height: 100%;
+  
 }
 
+/* Thiết lập chiều cao 100% cho các phần tử html, body và #root */
+
+/* -------------------------------------------------------------- */
 .layout {
   height: 100%;
 }
 
+/* Thiết lập chiều cao 100% cho phần tử có class "layout" */
+
+/* -------------------------------------------------------------- */
 .slide {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
+/* Thiết lập chiều cao 100% và hiển thị dạng flex, theo hướng dọc, cho phần tử có class "slide" */
+
+/* -------------------------------------------------------------- */
 .menu-items {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
+/* Thiết lập thuộc tính flex-grow là 1 để phần tử có class "menu-items" mở rộng để điền vào không gian trống, hiển thị dạng flex, theo hướng dọc */
+
+/* -------------------------------------------------------------- */
 #logout {
   margin-top: 200px;
 }
 
+/* Thiết lập margin-top là 200px cho phần tử có id "logout" */
+
+/* -------------------------------------------------------------- */
 .menu-item {
   margin-bottom: 10px;
 }
 
+/* Thiết lập margin-bottom là 10px cho các phần tử có class "menu-item" */
+
+/* -------------------------------------------------------------- */
 .layout-content {
   overflow: auto;
 }
 
+/* Thiết lập overflow là auto cho phần tử có class "layout-content" */
+
+/* -------------------------------------------------------------- */
 .fixed-card {
   position: fixed;
   bottom: 50;
@@ -43,6 +65,9 @@ body,
   /* Các thuộc tính khác (nếu cần) */
 }
 
+/* Thiết lập vị trí cố định (fixed) cho phần tử có class "fixed-card" ở dưới cùng bên phải của trang, và đặt kích thước, màu nền và màu chữ */
+
+/* -------------------------------------------------------------- */
 .fixed-card-service {
   position: fixed;
   bottom: 50;
@@ -54,31 +79,43 @@ body,
   /* Các thuộc tính khác (nếu cần) */
 }
 
+/* Thiết lập vị trí cố định (fixed) cho phần tử có class "fixed-card-service" ở dưới cùng bên phải của trang, và đặt kích thước, màu nền và màu chữ */
+
+/* -------------------------------------------------------------- */
 .ant-table-thead>tr>th,
 .ant-table-thead>tr>td {
   background-color: #ff9138 !important;
   color: #fff !important;
 }
 
+/* Thiết lập màu nền và màu chữ cho các phần tử <th> và <td> trong phần đầu bảng, và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .ant-pagination-item-active a {
   background-color: #FF7506;
-  /* Đổi màu nền */
   color: white !important;
-  /* Đổi màu chữ */
   border-color: #FF7506 !important;
 }
 
+/* Thiết lập màu nền, màu chữ và màu viền cho các phần tử <a> trong phần trang hiện tại của thanh phân trang, và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .custom-color {
   color: #ff7506;
-  /* Đổi màu chữ */
 }
 
+/* Thiết lập màu chữ cho các phần tử có class "custom-color" */
+
+/* -------------------------------------------------------------- */
 .custom-input-container {
   display: flex;
   flex-direction: column-reverse;
   position: relative;
 }
 
+/* Thiết lập hiển thị dạng flex, theo hướng dọc đảo ngược, và vị trí tương đối (relative) cho phần tử có class "custom-input-container" */
+
+/* -------------------------------------------------------------- */
 .tags-container {
   display: flex;
   flex-wrap: wrap;
@@ -88,63 +125,86 @@ body,
   bottom: 0;
 }
 
+/* Thiết lập hiển thị dạng flex, và gói các phần tử trong hàng dọc (wrap), với khoảng cách giữa chúng là 4px, và vị trí tuyệt đối (absolute) cho phần tử có class "tags-container" */
 
+/* -------------------------------------------------------------- */
 .blue-checkbox .ant-checkbox-inner {
   border-color: blue;
 }
 
+/* Thiết lập màu viền cho phần tử có class "blue-checkbox" và phần tử con có class "ant-checkbox-inner" */
 
-/* Điều chỉnh cho các menu item chưa được chọn */
+/* -------------------------------------------------------------- */
 .ant-menu .ant-menu-item:hover {
   background-color: #FFF2E7 !important;
   color: #FF9138 !important;
 }
 
-/* Điều chỉnh cho các menu item đã được chọn */
+/* Thiết lập màu nền và màu chữ khi di chuột qua các phần tử <li> trong phần menu, và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .ant-menu .ant-menu-item-selected {
   background-color: #FF7506 !important;
   color: white !important;
 }
 
-/* Điều chỉnh cho các menu item có class "menu-item" */
+/* Thiết lập màu nền và màu chữ cho các phần tử <li> đã được chọn trong phần menu, và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .menu-item {
   text-decoration: none !important;
   display: flex !important;
 }
 
-/* Điều chỉnh màu chữ khi hover trên các liên kết a */
+/* Thiết lập không gạch chân cho các phần tử có class "menu-item", và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 a:hover {
   color: #FF9138 !important;
 }
 
-/* Điều chỉnh khi hover trên các menu item */
+/* Thiết lập màu chữ khi di chuột qua các phần tử <a>, và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .menu-item:hover {
   background-color: #FFF2E7 !important;
   color: #FF9138 !important;
 }
 
-/* Điều chỉnh khi hover trên các submenu */
+/* Thiết lập màu nền và màu chữ khi di chuột qua các phần tử có class "menu-item", và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .ant-menu-submenu-title:hover {
   background-color: #FFF2E7 !important;
   color: #FF9138 !important;
 }
 
-/* Điều chỉnh màu chữ khi hover trên các submenu item */
+/* Thiết lập màu nền và màu chữ khi di chuột qua các phần tử tiêu đề submenu, và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .ant-menu-submenu-popup .ant-menu-item:hover {
   background-color: #FFF2E7 !important;
   color: #FF9138 !important;
 }
 
+/* Thiết lập màu nền và màu chữ khi di chuột qua các phần tử <li> trong các submenu, và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .table-row:nth-child(even) {
   background-color: #FFF2E7;
 }
 
+/* Thiết lập màu nền cho các dòng chẵn trong bảng */
 
+/* -------------------------------------------------------------- */
 .list-item-wrapper {
   position: relative;
   display: block;
 }
 
+/* Thiết lập vị trí tương đối (relative) và hiển thị dạng block cho phần tử có class "list-item-wrapper" */
+
+/* -------------------------------------------------------------- */
 .item-title {
   position: absolute;
   top: 0;
@@ -158,34 +218,50 @@ a:hover {
   border-top-right-radius: 5px;
 }
 
+/* Thiết lập vị trí tuyệt đối (absolute) cho phần tử có class "item-title", và đặt kích thước, màu nền, màu chữ và bo tròn các góc trên cùng bên trái và phải */
+
+/* -------------------------------------------------------------- */
 .card-container canvas {
   width: 720px !important;
   height: 300px !important;
 }
 
-/* //------------ */
+/* Thiết lập kích thước cho phần tử <canvas> trong phần tử có class "card-container", và sử dụng !important để ghi đè các giá trị mặc định */
+
+/* -------------------------------------------------------------- */
 .hide-datepicker {
   opacity: 0;
   transform: scale(0.1);
   font-size: 0px;
 }
 
+/* Thiết lập độ mờ (opacity), tỷ lệ thu/phóng (scale) và kích thước phông chữ (font-size) cho các phần tử có class "hide-datepicker" */
+
+/* -------------------------------------------------------------- */
 .ant-picker-footer {
   display: none;
 }
 
+/* Ẩn phần chân trang (footer) của phần tử có class "ant-picker-footer" */
 
+/* -------------------------------------------------------------- */
 .progress-container {
   position: relative;
   display: inline-block;
 }
 
+/* Thiết lập vị trí tương đối (relative) và hiển thị dạng inline-block cho phần tử có class "progress-container" */
+
+/* -------------------------------------------------------------- */
 .outer-progress {
   position: relative;
   width: 60px;
   height: 60px;
 }
 
+/* Thiết lập vị trí tương đối (relative), chiều rộng và chiều cao cho phần tử có class "outer-progress" */
+
+/* -------------------------------------------------------------- */
 .inner-progress {
   position: absolute;
   top: 50%;
@@ -193,7 +269,15 @@ a:hover {
   transform: translate(-50%, -50%);
 }
 
+/* Thiết lập vị trí tuyệt đối (absolute) cho phần tử có class "inner-progress", và căn giữa nó trong phần tử cha */
+
+/* -------------------------------------------------------------- */
 .inner-progress .ant-progress-text {
   display: contents;
 }
 
+/* Thiết lập hiển thị dạng contents cho phần tử con có class "ant-progress-text" trong phần tử có class "inner-progress" */
+
+.ant-image-mask{
+ border-radius: 50%;
+}

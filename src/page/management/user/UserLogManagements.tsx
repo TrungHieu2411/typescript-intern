@@ -33,16 +33,16 @@ interface NoteUserData {
   action: string;
 }
 function UserLogManagements() {
-//----------------------------------------
-const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
-const noteUserData = useSelector(
-  (state: RootState) => state.firestoreNoteUserManagementData.data
-) as NoteUserData[];
+  //----------------------------------------
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const noteUserData = useSelector(
+    (state: RootState) => state.firestoreNoteUserManagementData.data
+  ) as NoteUserData[];
 
-useEffect(() => {
-  dispatch(getNoteUser());
-}, [dispatch]);
-
+  useEffect(() => {
+    dispatch(getNoteUser());
+  }, [dispatch]);
+  //----------------------------------------
   return (
     <Layout className="layout">
       <SlideMain />

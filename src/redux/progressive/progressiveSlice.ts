@@ -95,4 +95,3 @@ export const getProgressive =
       message.error("Failed to fetch service data.");
     }
   };
-  

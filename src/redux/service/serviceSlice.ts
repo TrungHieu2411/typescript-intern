@@ -1,7 +1,6 @@
 import {
   Action,
   ThunkAction,
-  ThunkDispatch,
   createSlice,
 } from "@reduxjs/toolkit";
 import { RootState } from "../store";
@@ -26,7 +25,6 @@ interface ServiceData {
   codeService: string;
   nameService: string;
   description: string;
-  progressiveId: number;
 }
 
 export const { setData } = serviceSlice.actions;
@@ -60,7 +58,6 @@ export const createService =
         codeService: newService.codeService,
         nameService: newService.nameService,
         description: newService.description,
-        progressiveId: newService.progressiveId,
         isActive: "Hoạt động"
       });
       window.location.href = "/service"
