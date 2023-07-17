@@ -2,7 +2,7 @@ html,
 body,
 #root {
   height: 100%;
-  
+
 }
 
 /* Thiết lập chiều cao 100% cho các phần tử html, body và #root */
@@ -34,7 +34,7 @@ body,
 
 /* -------------------------------------------------------------- */
 #logout {
-  margin-top: 200px;
+  margin-top: 180px;
 }
 
 /* Thiết lập margin-top là 200px cho phần tử có id "logout" */
@@ -242,6 +242,9 @@ a:hover {
   display: none;
 }
 
+.ant-picker-dropdown .ant-picker-date-panel .ant-picker-body {
+  padding: 0px 18px;
+}
 /* Ẩn phần chân trang (footer) của phần tử có class "ant-picker-footer" */
 
 /* -------------------------------------------------------------- */
@@ -278,6 +281,6 @@ a:hover {
 
 /* Thiết lập hiển thị dạng contents cho phần tử con có class "ant-progress-text" trong phần tử có class "inner-progress" */
 
-.ant-image-mask{
- border-radius: 50%;
+.ant-image-mask {
+  border-radius: 50%;
 }

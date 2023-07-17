@@ -10,9 +10,7 @@ interface AuthManagementData {
   password: string;
 }
 
-const ConfirmPassword: React.FC = () => {
-  const formRef = React.useRef<FormInstance>(null);
-
+const ConfirmPassword = () => {
   //Lấy id trên params
   const { id } = useParams<{ id: string }>(); // Lấy giá trị id từ params
   const [passwordAuth, setPasswordAuth] = useState<AuthManagementData>({
@@ -75,7 +73,9 @@ const ConfirmPassword: React.FC = () => {
       message.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
     }
   };
-
+//------------------
+//lấy giá trị các trường nhập liệu, thực hiện kiểm tra hợp lệ và thực hiện các thao tác liên quan đến form.
+  const formRef = React.useRef<FormInstance>(null);
   return (
     <>
       <div className="container-fluid">

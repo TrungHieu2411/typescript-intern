@@ -1,25 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  Form,
-  Image,
-  Input,
-  Layout,
-  Popover,
-  Select,
-  Spin,
-  Upload,
-} from "antd";
+import { Button, Card, Form, Image, Input, Layout, Popover, Select, Spin, Upload, message } from "antd";
 import { BellFilled, CameraOutlined } from "@ant-design/icons";
 import SlideMain from "./SlideMain";
 import "../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
+import Account from "../components/User/Account";
 
 const { Content } = Layout;
-
-const popoverContent = <h4>dadasd</h4>;
 
 interface UserData {
   id: string;
@@ -51,7 +39,6 @@ function Admin() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<any>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleUpdateAuthManagement = () => {
     const userRef = firebase.firestore().collection("authManagements").doc(id);
     const updatedUser = {
@@ -76,9 +63,8 @@ function Admin() {
   };
 
   const handleImageUpload = async (file: any) => {
-    setLoadingImage(true);
     setImageFile(file);
-
+    message.loading("Đang tải ảnh...")
     try {
       const storageRef = firebase.storage().ref();
       const imageRef = storageRef.child(`authManagements/${file.name}`);
@@ -87,6 +73,7 @@ function Admin() {
 
       setImageUrl(imageUrl);
       setLoadingImage(false);
+      message.success("Đã tải ảnh thành công!");
 
       // Cập nhật trường 'image' của đối tượng 'user'
       setUser({
@@ -99,15 +86,9 @@ function Admin() {
     }
   };
 
-  //------------
-  const storedUserId = localStorage.getItem("userId");
-
   useEffect(() => {
     const fetchUser = async () => {
-      const userRef = firebase
-        .firestore()
-        .collection("authManagements")
-        .doc(storedUserId || id);
+      const userRef = firebase.firestore().collection("authManagements").doc(id);
       const userSnapshot = await userRef.get();
 
       if (userSnapshot.exists) {
@@ -116,11 +97,9 @@ function Admin() {
         setImageUrl(userData.image);
       }
     };
-
     fetchUser();
-  }, [storedUserId, id]);
+  }, [id]);
 
-  //--------------
   useEffect(() => {
     const updateAuthManagement = () => {
       if (imageUrl) {
@@ -131,14 +110,11 @@ function Admin() {
     updateAuthManagement();
   }, [handleUpdateAuthManagement, imageUrl]);
 
-  //---------------
   const [authManagementData, setAuthManagementData] = useState<UserData[]>([]);
 
   useEffect(() => {
     const fetchAuthManagement = async () => {
-      const authManagementRef = firebase
-        .firestore()
-        .collection("authManagements");
+      const authManagementRef = firebase.firestore().collection("authManagements");
       const snapshot = await authManagementRef.get();
 
       setAuthManagementData(
@@ -203,39 +179,7 @@ function Admin() {
               </div>
               <div className="col-auto">
                 <span className="d-flex align-items-center justify-content-center me-5">
-                  <Button
-                    style={{ background: "#FFF2E7" }}
-                    type="ghost"
-                    shape="circle"
-                    className="mb-5"
-                  >
-                    <Popover
-                      placement="bottomLeft"
-                      content={popoverContent}
-                      trigger="click"
-                    >
-                      <BellFilled
-                        style={{ color: "#FF7506" }}
-                        className="fs-5 d-flex align-items-center justify-content-center"
-                      />
-                    </Popover>
-                  </Button>
-                  <img
-                    className="mb-5"
-                    style={{
-                      width: 50,
-                      height: 50,
-                      marginLeft: 10,
-                      borderRadius: "50%",
-                    }}
-                    src={imageUrl || "../assets/image/logo.jpg"}
-                    alt=""
-                  />
-
-                  <span className="ms-2 mb-5 me-4">
-                    <p className="mb-0">Xin chào</p>
-                    <p className="mb-0 fw-bold">{user.fullName}</p>
-                  </span>
+                  <Account />
                 </span>
               </div>
             </div>
@@ -255,7 +199,7 @@ function Admin() {
                           }}
                           placeholder={
                             loadingImage ? (
-                              <Spin />
+                              <Spin tip="Đang tải ảnh, vui lòng chờ..." />
                             ) : (
                               <img
                                 src={imageUrl || "../assets/image/logo.jpg"}
@@ -390,11 +334,10 @@ function Admin() {
                             <Select value={roleValue}>
                               {authManagementData.map((authManagement) => (
                                 <Select.Option
-                                key={authManagement.id}
-                                value={authManagement.role}
-                              >
-                                
-                              </Select.Option>
+                                  key={authManagement.id}
+                                  value={authManagement.role}
+                                >
+                                </Select.Option>
                               ))}
                             </Select>
                           </Form.Item>

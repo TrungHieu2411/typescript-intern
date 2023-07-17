@@ -20,87 +20,88 @@ import "../assets/css/style.css";
 import { Area } from "@ant-design/charts";
 
 import firebase from "firebase/compat/app";
+import Link from "antd/es/typography/Link";
 // Sử dụng WaveChart trong component của bạn
 
 const { Content } = Layout;
 
-  const dataByDay = [
-    { day: "1", "Cấp số": 2500 },
-    { day: "13", "Cấp số": 3500 },
-    { day: "19", "Cấp số": 2000 },
-    { day: "31", "Cấp số": 3000 },
-  ];
+const dataByDay = [
+  { day: "1", "Cấp số": 2500 },
+  { day: "13", "Cấp số": 3500 },
+  { day: "19", "Cấp số": 2000 },
+  { day: "31", "Cấp số": 3000 },
+];
 
-  const dataByWeek = [
-    { week: "tuần 1", "Cấp số": 2500 },
-    { week: "tuần 2", "Cấp số": 3500 },
-    { week: "tuần 3", "Cấp số": 2500 },
-    { week: "tuần 4", "Cấp số": 3000 },
-  ];
+const dataByWeek = [
+  { week: "tuần 1", "Cấp số": 2500 },
+  { week: "tuần 2", "Cấp số": 3500 },
+  { week: "tuần 3", "Cấp số": 2500 },
+  { week: "tuần 4", "Cấp số": 3000 },
+];
 
-  const dataByMonth = [
-    { month: "1", "Cấp số": 3000 },
-    { month: "2", "Cấp số": 4000 },
-    { month: "3", "Cấp số": 2500 },
-    { month: "4", "Cấp số": 4800 },
-    { month: "5", "Cấp số": 3500 },
-    { month: "6", "Cấp số": 5200 },
-    { month: "7", "Cấp số": 2200 },
-    { month: "8", "Cấp số": 5000 },
-    { month: "9", "Cấp số": 2300 },
-    { month: "10", "Cấp số": 4500 },
-    { month: "11", "Cấp số": 5100 },
-    { month: "12", "Cấp số": 2800 },
-  ];
+const dataByMonth = [
+  { month: "1", "Cấp số": 3000 },
+  { month: "2", "Cấp số": 4000 },
+  { month: "3", "Cấp số": 2500 },
+  { month: "4", "Cấp số": 4800 },
+  { month: "5", "Cấp số": 3500 },
+  { month: "6", "Cấp số": 5200 },
+  { month: "7", "Cấp số": 2200 },
+  { month: "8", "Cấp số": 5000 },
+  { month: "9", "Cấp số": 2300 },
+  { month: "10", "Cấp số": 4500 },
+  { month: "11", "Cấp số": 5100 },
+  { month: "12", "Cấp số": 2800 },
+];
 
-  const config: any = {
-    autoFit: false,
-    animation: {
-      appear: {
-        animation: "path-in",
-        duration: 3000,
-      },
+const config: any = {
+  autoFit: false,
+  animation: {
+    appear: {
+      animation: "path-in",
+      duration: 3000,
     },
-    xAxis: {
-      range: [0, 1],
-    },
-    smooth: true,
-    areaStyle: () => {
-      return {
-        fill: "l(270) 0:#ffffff 0.5:#6e92f6 1:#0a4bff",
-      };
-    },
+  },
+  xAxis: {
+    range: [0, 1],
+  },
+  smooth: true,
+  areaStyle: () => {
+    return {
+      fill: "l(270) 0:#ffffff 0.5:#6e92f6 1:#0a4bff",
+    };
+  },
+};
+
+type DataItem = {
+  day?: string;
+  week?: string;
+  month?: string;
+  "Cấp số": number;
+};
+function Dashboard() {
+  const [selectedView, setSelectedView] = useState("Ngày");
+
+  const handleViewChange = (value: any) => {
+    setSelectedView(value);
   };
 
-  type DataItem = {
-    day?: string;
-    week?: string;
-    month?: string;
-    "Cấp số": number;
+  const getDataBySelectedView = (): DataItem[] => {
+    if (selectedView === "Ngày") {
+      config.xField = "day";
+      config.yField = "Cấp số";
+      return dataByDay;
+    } else if (selectedView === "Tuần") {
+      config.xField = "week";
+      config.yField = "Cấp số";
+      return dataByWeek;
+    } else if (selectedView === "Tháng") {
+      config.xField = "month";
+      config.yField = "Cấp số";
+      return dataByMonth;
+    }
+    return [];
   };
-  function Dashboard() {
-    const [selectedView, setSelectedView] = useState("Ngày");
-
-    const handleViewChange = (value: any) => {
-      setSelectedView(value);
-    };
-
-    const getDataBySelectedView = (): DataItem[] => {
-      if (selectedView === "Ngày") {
-        config.xField = "day";
-        config.yField = "Cấp số";
-        return dataByDay;
-      } else if (selectedView === "Tuần") {
-        config.xField = "week";
-        config.yField = "Cấp số";
-        return dataByWeek;
-      } else if (selectedView === "Tháng") {
-        config.xField = "month";
-        config.yField = "Cấp số";
-        return dataByMonth;
-      }
-      return [];
-    };
   //--------------------------------------------------------------------------------------------------
   const [columnCount, setColumnCount] = useState(0);
   const [usedingCount, setUsedingCount] = useState(0);
@@ -344,12 +345,26 @@ const { Content } = Layout;
     const year = currentDate.getFullYear();
     return `${month} ${year}`;
   };
+  const activeDevice: number = Math.round((isActive * 100) / columnCount);
+  const notActiveDevice: number = Math.round(100 - activeDevice);
 
+  const activeService: number = Math.round(
+    (isActiveService * 100) / serviceCount
+  );
+  const notActiveService: number = Math.round(100 - activeService);
+
+  const pendingProgressive: number = Math.round(
+    (pendingCount * 100) / columnCount
+  );
+  const usedingProgressive: number = Math.round(100 - pendingProgressive);
+  const skipingProgressive: number = Math.round(
+    usedingProgressive - pendingProgressive
+  );
   return (
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col">
@@ -363,27 +378,34 @@ const { Content } = Layout;
                   <Card className="shadow" style={{ width: 170, height: 130 }}>
                     <div className="row align-items-center">
                       <div className="col-4 p-0">
-                        <Button
-                          style={{
-                            width: 45,
-                            height: 45,
-                            color: "#6695FB",
-                            background: "#00F5FF",
-                          }}
-                          className="sttdacap"
-                          shape="circle"
-                          icon={
-                            <img
-                              src="../assets/image/icon-dasboard03.png"
-                              alt=""
-                            />
-                          }
-                        />
+                        <Link href="/progressive">
+                          <Button
+                            style={{
+                              width: 45,
+                              height: 45,
+                              color: "#6695FB",
+                              background: "#00F5FF",
+                            }}
+                            className="sttdacap"
+                            shape="circle"
+                            icon={
+                              <img
+                                src="../assets/image/icon-dasboard03.png"
+                                alt=""
+                              />
+                            }
+                          />
+                        </Link>
                       </div>
                       <div className="col-6 ps-2">
-                        <span style={{ fontSize: 12 }} className="">
-                          Số thứ tự đã cấp
-                        </span>
+                        <Link href="/progressive">
+                          <span
+                            style={{ fontSize: 12, color: "black" }}
+                            className=""
+                          >
+                            Số thứ tự đã cấp
+                          </span>
+                        </Link>
                       </div>
 
                       <div className="col-6 p-0 my-3 pt-1 text-start">
@@ -409,26 +431,33 @@ const { Content } = Layout;
                   <Card className="shadow" style={{ width: 170, height: 130 }}>
                     <div className="row align-items-center">
                       <div className="col-4 p-0">
-                        <Button
-                          style={{
-                            width: 45,
-                            height: 45,
-                            color: "#35C75A",
-                            background: "#FAF0E6",
-                          }}
-                          shape="circle"
-                          icon={
-                            <img
-                              src="../assets/image/icon-dasboard02.png"
-                              alt=""
-                            />
-                          }
-                        />
+                        <Link href="/progressive">
+                          <Button
+                            style={{
+                              width: 45,
+                              height: 45,
+                              color: "#35C75A",
+                              background: "#FAF0E6",
+                            }}
+                            shape="circle"
+                            icon={
+                              <img
+                                src="../assets/image/icon-dasboard02.png"
+                                alt=""
+                              />
+                            }
+                          />
+                        </Link>
                       </div>
                       <div className="col-6 ps-2 p-0">
-                        <span style={{ fontSize: 12 }} className="">
-                          Số thứ tự đã sử dụng
-                        </span>
+                        <Link href="progressive">
+                          <span
+                            style={{ fontSize: 12, color: "black" }}
+                            className=""
+                          >
+                            Số thứ tự đã sử dụng
+                          </span>
+                        </Link>
                       </div>
 
                       <div className="col-6 p-0 my-3 pt-1 text-start">
@@ -456,26 +485,33 @@ const { Content } = Layout;
                   <Card className="shadow" style={{ width: 170, height: 130 }}>
                     <div className="row align-items-center">
                       <div className="col-4 p-0">
-                        <Button
-                          style={{
-                            width: 45,
-                            height: 45,
-                            color: "#FFAC6A",
-                            background: "#EEEED1",
-                          }}
-                          shape="circle"
-                          icon={
-                            <img
-                              src="../assets/image/icon-dasboard05.png"
-                              alt=""
-                            />
-                          }
-                        />
+                        <Link href="progressive">
+                          <Button
+                            style={{
+                              width: 45,
+                              height: 45,
+                              color: "#FFAC6A",
+                              background: "#EEEED1",
+                            }}
+                            shape="circle"
+                            icon={
+                              <img
+                                src="../assets/image/icon-dasboard05.png"
+                                alt=""
+                              />
+                            }
+                          />
+                        </Link>
                       </div>
                       <div className="col-6 ps-2 p-0">
-                        <span style={{ fontSize: 12 }} className="">
-                          Số thứ tự đang chờ
-                        </span>
+                        <Link href="progressive">
+                          <span
+                            style={{ fontSize: 12, color: "black" }}
+                            className=""
+                          >
+                            Số thứ tự đang chờ
+                          </span>
+                        </Link>
                       </div>
 
                       <div className="col-6 p-0 my-3 pt-1 text-start">
@@ -501,26 +537,33 @@ const { Content } = Layout;
                   <Card className="shadow" style={{ width: 170, height: 130 }}>
                     <div className="row align-items-center">
                       <div className="col-4 p-0">
-                        <Button
-                          style={{
-                            width: 45,
-                            height: 45,
-                            color: "#F86D6D",
-                            background: "#FFFFE0",
-                          }}
-                          shape="circle"
-                          icon={
-                            <img
-                              src="../assets/image/icon-dasboard07.png"
-                              alt=""
-                            />
-                          }
-                        />
+                        <Link href="progressive">
+                          <Button
+                            style={{
+                              width: 45,
+                              height: 45,
+                              color: "#F86D6D",
+                              background: "#FFFFE0",
+                            }}
+                            shape="circle"
+                            icon={
+                              <img
+                                src="../assets/image/icon-dasboard07.png"
+                                alt=""
+                              />
+                            }
+                          />
+                        </Link>
                       </div>
                       <div className="col-6 ps-2 p-0">
-                        <span style={{ fontSize: 12 }} className="">
-                          Số thứ tự đã bỏ qua
-                        </span>
+                        <Link href="progressive">
+                          <span
+                            style={{ fontSize: 12, color: "black" }}
+                            className=""
+                          >
+                            Số thứ tự đã bỏ qua
+                          </span>
+                        </Link>
                       </div>
 
                       <div className="col-6 p-0 my-3 pt-1 text-start">
@@ -547,7 +590,7 @@ const { Content } = Layout;
                 <div className="col-12 mt-4">
                   <Card
                     className="shadow card-container"
-                    style={{ width: 770, height: 420 }}
+                    style={{ width: 775, height: 410 }}
                   >
                     <div className="row">
                       <div className="col">
@@ -617,31 +660,33 @@ const { Content } = Layout;
                 style={{ height: 80 }}
               >
                 <div className="row">
-                  <div className="col-3">
+                  <div className="col-3 p-1">
                     <div className="progress-container">
-                      <div className="outer-progress mt-1">
-                        <Progress
-                          type="circle"
-                          strokeColor={"#FF7506"}
-                          size={60}
-                          percent={90}
-                        />
-                        <div className="inner-progress">
+                      <Link href="/device">
+                        <div className="outer-progress mt-1">
                           <Progress
                             type="circle"
-                            strokeColor={"#7E7D88"}
-                            size={50}
-                            percent={5}
+                            strokeColor={"#FF7506"}
+                            size={60}
+                            percent={activeDevice}
                           />
+                          <div className="inner-progress">
+                            <Progress
+                              type="circle"
+                              strokeColor={"#7E7D88"}
+                              size={50}
+                              percent={notActiveDevice}
+                            />
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     </div>
                   </div>
                   <div className="col-3 p-0">
                     <div className="row mt-1">
                       <div className="col-12 p-0">
                         <h4
-                          className="ms-3 me-2 mt-1 fw-bold"
+                          className="ms-3 pe-2 mt-1 fw-bold"
                           style={{ fontSize: 20 }}
                         >
                           {deviceCount}
@@ -665,7 +710,7 @@ const { Content } = Layout;
                   <div className="col-5 p-0">
                     <div className="row">
                       <div className="col-9 my-1 p-0">
-                        <Badge color="#FFD130" text="Đang hoạt động" />{" "}
+                        <Badge color="#FF7506" text="Đang hoạt động" />{" "}
                       </div>
                       <div className="col-3 my-1">
                         <span
@@ -698,24 +743,26 @@ const { Content } = Layout;
                 style={{ height: 80 }}
               >
                 <div className="row">
-                  <div className="col-3">
+                  <div className="col-3 p-1">
                     <div className="progress-container">
-                      <div className="outer-progress mt-1">
+                     <Link href="/service">
+                     <div className="outer-progress mt-1">
                         <Progress
                           type="circle"
                           strokeColor={"#4277FF"}
                           size={60}
-                          percent={76}
+                          percent={activeService}
                         />
                         <div className="inner-progress">
                           <Progress
                             type="circle"
                             strokeColor={"#7E7D88"}
                             size={50}
-                            percent={20}
+                            percent={notActiveService}
                           />
                         </div>
                       </div>
+                     </Link>
                     </div>
                   </div>
                   <div className="col-3 p-0">
@@ -757,7 +804,7 @@ const { Content } = Layout;
                         </span>
                       </div>
                       <div className="col-9 p-0">
-                        <Badge color="#4277FF" text="Ngưng hoạt động" />{" "}
+                        <Badge color="#7E7D88" text="Ngưng hoạt động" />{" "}
                       </div>
                       <div className="col-3">
                         <span
@@ -779,32 +826,34 @@ const { Content } = Layout;
                 style={{ height: 80 }}
               >
                 <div className="row">
-                  <div className="col-3">
+                  <div className="col-3 p-1">
                     <div className="progress-container">
+                      <Link href="/progressive">
                       <div className="outer-progress mt-1">
                         <Progress
                           type="circle"
                           strokeColor={"#35C75A"}
                           size={60}
-                          percent={86}
+                          percent={pendingProgressive}
                         />
                         <div className="inner-progress">
                           <Progress
                             type="circle"
                             strokeColor={"#7E7D88"}
                             size={50}
-                            percent={20}
+                            percent={usedingProgressive}
                           />
                           <div className="inner-progress">
                             <Progress
                               type="circle"
                               strokeColor={"#F178B6"}
                               size={40}
-                              percent={10}
+                              percent={skipingProgressive}
                             />
                           </div>
                         </div>
                       </div>
+                      </Link>
                     </div>
                   </div>
                   <div className="col-3 p-0">
@@ -846,7 +895,7 @@ const { Content } = Layout;
                         </span>
                       </div>
                       <div className="col-9 p-0">
-                        <Badge color="#35C75A" text="Đã sử dụng" />{" "}
+                        <Badge color="#7E7D88" text="Đã sử dụng" />{" "}
                       </div>
                       <div className="col-3">
                         <span
@@ -857,7 +906,7 @@ const { Content } = Layout;
                         </span>
                       </div>
                       <div className="col-9 p-0">
-                        <Badge color="#35C75A" text="Bỏ qua" />{" "}
+                        <Badge color="#F178B6" text="Bỏ qua" />{" "}
                       </div>
                       <div className="col-3">
                         <span

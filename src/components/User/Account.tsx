@@ -82,9 +82,9 @@ const Account = () => {
     <div
       style={{
         width: 300,
-        marginTop: -11,
+        marginTop: -12,
         marginLeft: -20,
-        marginRight: -20,
+        marginRight: -12,
         borderRadius: 5,
         maxHeight: 400, // Đặt chiều cao tối đa của phần tử
         overflowY: "auto", // Kích hoạt cuộn theo chiều dọc khi danh sách vượt quá chiều cao tối đa
@@ -97,17 +97,17 @@ const Account = () => {
           top: 0,
           backgroundColor: "white",
           zIndex: 1,
-          width: 283,
+          width: 275,
         }}
       >
         <h5 className="item-title ps-3">Thông báo</h5>
       </div>
       <List
-        className="mt-4"
+        className="mt-4 ms-2"
         dataSource={progressiveData}
         renderItem={(item) => (
           <List.Item>
-            <div className="container px-4">
+            <div className="container pe-4">
               <div className="list-item-wrapper" style={{ height: 50 }}>
                 <List.Item>
                   <span>

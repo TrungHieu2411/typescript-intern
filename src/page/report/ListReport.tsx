@@ -14,17 +14,46 @@ import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { getProgressive } from "../../redux/progressive/progressiveSlice";
-
+import tableExport from "antd-table-export";
 const { Content } = Layout;
 const { Column } = Table;
+
+
+const columns = [
+  {
+    title: "Số thứ tự",
+    dataIndex: "number",
+    key: "number",
+  },
+  {
+    title: "Tên dịch vụ",
+    dataIndex: "nameService",
+    key: "nameService",
+  },
+  {
+    title: "Thời gian cấp",
+    dataIndex: "timeCreate",
+    key: "timeCreate",
+  },
+  {
+    title: "Trạng thái",
+    dataIndex: "status",
+    key: "status",
+  },
+  {
+    title: "Nguồn cấp",
+    dataIndex: "typeDevice",
+    key: "typeDevice",
+  },
+];
 
 const renderStatus = (status: string) => {
   let color = "";
   let text = "";
 
-  if (status === "Đã bỏ qua") {
+  if (status === "Bỏ qua") {
     color = "#FF0000"; // Đỏ
-    text = "Đã bỏ qua";
+    text = "Bỏ qua";
   } else if (status === "Đang chờ") {
     color = "#FFA500"; // Cam
     text = "Đang chờ";
@@ -47,8 +76,7 @@ interface ProgressiveData {
 }
 
 function ListReport() {
-  
-//----------------------------------------
+  //----------------------------------------
   const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const progressiveData = useSelector(
     (state: RootState) => state.firestoreProgressiveData.data
@@ -56,13 +84,13 @@ function ListReport() {
   useEffect(() => {
     dispatch(getProgressive());
   }, []);
-//----------------------------------------
+  //----------------------------------------
 
   const [filteredData, setFilteredData] = useState<ProgressiveData[]>([]);
   useEffect(() => {
     setFilteredData(progressiveData);
   }, [progressiveData]);
-  
+
   const handleTableChange = (pagination: any, filters: any, sorter: any) => {
     const { order } = sorter;
 
@@ -102,6 +130,10 @@ function ListReport() {
     setFilteredData(sortedData);
   };
 
+  const handleExportToExcel = () => {
+    const exportInstance = new tableExport(filteredData, columns);
+    exportInstance.download("Báo cáo", "xlsx");
+  };
   return (
     <Layout className="layout">
       <SlideMain />
@@ -125,8 +157,7 @@ function ListReport() {
                     <label htmlFor="">Chọn thời gian</label>
                   </div>
                   <div className="col">
-                    <DatePicker size="large" style={{ width: 130 }} 
-                     />
+                    <DatePicker size="large" style={{ width: 130 }} />
                     <img
                       style={{ width: 15 }}
                       src="../assets/image/arrow-right.png"
@@ -186,7 +217,10 @@ function ListReport() {
               </div>
               <div className="col-1 mt-3">
                 <Link to={"#"}>
-                  <Card className="fixed-card text-center">
+                  <Card
+                    className="fixed-card text-center"
+                    onClick={handleExportToExcel}
+                  >
                     <img src="../assets/image/document-download.png" alt="" />
                     <p className="fw-bold" style={{ fontSize: 10 }}>
                       Tải về

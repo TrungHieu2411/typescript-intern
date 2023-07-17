@@ -37,9 +37,9 @@ const renderStatus = (status: string) => {
   let color = "";
   let text = "";
 
-  if (status === "Đã bỏ qua") {
+  if (status === "Bỏ qua") {
     color = "#FF0000"; // Đỏ
-    text = "Đã bỏ qua";
+    text = "Bỏ qua";
   } else if (status === "Đang chờ") {
     color = "#FFA500"; // Cam
     text = "Đang chờ";
