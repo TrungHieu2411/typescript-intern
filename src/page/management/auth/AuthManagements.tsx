@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Badge,
   Card,
@@ -54,20 +54,17 @@ interface AuthManagementData {
   isActive: string;
 }
 function AuthManagements() {
-
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [filterIsActive, setFilterIsActive] = useState<string>("all");
 
-  
-//----------------------------------------
-const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
-const authManagementData = useSelector(
-  (state: RootState) => state.firestoreAuthManagementData.data
-) as AuthManagementData[];
-useEffect(() => {
-  dispatch(getAuthMangement());
-}, [dispatch]);
-
+  //----------------------------------------
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const authManagementData = useSelector(
+    (state: RootState) => state.firestoreAuthManagementData.data
+  ) as AuthManagementData[];
+  useEffect(() => {
+    dispatch(getAuthMangement());
+  }, [dispatch]);
 
   const handleSearch = (value: string) => {
     setSearchKeyword(value);

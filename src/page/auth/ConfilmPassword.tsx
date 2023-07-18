@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Button, Input, Form, message } from "antd";
 import { FormInstance } from "antd/lib/form";
 import firebase from "firebase/compat/app";
@@ -6,16 +6,9 @@ import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import { useParams } from "react-router-dom";
 
-interface AuthManagementData {
-  password: string;
-}
-
 const ConfirmPassword = () => {
   //Lấy id trên params
   const { id } = useParams<{ id: string }>(); // Lấy giá trị id từ params
-  const [passwordAuth, setPasswordAuth] = useState<AuthManagementData>({
-    password: "",
-  });
   //------------
   useEffect(() => {
     const fetchAuthManagement = async () => {
@@ -28,9 +21,8 @@ const ConfirmPassword = () => {
           const authManagementSnapshot = await authManagementRef.get();
 
           if (authManagementSnapshot.exists) {
-            const authManagementData =
-              authManagementSnapshot.data() as AuthManagementData;
-            setPasswordAuth(authManagementData);
+            
+          
           } else {
             message.error("Không tìm thấy thông tin xác thực.");
           }
@@ -73,8 +65,8 @@ const ConfirmPassword = () => {
       message.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
     }
   };
-//------------------
-//lấy giá trị các trường nhập liệu, thực hiện kiểm tra hợp lệ và thực hiện các thao tác liên quan đến form.
+  //------------------
+  //lấy giá trị các trường nhập liệu, thực hiện kiểm tra hợp lệ và thực hiện các thao tác liên quan đến form.
   const formRef = React.useRef<FormInstance>(null);
   return (
     <>

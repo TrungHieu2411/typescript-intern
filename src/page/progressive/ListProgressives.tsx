@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Badge,
   Card,
@@ -23,7 +23,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { getService, setData } from "../../redux/service/serviceSlice";
+import { getService } from "../../redux/service/serviceSlice";
 import { ThunkDispatch } from "redux-thunk";
 import { getProgressive } from "../../redux/progressive/progressiveSlice";
 import { getDevice } from "../../redux/device/deviceSlice";

@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  Checkbox,
-  Form,
-  Input,
-  Layout,
-  message,
-} from "antd";
+import { Button, Card, Checkbox, Form, Input, Layout, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import Account from "../../components/User/Account";
@@ -90,12 +82,11 @@ function UpdateServices() {
         description: service.description,
         isActive: "Hoạt động",
       };
-  
+
       message.success(`Cập nhật thông tin ${service.codeService} thành công!`);
       await addNoteToCollection(`Cập nhật dịch vụ: ${service.codeService}`);
-  dispatch(updateService(id, serviceData));
+      dispatch(updateService(id, serviceData));
       try {
-        
         console.log("Service updated successfully!");
         window.location.href = "/service";
       } catch (error) {
@@ -103,8 +94,6 @@ function UpdateServices() {
       }
     }
   };
-  
-
 
   return (
     <Layout className="layout">

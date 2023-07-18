@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Badge,
   Card,
@@ -59,7 +59,7 @@ function DetailServices() {
     codeService: "",
     nameService: "",
     description: "",
-  progressiveId: "",
+    progressiveId: "",
   });
 
   useEffect(() => {
@@ -70,11 +70,11 @@ function DetailServices() {
       if (serviceSnapshot.exists) {
         const serviceData = serviceSnapshot.data() as ServiceData;
         setService(serviceData);
-      } 
+      }
     };
     fetchService();
   }, [id]);
-   //------------
+  //------------
   const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
 
   useEffect(() => {
@@ -104,7 +104,12 @@ function DetailServices() {
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
-                <BreadCrumbThree text="Dịch vụ" text2="Danh sách dịch vụ" href="/service" text3="Chi tiết"/>
+                <BreadCrumbThree
+                  text="Dịch vụ"
+                  text2="Danh sách dịch vụ"
+                  href="/service"
+                  text3="Chi tiết"
+                />
               </div>
               <div className="col-auto ">
                 <span className="d-flex align-items-center justify-content-center me-5">
@@ -217,13 +222,13 @@ function DetailServices() {
                       <label htmlFor="">Trạng thái</label>
                       <Select defaultValue="all" style={{ width: 140 }}>
                         <Select.Option value="all">Tất cả</Select.Option>
-                        <Select.Option value="active">Đã hoàn thành</Select.Option>
+                        <Select.Option value="active">
+                          Đã hoàn thành
+                        </Select.Option>
                         <Select.Option value="inactive">
                           Đang thực hiện
                         </Select.Option>
-                        <Select.Option value="inactive">
-                          Vắng
-                        </Select.Option>
+                        <Select.Option value="inactive">Vắng</Select.Option>
                       </Select>
                     </div>
 
@@ -259,7 +264,7 @@ function DetailServices() {
                   <div className="row mt-3">
                     <Table
                       dataSource={progressiveData}
-                        pagination={{ pageSize: 8 }}
+                      pagination={{ pageSize: 8 }}
                       size="small"
                       rowClassName={() => "table-row"}
                       className="custom-table"

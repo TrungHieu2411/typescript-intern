@@ -1,7 +1,6 @@
 import {
   Action,
   ThunkAction,
-  ThunkDispatch,
   createSlice,
 } from "@reduxjs/toolkit";
 import firebase from "firebase/compat/app";
@@ -146,3 +145,5 @@ export const updateDevice =
       console.log(error);
     }
   };
+
+

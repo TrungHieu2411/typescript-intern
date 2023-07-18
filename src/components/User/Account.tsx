@@ -1,10 +1,15 @@
 import Link from "antd/es/typography/Link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+
+import { Button, List, Popover } from "antd";
+import { BellFilled } from "@ant-design/icons";
 
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
-import { Button, List, Popover } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import { getProgressive } from "../../redux/progressive/progressiveSlice";
 
 interface UserData {
   fullName: string;
@@ -26,27 +31,14 @@ interface ProgressiveData {
 
 const Account = () => {
   //------------
-  const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
 
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const progressiveData = useSelector(
+    (state: RootState) => state.firestoreProgressiveData.data
+  ) as ProgressiveData[];
   useEffect(() => {
-    const fetchProgressive = async () => {
-      const progressiveRef = firebase.firestore().collection("progressives");
-      const snapshot = await progressiveRef.get();
-
-      setProgressiveData(
-        await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const progressive = doc.data() as ProgressiveData;
-            progressive.id = doc.id;
-
-            return progressive;
-          })
-        )
-      );
-    };
-
-    fetchProgressive();
-  }, []);
+    dispatch(getProgressive());
+  });
   //=--------
 
   const { id } = useParams<{ id: string }>();
@@ -77,7 +69,7 @@ const Account = () => {
 
     fetchUser();
   }, [userId, id]);
-//-------
+  //-------
   const popoverContent = (
     <div
       style={{

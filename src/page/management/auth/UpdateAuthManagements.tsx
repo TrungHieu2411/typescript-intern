@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, Form, Input, Layout, Select, message } from "antd";
 import SlideMain from "../../../containers/SlideMain";
 import Account from "../../../components/User/Account";
@@ -97,7 +97,7 @@ function UpdateAuthManagements() {
       await addNoteToCollection(
         `Cập nhật thông tin tài khoản: ${authManagement.userName}`
       );
-try {
+      try {
         dispatch(updateAuthManagement(id, authManagement));
         console.log("Service updated successfully!");
         window.location.href = "/authManagement";
@@ -108,35 +108,38 @@ try {
   };
 
   useEffect(() => {
-  const fetchAuthManagement = async () => {
-    const authManagementRef = firebase
-      .firestore()
-      .collection("authManagements")
-      .doc(id);
-    const authManagementSnapshot = await authManagementRef.get();
+    const fetchAuthManagement = async () => {
+      const authManagementRef = firebase
+        .firestore()
+        .collection("authManagements")
+        .doc(id);
+      const authManagementSnapshot = await authManagementRef.get();
 
-    if (authManagementSnapshot.exists) {
-      const authManagementData =
-        authManagementSnapshot.data() as AuthManagementData;
-      setAuthManagement((prevAuthManagement) => ({
-        ...prevAuthManagement,
-        ...authManagementData,
-        role: authManagementData.role || null,
-      }));
+      if (authManagementSnapshot.exists) {
+        const authManagementData =
+          authManagementSnapshot.data() as AuthManagementData;
+        setAuthManagement((prevAuthManagement) => ({
+          ...prevAuthManagement,
+          ...authManagementData,
+          role: authManagementData.role || null,
+        }));
+      }
+    };
 
-    }
-  };
-
-  fetchAuthManagement();
-}, [id]);
+    fetchAuthManagement();
+  }, [id]);
 
   //----------------------
 
-  const [authManagementData, setAuthManagementData] = useState<AuthManagementData[]>([]);
+  const [authManagementData, setAuthManagementData] = useState<
+    AuthManagementData[]
+  >([]);
 
   useEffect(() => {
     const fetchAuthManagement = async () => {
-      const authManagementRef = firebase.firestore().collection("authManagements");
+      const authManagementRef = firebase
+        .firestore()
+        .collection("authManagements");
       const snapshot = await authManagementRef.get();
 
       setAuthManagementData(
@@ -274,10 +277,12 @@ try {
                             Vai trò: <span style={{ color: "#FF7506" }}>*</span>
                           </label>
                           <Form.Item className="">
-                          <Select value={roleValue}>
+                            <Select value={roleValue}>
                               {authManagementData.map((authManagement) => (
-                                <Select.Option key={authManagement.id} value={authManagement.role}>
-                                  
+                                <Select.Option
+                                  key={authManagement.id}
+                                  value={authManagement.role}
+                                >
                                 </Select.Option>
                               ))}
                             </Select>

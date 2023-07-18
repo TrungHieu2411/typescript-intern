@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button, Input, Form, message } from "antd";
 import { FormInstance } from "antd/lib/form";
 import firebase from "firebase/compat/app";
@@ -6,8 +6,7 @@ import firebase from "firebase/compat/app";
 const ForgotPassword: React.FC = () => {
   const formRef = React.useRef<FormInstance>(null);
 
-//------------
-  const [email, setEmail] = useState("");
+  //------------
   const onFinish = async (values: any) => {
     const { email } = values;
 
@@ -17,7 +16,7 @@ const ForgotPassword: React.FC = () => {
         message.error("Không tìm thấy địa chỉ email.");
         return;
       }
-
+      message.loading("Đã tìm thấy được địa chỉ email, vui lòng chờ..!");
       setTimeout(() => {
         window.location.href = `/xacnhanmatkhau/${accountId}`;
       }, 2000);
@@ -27,11 +26,15 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
-//------------
+  //------------
   const getAccountIdByEmail = async (email: string) => {
     try {
-      const authManagementCollection = firebase.firestore().collection("authManagements");
-      const snapshot = await authManagementCollection.where("email", "==", email).get();
+      const authManagementCollection = firebase
+        .firestore()
+        .collection("authManagements");
+      const snapshot = await authManagementCollection
+        .where("email", "==", email)
+        .get();
 
       if (!snapshot.empty) {
         const doc = snapshot.docs[0];
@@ -51,14 +54,7 @@ const ForgotPassword: React.FC = () => {
     window.location.href = "/"; // Chuyển đến trang chủ
   };
 
-//------------
-  useEffect(() => {
-    const emailParam = new URLSearchParams(window.location.search).get("email");
-    if (emailParam) {
-      setEmail(emailParam);
-    }
-  }, []);
-
+  //------------
   return (
     <>
       <div className="container-fluid">

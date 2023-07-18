@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Form, Input, Select, Button, Layout, message } from "antd";
 import Account from "../../components/User/Account";
 import SlideMain from "../../containers/SlideMain";
@@ -96,17 +96,15 @@ function AddDevices() {
     }
   };
 
-//----------------------------------------
+  //----------------------------------------
   const dispatch = useDispatch();
   const onFinish = async () => {
-    message.success(
-      `Thêm mới thiết bị ${newDevice.codeDevice} thành công!`
-    );
+    message.success(`Thêm mới thiết bị ${newDevice.codeDevice} thành công!`);
     await dispatch(createDevice(newDevice) as any);
     // Thêm ghi chú vào collection noteUsers
     await addNoteToCollection(`Thêm mới dịch vụ: ${newDevice.codeDevice}`);
   };
-//----------------------------------------
+  //----------------------------------------
   const [form] = Form.useForm();
   const handleAddDevice = async () => {
     try {

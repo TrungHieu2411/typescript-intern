@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Col,
   DatePicker,
@@ -7,7 +7,6 @@ import {
   Row,
   Space,
   Table,
-  message,
 } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Column from "antd/es/table/Column";
@@ -17,8 +16,6 @@ import BreadCrumbTwo from "../../../components/BreadCrumb/BreadCrumbTwo";
 import Account from "../../../components/User/Account";
 import "../../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { ThunkDispatch } from "redux-thunk";

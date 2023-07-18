@@ -8,7 +8,6 @@ import {
   Select,
   Space,
   Table,
-  message,
 } from "antd";
 
 import { SearchOutlined } from "@ant-design/icons";
@@ -19,11 +18,9 @@ import Account from "../../components/User/Account";
 import SlideMain from "../../containers/SlideMain";
 import "../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { getService, setData } from "../../redux/service/serviceSlice";
+import { getService } from "../../redux/service/serviceSlice";
 import { ThunkDispatch } from "redux-thunk";
 
 const renderIsActive = (status: string) => {
@@ -52,11 +49,10 @@ interface ServiceData {
   description: string;
 }
 function ListService() {
-
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [filterIsActive, setFilterIsActive] = useState<string>("all");
 
-//----------------------------------------
+  //----------------------------------------
   const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const serviceData = useSelector(
     (state: RootState) => state.firestoreServiceData.data
@@ -64,8 +60,8 @@ function ListService() {
   useEffect(() => {
     dispatch(getService());
   }, [dispatch]);
- 
-//----------------------------------------
+
+  //----------------------------------------
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
   };

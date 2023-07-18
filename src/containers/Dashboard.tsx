@@ -21,15 +21,47 @@ import { Area } from "@ant-design/charts";
 
 import firebase from "firebase/compat/app";
 import Link from "antd/es/typography/Link";
+import { useSelector } from "react-redux";
+import { getProgressive } from "../redux/progressive/progressiveSlice";
+import { RootState } from "../redux/store";
+import { useDispatch } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
 // Sử dụng WaveChart trong component của bạn
 
 const { Content } = Layout;
 
 const dataByDay = [
-  { day: "1", "Cấp số": 2500 },
-  { day: "13", "Cấp số": 3500 },
-  { day: "19", "Cấp số": 2000 },
-  { day: "31", "Cấp số": 3000 },
+  { day: "1", "Cấp số": 4982 },
+  { day: "2", "Cấp số": 4106 },
+  { day: "3", "Cấp số": 5703 },
+  { day: "4", "Cấp số": 5620 },
+  { day: "5", "Cấp số": 4589 },
+  { day: "6", "Cấp số": 4915 },
+  { day: "7", "Cấp số": 5487 },
+  { day: "8", "Cấp số": 3721 },
+  { day: "9", "Cấp số": 5664 },
+  { day: "10", "Cấp số": 4649 },
+  { day: "11", "Cấp số": 5935 },
+  { day: "12", "Cấp số": 4860 },
+  { day: "13", "Cấp số": 4012 },
+  { day: "14", "Cấp số": 5193 },
+  { day: "15", "Cấp số": 3842 },
+  { day: "16", "Cấp số": 5719 },
+  { day: "17", "Cấp số": 4556 },
+  { day: "18", "Cấp số": 3986 },
+  { day: "19", "Cấp số": 5501 },
+  { day: "20", "Cấp số": 4997 },
+  { day: "21", "Cấp số": 3775 },
+  { day: "22", "Cấp số": 5782 },
+  { day: "23", "Cấp số": 5398 },
+  { day: "24", "Cấp số": 4189 },
+  { day: "25", "Cấp số": 3754 },
+  { day: "26", "Cấp số": 5427 },
+  { day: "27", "Cấp số": 4376 },
+  { day: "28", "Cấp số": 5950 },
+  { day: "29", "Cấp số": 3789 },
+  { day: "30", "Cấp số": 5312 },
+  { day: "31", "Cấp số": 4573 },
 ];
 
 const dataByWeek = [
@@ -89,7 +121,7 @@ function Dashboard() {
   const getDataBySelectedView = (): DataItem[] => {
     if (selectedView === "Ngày") {
       config.xField = "day";
-      config.yField = "Cấp số";
+      config.yField = `Cấp số`;
       return dataByDay;
     } else if (selectedView === "Tuần") {
       config.xField = "week";

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, Checkbox, Form, Input, Layout, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 

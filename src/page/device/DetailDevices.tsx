@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Layout } from "antd";
 
 import SlideMain from "../../containers/SlideMain";

@@ -235,6 +235,20 @@ a:hover {
   font-size: 0px;
 }
 
+.ant-picker-header  {
+  color:
+    #FF7506 !important;
+}
+.ant-picker-header-super-next-btn, .ant-picker-header-prev-btn, .ant-picker-header-super-prev-btn, .ant-picker-header-next-btn  {
+  color:
+    #FF7506 !important;
+}
+
+.ant-picker-content th {
+  color:
+  #FF7506 !important;
+}
+
 /* Thiết lập độ mờ (opacity), tỷ lệ thu/phóng (scale) và kích thước phông chữ (font-size) cho các phần tử có class "hide-datepicker" */
 
 /* -------------------------------------------------------------- */
@@ -245,6 +259,7 @@ a:hover {
 .ant-picker-dropdown .ant-picker-date-panel .ant-picker-body {
   padding: 0px 18px;
 }
+
 /* Ẩn phần chân trang (footer) của phần tử có class "ant-picker-footer" */
 
 /* -------------------------------------------------------------- */

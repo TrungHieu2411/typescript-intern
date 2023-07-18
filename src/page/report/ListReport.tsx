@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge, Card, DatePicker, Layout, Table } from "antd";
 import { Link } from "react-router-dom";
 
@@ -17,7 +17,6 @@ import { getProgressive } from "../../redux/progressive/progressiveSlice";
 import tableExport from "antd-table-export";
 const { Content } = Layout;
 const { Column } = Table;
-
 
 const columns = [
   {

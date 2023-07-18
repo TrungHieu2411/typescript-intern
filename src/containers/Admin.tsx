@@ -1,11 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { Button, Card, Form, Image, Input, Layout, Popover, Select, Spin, Upload, message } from "antd";
-import { BellFilled, CameraOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import {
+  Button,
+  Card,
+  Form,
+  Image,
+  Input,
+  Layout,
+  Select,
+  Spin,
+  Upload,
+  message,
+} from "antd";
+import { CameraOutlined } from "@ant-design/icons";
 import SlideMain from "./SlideMain";
 import "../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import { useParams } from "react-router-dom";
 import Account from "../components/User/Account";
+import { getAuthMangement } from "../redux/authManagement/authManagementSlice";
+import { RootState } from "../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
 
 const { Content } = Layout;
 
@@ -64,7 +79,7 @@ function Admin() {
 
   const handleImageUpload = async (file: any) => {
     setImageFile(file);
-    message.loading("Đang tải ảnh...")
+    message.loading("Đang tải ảnh...");
     try {
       const storageRef = firebase.storage().ref();
       const imageRef = storageRef.child(`authManagements/${file.name}`);
@@ -88,7 +103,10 @@ function Admin() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userRef = firebase.firestore().collection("authManagements").doc(id);
+      const userRef = firebase
+        .firestore()
+        .collection("authManagements")
+        .doc(id);
       const userSnapshot = await userRef.get();
 
       if (userSnapshot.exists) {
@@ -110,39 +128,12 @@ function Admin() {
     updateAuthManagement();
   }, [handleUpdateAuthManagement, imageUrl]);
 
-  const [authManagementData, setAuthManagementData] = useState<UserData[]>([]);
-
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const authManagementData = useSelector(
+    (state: RootState) => state.firestoreProgressiveData.data
+  ) as UserData[];
   useEffect(() => {
-    const fetchAuthManagement = async () => {
-      const authManagementRef = firebase.firestore().collection("authManagements");
-      const snapshot = await authManagementRef.get();
-
-      setAuthManagementData(
-        await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const authManagement = doc.data() as UserData;
-            authManagement.id = doc.id;
-
-            const roleRef = authManagement.role;
-
-            if (roleRef) {
-              const roleDoc = await roleRef.get();
-              if (roleDoc.exists) {
-                const roleData = roleDoc.data();
-                if (roleData && roleData.nameRole) {
-                  const roleName = roleData.nameRole;
-                  authManagement.role = roleName;
-                }
-              }
-            }
-
-            return authManagement;
-          })
-        )
-      );
-    };
-
-    fetchAuthManagement();
+    dispatch(getAuthMangement());
   }, []);
 
   const [roleValue, setRoleValue] = useState<string | null>(null);

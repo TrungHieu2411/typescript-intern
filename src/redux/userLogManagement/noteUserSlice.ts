@@ -1,7 +1,6 @@
 import {
   Action,
   ThunkAction,
-  ThunkDispatch,
   createSlice,
 } from "@reduxjs/toolkit";
 import { RootState } from "../store";
@@ -9,7 +8,6 @@ import { message } from "antd";
 
 //firebase
 import firebase from "firebase/compat/app";
-import { DocumentData } from "@firebase/firestore";
 
 export const noteUserManagementSlice = createSlice({
   name: "noteUser",

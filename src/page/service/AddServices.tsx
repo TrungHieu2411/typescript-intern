@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Card, Checkbox, Form, Input, Layout, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
@@ -28,18 +28,6 @@ function AddServices() {
     setIsAutoIncrement(e.target.checked);
   };
 
-  const generateProgressiveId = (
-    currentNumber: number,
-    isAutoIncrement: boolean
-  ): number => {
-    let progressiveId = currentNumber;
-
-    if (isAutoIncrement) {
-      progressiveId = currentNumber + 1;
-    }
-
-    return progressiveId;
-  };
   //------------
   //------------
   const [newService, setNewService] = useState<ServiceData>({
@@ -75,9 +63,7 @@ function AddServices() {
 
   const dispatch = useDispatch();
   const onFinish = async () => {
-    message.success(
-      `Thêm mới thiết bị ${newService.codeService} thành công!`
-    );
+    message.success(`Thêm mới thiết bị ${newService.codeService} thành công!`);
     await dispatch(createService(newService) as any);
     // Thêm ghi chú vào collection noteUsers
     await addNoteToCollection(`Thêm mới dịch vụ: ${newService.codeService}`);

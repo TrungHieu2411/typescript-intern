@@ -1,7 +1,6 @@
 import {
   Action,
   ThunkAction,
-  ThunkDispatch,
   createSlice,
 } from "@reduxjs/toolkit";
 import { RootState } from "../store";

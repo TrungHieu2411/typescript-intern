@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Badge,
   Card,
@@ -17,9 +17,7 @@ import BreadCrumbTwo from "../../components/BreadCrumb/BreadCrumbTwo";
 import Account from "../../components/User/Account";
 import "../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
-import { getDevice, setData } from "../../redux/device/deviceSlice";
+import { getDevice } from "../../redux/device/deviceSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { ThunkDispatch } from "redux-thunk";
@@ -83,22 +81,23 @@ function ListDevices() {
   };
 
   const filteredDeviceData = deviceData
-  .filter((device) =>
-    device.nameDevice.toLowerCase().includes(searchKeyword.toLowerCase())
-  )
-  .filter((device) => {
-    if (filterIsActive === "all") {
-      return true;
-    } else {
-      return device.isActive === filterIsActive;
-    }
-  }).filter((device) => {
-    if (filterIsConnected === "all") {
-      return true;
-    } else {
-      return device.isConnected === filterIsConnected;
-    }
-  });
+    .filter((device) =>
+      device.nameDevice.toLowerCase().includes(searchKeyword.toLowerCase())
+    )
+    .filter((device) => {
+      if (filterIsActive === "all") {
+        return true;
+      } else {
+        return device.isActive === filterIsActive;
+      }
+    })
+    .filter((device) => {
+      if (filterIsConnected === "all") {
+        return true;
+      } else {
+        return device.isConnected === filterIsConnected;
+      }
+    });
 
   const handleFilterChangeActive = (value: string) => {
     setFilterIsActive(value);
@@ -192,7 +191,7 @@ function ListDevices() {
                           />
                         </Space>
                       }
-                       onChange={(e) => handleSearch(e.target.value)}
+                      onChange={(e) => handleSearch(e.target.value)}
                     />
                   </div>
                 </div>

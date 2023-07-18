@@ -28,7 +28,7 @@ function AddProgressives() {
     const serviceIndex = nameService.findIndex(
       (service) => service.id === serviceId
     );
-  
+
     return Math.floor(serviceIndex / 3) + 1;
   };
 
@@ -115,7 +115,7 @@ function AddProgressives() {
 
   const getExpirationTime = () => {
     const currentDate = new Date();
-    currentDate.setHours(currentDate.getHours() + 5);   
+    currentDate.setHours(currentDate.getHours() + 5);
     const expirationHour = currentDate.getHours();
     const expirationMinute = currentDate.getMinutes();
     const currentDay = currentDate.getDate();
@@ -148,7 +148,7 @@ function AddProgressives() {
     }
   };
 
-//----------------------------------------
+  //----------------------------------------
   const [progressiveNumber, setProgressiveNumber] = useState<number>(0);
 
   const handleAddProgressive = async () => {
@@ -179,7 +179,7 @@ function AddProgressives() {
         authManagementId: userId,
         status: "Đang chờ",
       });
-      message.success(`Thêm mới cấp số ${newProgressiveNumber} thành công!`)
+      message.success(`Thêm mới cấp số ${newProgressiveNumber} thành công!`);
       // Thêm ghi chú vào collection noteUsers
       await addNoteToCollection(`Thêm mới cấp số: ${newProgressiveNumber}`);
 
@@ -192,7 +192,7 @@ function AddProgressives() {
     }
   };
 
-//----------------------------------------
+  //----------------------------------------
   return (
     <Layout className="layout">
       <SlideMain />

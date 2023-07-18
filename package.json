@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@adobe/react-spectrum": "^3.28.0",
     "@ant-design/charts": "^1.4.2",
     "@ant-design/icons": "^5.1.4",
     "@firebase/database-compat": "^0.3.4",

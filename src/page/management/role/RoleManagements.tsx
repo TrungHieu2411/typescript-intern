@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Col, Input, Layout, Row, Space, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Column from "antd/es/table/Column";

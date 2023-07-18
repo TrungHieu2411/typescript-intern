@@ -13,7 +13,6 @@ import SubMenu from "antd/es/menu/SubMenu";
 import Link from "antd/es/typography/Link";
 
 function SlideMain() {
-
   const handleLogoutClick = () => {
     console.log("Bấm nút Đăng xuất");
     localStorage.removeItem("userId");
