@@ -345,21 +345,32 @@ function Dashboard() {
     const year = currentDate.getFullYear();
     return `${month} ${year}`;
   };
+  //---------
   const activeDevice: number = Math.round((isActive * 100) / columnCount);
   const notActiveDevice: number = Math.round(100 - activeDevice);
 
+  //---------
   const activeService: number = Math.round(
     (isActiveService * 100) / serviceCount
   );
   const notActiveService: number = Math.round(100 - activeService);
 
-  const pendingProgressive: number = Math.round(
+  //---------
+  const pendingProgressive: number = Math.floor(
     (pendingCount * 100) / columnCount
   );
-  const usedingProgressive: number = Math.round(100 - pendingProgressive);
-  const skipingProgressive: number = Math.round(
-    usedingProgressive - pendingProgressive
+  const usedingProgressive: number = Math.floor(
+    (usedingCount * 100) / columnCount
   );
+  const skipingProgressive: number =
+    100 - pendingProgressive - usedingProgressive;
+
+  console.log(pendingProgressive);
+  console.log(usedingProgressive);
+
+  console.log(skipingProgressive);
+
+  //---------
   return (
     <Layout className="layout">
       <SlideMain />
@@ -371,9 +382,9 @@ function Dashboard() {
                 <BreadCrumbOne text="Dashboard" />
               </div>
             </div>
-            <div className="pt-3 ">
+            <div className="pt-3 mt-3">
               <h4 style={{ color: "#FF7506" }}>Biểu đồ cấp số </h4>
-              <div className="row row-cols-4 mt-4">
+              <div className="row row-cols-4 my-4">
                 <div className="col">
                   <Card className="shadow" style={{ width: 170, height: 130 }}>
                     <div className="row align-items-center">
@@ -587,59 +598,59 @@ function Dashboard() {
                     </div>
                   </Card>
                 </div>
-                <div className="col-12 mt-4">
-                  <Card
-                    className="shadow card-container"
-                    style={{ width: 775, height: 410 }}
-                  >
-                    <div className="row">
-                      <div className="col">
-                        {selectedView === "Ngày" && (
-                          <>
-                            <h4>Bảng thống kê theo ngày</h4>
-                            <p>{getCurrentMonthYear()}</p>
-                          </>
-                        )}
-                        {selectedView === "Tuần" && (
-                          <>
-                            <h4>Bảng thống kê theo tuần</h4>
-                            <p>{getCurrentMonthYear()}</p>
-                          </>
-                        )}
-                        {selectedView === "Tháng" && (
-                          <>
-                            <h4>Bảng thống kê theo tháng</h4>
-                            <p>Năm {new Date().getFullYear()}</p>
-                          </>
-                        )}
-                      </div>
-                      <div className="col text-end">
-                        <p>
-                          Xem theo{" "}
-                          <Select
-                            style={{ width: 85 }}
-                            value={selectedView}
-                            onChange={handleViewChange}
-                          >
-                            {["Ngày", "Tuần", "Tháng"].map((option) => (
-                              <Select.Option key={option} value={option}>
-                                {option}
-                              </Select.Option>
-                            ))}
-                          </Select>
-                        </p>
-                      </div>
+              </div>
+              <div className="col-12 mt-1">
+                <Card
+                  className="shadow card-container"
+                  style={{ width: 775, height: 405 }}
+                >
+                  <div className="row">
+                    <div className="col">
+                      {selectedView === "Ngày" && (
+                        <>
+                          <h4>Bảng thống kê theo ngày</h4>
+                          <p>{getCurrentMonthYear()}</p>
+                        </>
+                      )}
+                      {selectedView === "Tuần" && (
+                        <>
+                          <h4>Bảng thống kê theo tuần</h4>
+                          <p>{getCurrentMonthYear()}</p>
+                        </>
+                      )}
+                      {selectedView === "Tháng" && (
+                        <>
+                          <h4>Bảng thống kê theo tháng</h4>
+                          <p>Năm {new Date().getFullYear()}</p>
+                        </>
+                      )}
                     </div>
+                    <div className="col text-end">
+                      <p>
+                        Xem theo{" "}
+                        <Select
+                          style={{ width: 85 }}
+                          value={selectedView}
+                          onChange={handleViewChange}
+                        >
+                          {["Ngày", "Tuần", "Tháng"].map((option) => (
+                            <Select.Option key={option} value={option}>
+                              {option}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </p>
+                    </div>
+                  </div>
 
-                    {/* ...Nội dung Card... */}
-                    <Area
-                      data={getDataBySelectedView()}
-                      xField={selectedView.toLowerCase()}
-                      yField="Cấp số"
-                      {...config}
-                    />
-                  </Card>
-                </div>
+                  {/* ...Nội dung Card... */}
+                  <Area
+                    data={getDataBySelectedView()}
+                    xField={selectedView.toLowerCase()}
+                    yField="Cấp số"
+                    {...config}
+                  />
+                </Card>
               </div>
             </div>
           </div>
@@ -707,10 +718,17 @@ function Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <div className="col-5 p-0">
+                  <div className="col-5 mt-2 p-0">
                     <div className="row">
                       <div className="col-9 my-1 p-0">
-                        <Badge color="#FF7506" text="Đang hoạt động" />{" "}
+                        <Badge
+                          color="#FF7506"
+                          text={
+                            <span style={{ fontSize: "12px" }}>
+                              Đang hoạt động
+                            </span>
+                          }
+                        />
                       </div>
                       <div className="col-3 my-1">
                         <span
@@ -721,7 +739,14 @@ function Dashboard() {
                         </span>
                       </div>
                       <div className="col-9 p-0">
-                        <Badge color="#7E7D88" text="Ngưng hoạt động" />{" "}
+                        <Badge
+                          color="#7E7D88"
+                          text={
+                            <span style={{ fontSize: "12px" }}>
+                              Ngưng hoạt động
+                            </span>
+                          }
+                        />{" "}
                       </div>
                       <div className="col-3">
                         <span
@@ -745,24 +770,24 @@ function Dashboard() {
                 <div className="row">
                   <div className="col-3 p-1">
                     <div className="progress-container">
-                     <Link href="/service">
-                     <div className="outer-progress mt-1">
-                        <Progress
-                          type="circle"
-                          strokeColor={"#4277FF"}
-                          size={60}
-                          percent={activeService}
-                        />
-                        <div className="inner-progress">
+                      <Link href="/service">
+                        <div className="outer-progress mt-1">
                           <Progress
                             type="circle"
-                            strokeColor={"#7E7D88"}
-                            size={50}
-                            percent={notActiveService}
+                            strokeColor={"#4277FF"}
+                            size={60}
+                            percent={activeService}
                           />
+                          <div className="inner-progress">
+                            <Progress
+                              type="circle"
+                              strokeColor={"#7E7D88"}
+                              size={50}
+                              percent={notActiveService}
+                            />
+                          </div>
                         </div>
-                      </div>
-                     </Link>
+                      </Link>
                     </div>
                   </div>
                   <div className="col-3 p-0">
@@ -790,10 +815,17 @@ function Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <div className="col-5 p-0">
+                  <div className="col-5 mt-2 p-0">
                     <div className="row">
                       <div className="col-9 my-1 p-0">
-                        <Badge color="#4277FF" text="Đang hoạt động" />{" "}
+                        <Badge
+                          color="#4277FF"
+                          text={
+                            <span style={{ fontSize: "12px" }}>
+                              Đang hoạt động
+                            </span>
+                          }
+                        />{" "}
                       </div>
                       <div className="col-3 my-1">
                         <span
@@ -804,7 +836,14 @@ function Dashboard() {
                         </span>
                       </div>
                       <div className="col-9 p-0">
-                        <Badge color="#7E7D88" text="Ngưng hoạt động" />{" "}
+                        <Badge
+                          color="#7E7D88"
+                          text={
+                            <span style={{ fontSize: "12px" }}>
+                              Ngưng hoạt động
+                            </span>
+                          }
+                        />{" "}
                       </div>
                       <div className="col-3">
                         <span
@@ -829,30 +868,30 @@ function Dashboard() {
                   <div className="col-3 p-1">
                     <div className="progress-container">
                       <Link href="/progressive">
-                      <div className="outer-progress mt-1">
-                        <Progress
-                          type="circle"
-                          strokeColor={"#35C75A"}
-                          size={60}
-                          percent={pendingProgressive}
-                        />
-                        <div className="inner-progress">
+                        <div className="outer-progress mt-1">
                           <Progress
                             type="circle"
-                            strokeColor={"#7E7D88"}
-                            size={50}
-                            percent={usedingProgressive}
+                            strokeColor={"#35C75A"}
+                            size={60}
+                            percent={pendingProgressive}
                           />
                           <div className="inner-progress">
                             <Progress
                               type="circle"
-                              strokeColor={"#F178B6"}
-                              size={40}
-                              percent={skipingProgressive}
+                              strokeColor={"#7E7D88"}
+                              size={50}
+                              percent={usedingProgressive}
                             />
+                            <div className="inner-progress">
+                              <Progress
+                                type="circle"
+                                strokeColor={"#F178B6"}
+                                size={40}
+                                percent={skipingProgressive}
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
                       </Link>
                     </div>
                   </div>
@@ -881,10 +920,15 @@ function Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <div className="col-5 p-0">
+                  <div className="col-5 mt-1 p-0">
                     <div className="row">
                       <div className="col-9 p-0">
-                        <Badge color="#35C75A" text="Đang chờ" />{" "}
+                        <Badge
+                          color="#35C75A"
+                          text={
+                            <span style={{ fontSize: "12px" }}>Đang chờ</span>
+                          }
+                        />{" "}
                       </div>
                       <div className="col-3 ">
                         <span
@@ -895,7 +939,12 @@ function Dashboard() {
                         </span>
                       </div>
                       <div className="col-9 p-0">
-                        <Badge color="#7E7D88" text="Đã sử dụng" />{" "}
+                        <Badge
+                          color="#7E7D88"
+                          text={
+                            <span style={{ fontSize: "12px" }}>Đã sử dụng</span>
+                          }
+                        />{" "}
                       </div>
                       <div className="col-3">
                         <span
@@ -906,7 +955,12 @@ function Dashboard() {
                         </span>
                       </div>
                       <div className="col-9 p-0">
-                        <Badge color="#F178B6" text="Bỏ qua" />{" "}
+                        <Badge
+                          color="#F178B6"
+                          text={
+                            <span style={{ fontSize: "12px" }}>Bỏ qua</span>
+                          }
+                        />{" "}
                       </div>
                       <div className="col-3">
                         <span

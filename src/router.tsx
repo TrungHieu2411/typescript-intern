@@ -47,13 +47,12 @@ const Router = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
       {allowAccess ? (
         <>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/:id" element={<Admin />} />
-          <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/device" element={<ListDevices />} />
           <Route path="/addDevice" element={<AddDevices />} />
@@ -90,7 +89,7 @@ const Router = () => {
 
           <Route path="/userLogManagement" element={<UserLogManagements />} />
           {/* Các route khác cho phép truy cập khi đăng nhập */}
-          <Route path="/*" element={<NotFould />}/>
+          <Route path="/*" element={<NotFould />} />
         </>
       ) : (
         <>
@@ -98,7 +97,7 @@ const Router = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/quenmatkhau" element={<ForgotPassword />} />
           <Route path="/xacnhanmatkhau/:id" element={<ConfilmPassword />} />
-          <Route path="/*" element={<NotFould />}/>
+          <Route path="/*" element={<NotFould />} />
         </>
       )}
     </Routes>

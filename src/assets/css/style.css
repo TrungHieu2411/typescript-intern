@@ -223,7 +223,7 @@ a:hover {
 /* -------------------------------------------------------------- */
 .card-container canvas {
   width: 720px !important;
-  height: 300px !important;
+  height: 290px !important;
 }
 
 /* Thiết lập kích thước cho phần tử <canvas> trong phần tử có class "card-container", và sử dụng !important để ghi đè các giá trị mặc định */
