@@ -21,6 +21,10 @@ import "../../assets/css/style.css";
 import firebase from "firebase/compat/app";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import Account from "../../components/User/Account";
+import { getProgressive } from "../../redux/progressive/progressiveSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import { RootState } from "../../redux/store";
 
 interface ServiceData {
   codeService: string;
@@ -33,7 +37,7 @@ const renderIsActive = (status: string) => {
   let color = "";
   let text = "";
 
-  if (status === "Vắng") {
+  if (status === "Bỏ qua") {
     color = "#535261"; // Xanh lá cây
     text = "Vắng";
   } else if (status === "Đang chờ") {
@@ -74,28 +78,44 @@ function DetailServices() {
     };
     fetchService();
   }, [id]);
-  //------------
-  const [progressiveData, setProgressiveData] = useState<ProgressiveData[]>([]);
 
+  //----------------------------------------
+  const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
+  const progressiveData = useSelector(
+    (state: RootState) => state.firestoreProgressiveData.data
+  ) as ProgressiveData[];
   useEffect(() => {
-    const fetchProgressive = async () => {
-      const progressiveRef = firebase.firestore().collection("progressives");
-      const snapshot = await progressiveRef.get();
-      setProgressiveData(
-        await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const progressive = doc.data() as ProgressiveData;
-            progressive.id = doc.id;
-
-            return progressive;
-          })
-        )
-      );
-    };
-
-    fetchProgressive();
+    dispatch(getProgressive());
   }, []);
 
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+  };
+
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const filteredRoleManagementData = progressiveData
+    .filter((progressive) => {
+      const isActiveText = renderIsActive(
+        progressive.status
+      ).props.text.toLowerCase();
+      return (
+        isActiveText.includes(searchKeyword.toLowerCase()) &&
+        (filterStatus === "all" || isActiveText === filterStatus.toLowerCase())
+      );
+    })
+    .filter((progressive) => {
+      if (filterStatus === "all") {
+        return true;
+      } else {
+        return renderIsActive(progressive.status).props.text === filterStatus;
+      }
+    });
+
+  const handleFilterChangeStatus = (value: string) => {
+    setFilterStatus(value);
+  };
   return (
     <Layout className="layout">
       <SlideMain />
@@ -220,15 +240,20 @@ function DetailServices() {
                   <div className="row">
                     <div className="col-3">
                       <label htmlFor="">Trạng thái</label>
-                      <Select defaultValue="all" style={{ width: 140 }}>
+                      <Select
+                        defaultValue="all"
+                        style={{ width: 140 }}
+                        onChange={handleFilterChangeStatus}
+                        value={filterStatus} // Thêm giá trị value để đồng bộ giá trị hiển thị
+                      >
                         <Select.Option value="all">Tất cả</Select.Option>
-                        <Select.Option value="active">
+                        <Select.Option value="Đã hoàn thành">
                           Đã hoàn thành
                         </Select.Option>
-                        <Select.Option value="inactive">
+                        <Select.Option value="Đang thực hiện">
                           Đang thực hiện
                         </Select.Option>
-                        <Select.Option value="inactive">Vắng</Select.Option>
+                        <Select.Option value="Vắng">Vắng</Select.Option>
                       </Select>
                     </div>
 
@@ -258,12 +283,13 @@ function DetailServices() {
                             />
                           </Space>
                         }
+                        onChange={(e) => handleSearch(e.target.value)}
                       />
                     </div>
                   </div>
                   <div className="row mt-3">
                     <Table
-                      dataSource={progressiveData}
+                      dataSource={filteredRoleManagementData}
                       pagination={{ pageSize: 8 }}
                       size="small"
                       rowClassName={() => "table-row"}

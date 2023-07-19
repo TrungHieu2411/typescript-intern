@@ -25,7 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { getService } from "../../redux/service/serviceSlice";
 import { ThunkDispatch } from "redux-thunk";
-import { getProgressive } from "../../redux/progressive/progressiveSlice";
+import { countProgressive, getProgressive } from "../../redux/progressive/progressiveSlice";
 import { getDevice } from "../../redux/device/deviceSlice";
 import moment from "moment";
 import "moment/locale/vi"; // Thay 'vi' bằng mã ngôn ngữ tương ứng nếu bạn muốn sử dụng ngôn ngữ khác
@@ -107,6 +107,7 @@ function ListProgressives() {
   useEffect(() => {
     dispatch(getProgressive());
   }, []);
+
   //--------------------------------------------
 
   const handleSearch = (value: string) => {
@@ -167,6 +168,7 @@ function ListProgressives() {
   const handleFilterChangeTypeDevice = (value: string) => {
     setFilterTypeDevice(value);
   };
+  
 
   return (
     <Layout className="layout">

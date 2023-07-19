@@ -21,70 +21,9 @@ import { Area } from "@ant-design/charts";
 
 import firebase from "firebase/compat/app";
 import Link from "antd/es/typography/Link";
-import { useSelector } from "react-redux";
-import { getProgressive } from "../redux/progressive/progressiveSlice";
-import { RootState } from "../redux/store";
-import { useDispatch } from "react-redux";
-import { ThunkDispatch } from "redux-thunk";
 // Sử dụng WaveChart trong component của bạn
 
 const { Content } = Layout;
-
-const dataByDay = [
-  { day: "1", "Cấp số": 4982 },
-  { day: "2", "Cấp số": 4106 },
-  { day: "3", "Cấp số": 5703 },
-  { day: "4", "Cấp số": 5620 },
-  { day: "5", "Cấp số": 4589 },
-  { day: "6", "Cấp số": 4915 },
-  { day: "7", "Cấp số": 5487 },
-  { day: "8", "Cấp số": 3721 },
-  { day: "9", "Cấp số": 5664 },
-  { day: "10", "Cấp số": 4649 },
-  { day: "11", "Cấp số": 5935 },
-  { day: "12", "Cấp số": 4860 },
-  { day: "13", "Cấp số": 4012 },
-  { day: "14", "Cấp số": 5193 },
-  { day: "15", "Cấp số": 3842 },
-  { day: "16", "Cấp số": 5719 },
-  { day: "17", "Cấp số": 4556 },
-  { day: "18", "Cấp số": 3986 },
-  { day: "19", "Cấp số": 5501 },
-  { day: "20", "Cấp số": 4997 },
-  { day: "21", "Cấp số": 3775 },
-  { day: "22", "Cấp số": 5782 },
-  { day: "23", "Cấp số": 5398 },
-  { day: "24", "Cấp số": 4189 },
-  { day: "25", "Cấp số": 3754 },
-  { day: "26", "Cấp số": 5427 },
-  { day: "27", "Cấp số": 4376 },
-  { day: "28", "Cấp số": 5950 },
-  { day: "29", "Cấp số": 3789 },
-  { day: "30", "Cấp số": 5312 },
-  { day: "31", "Cấp số": 4573 },
-];
-
-const dataByWeek = [
-  { week: "tuần 1", "Cấp số": 2500 },
-  { week: "tuần 2", "Cấp số": 3500 },
-  { week: "tuần 3", "Cấp số": 2500 },
-  { week: "tuần 4", "Cấp số": 3000 },
-];
-
-const dataByMonth = [
-  { month: "1", "Cấp số": 3000 },
-  { month: "2", "Cấp số": 4000 },
-  { month: "3", "Cấp số": 2500 },
-  { month: "4", "Cấp số": 4800 },
-  { month: "5", "Cấp số": 3500 },
-  { month: "6", "Cấp số": 5200 },
-  { month: "7", "Cấp số": 2200 },
-  { month: "8", "Cấp số": 5000 },
-  { month: "9", "Cấp số": 2300 },
-  { month: "10", "Cấp số": 4500 },
-  { month: "11", "Cấp số": 5100 },
-  { month: "12", "Cấp số": 2800 },
-];
 
 const config: any = {
   autoFit: false,
@@ -105,12 +44,6 @@ const config: any = {
   },
 };
 
-type DataItem = {
-  day?: string;
-  week?: string;
-  month?: string;
-  "Cấp số": number;
-};
 function Dashboard() {
   const [selectedView, setSelectedView] = useState("Ngày");
 
@@ -118,22 +51,6 @@ function Dashboard() {
     setSelectedView(value);
   };
 
-  const getDataBySelectedView = (): DataItem[] => {
-    if (selectedView === "Ngày") {
-      config.xField = "day";
-      config.yField = `Cấp số`;
-      return dataByDay;
-    } else if (selectedView === "Tuần") {
-      config.xField = "week";
-      config.yField = "Cấp số";
-      return dataByWeek;
-    } else if (selectedView === "Tháng") {
-      config.xField = "month";
-      config.yField = "Cấp số";
-      return dataByMonth;
-    }
-    return [];
-  };
   //--------------------------------------------------------------------------------------------------
   const [columnCount, setColumnCount] = useState(0);
   const [usedingCount, setUsedingCount] = useState(0);
@@ -402,6 +319,201 @@ function Dashboard() {
 
   console.log(skipingProgressive);
 
+  const dataByDay = [
+    { day: "1", "Cấp số": 4982 },
+    { day: "2", "Cấp số": 4106 },
+    { day: "3", "Cấp số": 5703 },
+    { day: "4", "Cấp số": 5620 },
+    { day: "5", "Cấp số": 4589 },
+    { day: "6", "Cấp số": 4915 },
+    { day: "7", "Cấp số": 5487 },
+    { day: "8", "Cấp số": 3721 },
+    { day: "9", "Cấp số": 5664 },
+    { day: "10", "Cấp số": 4649 },
+    { day: "11", "Cấp số": 5935 },
+    { day: "12", "Cấp số": 4860 },
+    { day: "13", "Cấp số": 4012 },
+    { day: "14", "Cấp số": 5193 },
+    { day: "15", "Cấp số": 3842 },
+    { day: "16", "Cấp số": 5719 },
+    { day: "17", "Cấp số": 4556 },
+    { day: "18", "Cấp số": 3986 },
+    { day: "19", "Cấp số": 5501 },
+    { day: "20", "Cấp số": 4997 },
+    { day: "21", "Cấp số": 3775 },
+    { day: "22", "Cấp số": 5782 },
+    { day: "23", "Cấp số": 5398 },
+    { day: "24", "Cấp số": 4189 },
+    { day: "25", "Cấp số": 3754 },
+    { day: "26", "Cấp số": 5427 },
+    { day: "27", "Cấp số": 4376 },
+    { day: "28", "Cấp số": 5950 },
+    { day: "29", "Cấp số": 3789 },
+    { day: "30", "Cấp số": 5312 },
+    { day: "31", "Cấp số": 4573 },
+  ];
+
+  const dataByWeek = [
+    { week: "tuần 1", "Cấp số": 2500 },
+    { week: "tuần 2", "Cấp số": 3500 },
+    { week: "tuần 3", "Cấp số": 2500 },
+    { week: "tuần 4", "Cấp số": 3000 },
+  ];
+
+  const dataByMonth = [
+    { month: "1", "Cấp số": 3000 },
+    { month: "2", "Cấp số": 4000 },
+    { month: "3", "Cấp số": 2500 },
+    { month: "4", "Cấp số": 4800 },
+    { month: "5", "Cấp số": 3500 },
+    { month: "6", "Cấp số": 5200 },
+    { month: "7", "Cấp số": 2200 },
+    { month: "8", "Cấp số": 5000 },
+    { month: "9", "Cấp số": 2300 },
+    { month: "10", "Cấp số": 4500 },
+    { month: "11", "Cấp số": 5100 },
+    { month: "12", "Cấp số": 2800 },
+  ];
+
+  type DataItem = {
+    day?: string;
+    week?: string;
+    month?: string;
+    "Cấp số": number;
+  };
+
+  interface ProgressiveData {
+    id: string;
+    timeCreate: string;
+    timeCreateMonth: string;
+    timeCreateWeek: string;
+  }
+
+  interface DateCountMap {
+    [date: string]: number;
+  }
+  const [fetchedData, setFetchedData] = useState<DataItem[]>([]);
+  const [fetchedDataMonth, setFetchedDataMonth] = useState<DataItem[]>([]);
+  const [fetchedDataWeek, setFetchedDataWeek] = useState<DataItem[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const progressiveRef = firebase.firestore().collection("progressives");
+        const snapshot = await progressiveRef.get();
+  
+        const fetchedProgressiveData = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const progressive = doc.data() as ProgressiveData;
+            progressive.id = doc.id;
+  
+            // Extract date from timeCreate field
+            const timeCreate = progressive.timeCreate;
+            if (timeCreate) {
+              const dateParts = timeCreate.split(" ");
+              if (dateParts.length === 2) {
+                const [timePart, datePart] = dateParts;
+                const [day, month] = datePart.split("/");
+                const formattedDate = `${day}`;
+                const formattedDateMonth = `${month}`;
+  
+                progressive.timeCreate = formattedDate;
+                progressive.timeCreateMonth = formattedDateMonth;
+  
+                // Calculate week from day
+                const weekNumber = Math.ceil(Number(day) / 7);
+                const formattedDateWeek = `tuần ${weekNumber}`;
+                progressive.timeCreateWeek = formattedDateWeek;
+              }
+            }
+  
+            return progressive;
+          })
+        );
+  
+        // Count the occurrences of each date in timeCreate, timeCreateMonth, and timeCreateWeek
+        const dateCount = fetchedProgressiveData.reduce((acc, progressive) => {
+          const { timeCreate } = progressive;
+          if (timeCreate) {
+            acc[timeCreate] = (acc[timeCreate] || 0) + 1;
+          }
+          return acc;
+        }, {} as DateCountMap);
+  
+        const dateCountMonth = fetchedProgressiveData.reduce(
+          (acc, progressive) => {
+            const { timeCreateMonth } = progressive;
+            if (timeCreateMonth) {
+              acc[timeCreateMonth] = (acc[timeCreateMonth] || 0) + 1;
+            }
+            return acc;
+          },
+          {} as DateCountMap
+        );
+        
+        const dateCountWeek = fetchedProgressiveData.reduce(
+          (acc, progressive) => {
+            const { timeCreateWeek } = progressive;
+            if (timeCreateWeek) {
+              acc[timeCreateWeek] = (acc[timeCreateWeek] || 0) + 1;
+            }
+            return acc;
+          },
+          {} as DateCountMap
+        );
+        
+        // Update dataByMonth and dataByWeek with the new counts
+        const updatedDataByMonth = dataByMonth.map((item) => ({
+          ...item,
+          "Cấp số": dateCountMonth[item.month] || 0,
+          day: item.month,
+        }));
+        
+        const updatedDataByWeek = dataByWeek.map((item) => ({
+          ...item,
+          "Cấp số": dateCountWeek[item.week] || 0,
+          day: item.week,
+        }));
+  
+        // Update dataByDay, dataByMonth, and dataByWeek with the new counts
+        const updatedDataByDay = dataByDay.map((item) => ({
+          ...item,
+          "Cấp số": dateCount[item.day] || 0,
+          day: item.day,
+        }));
+  
+        setFetchedData(updatedDataByDay);
+        setFetchedDataMonth(updatedDataByMonth);
+        setFetchedDataWeek(updatedDataByWeek);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+        // Handle error if needed
+      }
+    };
+  
+    fetchData();
+  }, []);
+
+  // Update getDataBySelectedView() to return data based on the selected view
+  const getDataBySelectedView = (): DataItem[] => {
+    if (selectedView === "Ngày") {
+      return fetchedData.map((item) => ({
+        ...item,
+        day: item.day,
+      }));
+    } else if (selectedView === "Tháng") {
+      return fetchedDataMonth.map((item) => ({
+        ...item,
+        month: item.month,
+      }));
+    } else if (selectedView === "Tuần") {
+      return fetchedDataWeek.map((item) => ({
+        ...item,
+        week: item.week,
+      }));
+    }
+    return [];
+  };
   //---------
   return (
     <Layout className="layout">
@@ -674,11 +786,10 @@ function Dashboard() {
                       </p>
                     </div>
                   </div>
-
                   {/* ...Nội dung Card... */}
                   <Area
                     data={getDataBySelectedView()}
-                    xField={selectedView.toLowerCase()}
+                    xField={"day"}
                     yField="Cấp số"
                     {...config}
                   />
@@ -1008,7 +1119,7 @@ function Dashboard() {
               </Card>
             </div>
             <div className="col-12">
-              <DatePicker
+              <DatePicker 
                 className="hide-datepicker"
                 open
                 style={{ position: "absolute", bottom: -8 }}
