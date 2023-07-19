@@ -58,7 +58,6 @@ function AddProgressives() {
   }, []);
 
   const { id } = useParams<{ id: string }>();
-
   const [user, setUser] = useState<UserData>({
     fullName: "",
     phone: "",
@@ -197,7 +196,7 @@ function AddProgressives() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -218,7 +217,7 @@ function AddProgressives() {
               <h4 style={{ color: "#FF7506" }}>Quản lý cấp số</h4>
             </div>
             <div className="mt-3">
-              <Card style={{ width: 1180, height: 550 }}>
+              <Card style={{ width: "100%", height: 550 }}>
                 <h3 className="text-center mb-4" style={{ color: "#FF9138" }}>
                   CẤP SỐ MỚI
                 </h3>

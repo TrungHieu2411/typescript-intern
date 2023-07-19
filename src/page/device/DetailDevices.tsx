@@ -75,7 +75,7 @@ function DetailDevices() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Layout.Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">

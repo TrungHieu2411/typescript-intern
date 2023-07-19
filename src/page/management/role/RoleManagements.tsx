@@ -47,7 +47,7 @@ function RoleManagement() {
     dispatch(getRoleManagement());
     dispatch(getAuthMangement());
   }, [dispatch]);
-  //-------------
+  //----------------------------------------
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const countNameRoleOccurrences = () => {
     const nameRoleCounts: { [key: string]: number } = {};
@@ -68,7 +68,6 @@ function RoleManagement() {
   };
 
   const nameRoleCounts = countNameRoleOccurrences();
-
   const filteredRoleManagementData = roleManagementData.filter((role) =>
     role.nameRole.toLowerCase().includes(searchKeyword.toLowerCase())
   );

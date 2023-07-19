@@ -14,12 +14,7 @@ import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../redux/store";
 
 const tags = [
-  " Khám tim mạch",
-  " Khám Sản - Phụ khoa",
-  " Khám răng hàm mặt",
-  " Khám tai mũi họng",
-  " Khám hô hấp",
-  " Khám tổng quát",
+  "",
 ];
 
 interface DeviceData {
@@ -133,12 +128,37 @@ function UpdateDevices() {
       }
     }
   };
-
+//--------------------
+  const [service, setService] = useState<{ id: String; nameService: string }[]>(
+    []
+  );
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const serviceSnapshot = await firebase
+          .firestore()
+          .collection("services")
+          .get();
+        const serviceData = serviceSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            nameService: data.nameService,
+          };
+        });
+        setService(serviceData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchService();
+  }, []);
+//--------------------
   return (
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Layout.Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -159,13 +179,13 @@ function UpdateDevices() {
               <h4 style={{ color: "#FF7506" }}>Quản lý thiết bị</h4>
             </div>
             <div className="mt-3">
-              <Card style={{ width: 1140, height: 500 }}>
+              <Card style={{ width: 1140, height: 480 }}>
                 <h6 style={{ color: "#FF7506" }}>Thông tin thiết bị</h6>
                 <Form className="mt-3">
                   <div className="row">
                     <div className="col-6">
                       <label htmlFor="codeDevice" className="mb-2">
-                        Mã thiết bị: <span style={{ color: "#FF7506" }}></span>
+                        Mã thiết bị: <span style={{ color: "#FF7506" }}>*</span>
                       </label>
                       <Form.Item className="" id="codeDevice">
                         <Input
@@ -185,7 +205,7 @@ function UpdateDevices() {
                     <div className="col-6">
                       <label htmlFor="typeDevice" className="mb-2">
                         Loại thiết bị:{" "}
-                        <span style={{ color: "#FF7506" }}></span>
+                        <span style={{ color: "#FF7506" }}>*</span>
                       </label>
                       <Form.Item>
                         <Select
@@ -210,7 +230,7 @@ function UpdateDevices() {
                     </div>
                     <div className="col-6">
                       <label htmlFor="nameDevice" className="mb-2">
-                        Tên thiết bị: <span style={{ color: "#FF7506" }}></span>
+                        Tên thiết bị: <span style={{ color: "#FF7506" }}>*</span>
                       </label>
                       <Form.Item className="" id="nameDevice">
                         <Input
@@ -229,7 +249,7 @@ function UpdateDevices() {
                     <div className="col-6">
                       <label htmlFor="" className="mb-2">
                         Tên đăng nhập:{" "}
-                        <span style={{ color: "#FF7506" }}></span>
+                        <span style={{ color: "#FF7506" }}>*</span>
                       </label>
                       <Form.Item className="">
                         <Input
@@ -246,7 +266,7 @@ function UpdateDevices() {
                     </div>
                     <div className="col-6">
                       <label htmlFor="" className="mb-2">
-                        Địa chỉ IP: <span style={{ color: "#FF7506" }}></span>
+                        Địa chỉ IP: <span style={{ color: "#FF7506" }}>*</span>
                       </label>
                       <Form.Item className="">
                         <Input
@@ -263,7 +283,7 @@ function UpdateDevices() {
                     </div>
                     <div className="col-6">
                       <label htmlFor="" className="mb-2">
-                        Mật khẩu: <span style={{ color: "#FF7506" }}></span>
+                        Mật khẩu: <span style={{ color: "#FF7506" }}>*</span>
                       </label>
                       <Form.Item className="">
                         <Input.Password
@@ -281,13 +301,13 @@ function UpdateDevices() {
                     <div className="col-12">
                       <label htmlFor="" className="mb-2">
                         Dịch vụ sử dụng:{" "}
-                        <span style={{ color: "#FF7506" }}></span>
+                        <span style={{ color: "#FF7506" }}>*</span>
                       </label>
                       <div style={{ display: "flex", flexDirection: "column" }}>
                         <Select
                           mode="tags"
                           style={{ height: 35, borderColor: "#FFAC6A" }}
-                          tokenSeparators={[","]}
+                          tokenSeparators={[" "]}
                           className="w-100"
                           value={device.service}
                           onChange={(value) =>
@@ -296,15 +316,24 @@ function UpdateDevices() {
                               service: value,
                             })
                           }
+
+                          aria-required
+                          placeholder="Nhập dịch vụ sử dụng"
                         >
-                          {tags.map((tag) => (
-                            <Select.Option key={tag}>{tag}</Select.Option>
+                          {service.map((service) => (
+                            <Select.Option
+                              key={service.nameService}
+                              value={" " + service.nameService}
+                            >
+                              {" "}
+                              {service.nameService}
+                            </Select.Option>
                           ))}
                         </Select>
                       </div>
                     </div>
-                    <div className="col-4 mb-5 pb-1 text-right">
-                      <span style={{ color: "#FF7506" }}></span>{" "}
+                    <div className="col-4 pb-1 text-right">
+                      <span style={{ color: "#FF7506" }}>*</span>{" "}
                       <small>Là trường hợp thông tin bắt buộc</small>
                     </div>
                   </div>

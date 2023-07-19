@@ -6,6 +6,7 @@ import {
 import { RootState } from "../store";
 //firebase
 import firebase from "firebase/compat/app";
+import moment from "moment";
 
 export const serviceSlice = createSlice({
   name: "service",
@@ -58,7 +59,8 @@ export const createService =
         codeService: newService.codeService,
         nameService: newService.nameService,
         description: newService.description,
-        isActive: "Hoạt động"
+        isActive: "Hoạt động",
+        
       });
       window.location.href = "/service"
       dispatch(getService());

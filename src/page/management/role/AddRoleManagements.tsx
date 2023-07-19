@@ -91,7 +91,7 @@ function AddRoleManagements() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -114,7 +114,7 @@ function AddRoleManagements() {
             <div className="mt-4 pt-2">
               <Card>
                 <h6 style={{ color: "#FF7506" }}>Thông tin vai trò</h6>
-                <Form className="mt-3 mb-2" form={form} onFinish={onFinish}>
+                <Form className="mt-3 " form={form} onFinish={onFinish}>
                   <div className="row">
                     <div className="col-6">
                       <div className="row">
@@ -335,7 +335,7 @@ function AddRoleManagements() {
                   </div>
                 </Form>
               </Card>
-              <div className="col-6 text-center offset-3 mt-3">
+              <div className="col-6 text-center offset-3 mt-2 mb-2">
                 <Form.Item>
                   <Button
                     danger

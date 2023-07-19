@@ -158,7 +158,7 @@ function AddDevices() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Layout.Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -392,7 +392,7 @@ function AddDevices() {
                         </Select>
                       </Form.Item>
                     </div>
-                    <div className="col-4 mb-5 text-right">
+                    <div className="col-4 mb-4 text-right">
                       <span style={{ color: "#FF7506" }}>*</span>{" "}
                       <small>Là trường hợp bắt buộc</small>
                     </div>

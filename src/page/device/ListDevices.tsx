@@ -61,10 +61,6 @@ interface DeviceData {
 }
 
 function ListDevices() {
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
-  const [filterIsActive, setFilterIsActive] = useState<string>("all");
-  const [filterIsConnected, setFilterIsConnected] = useState<string>("all");
-
   //-------------
   //Danh sach thiet bi
   const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
@@ -76,9 +72,9 @@ function ListDevices() {
   }, []);
   //------------
 
-  const handleSearch = (value: string) => {
-    setSearchKeyword(value);
-  };
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filterIsActive, setFilterIsActive] = useState<string>("all");
+  const [filterIsConnected, setFilterIsConnected] = useState<string>("all");
 
   const filteredDeviceData = deviceData
     .filter((device) =>
@@ -99,10 +95,12 @@ function ListDevices() {
       }
     });
 
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+  };
   const handleFilterChangeActive = (value: string) => {
     setFilterIsActive(value);
   };
-
   const handleFilterChangeConnected = (value: string) => {
     setFilterIsConnected(value);
   };
@@ -111,7 +109,7 @@ function ListDevices() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Layout.Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">

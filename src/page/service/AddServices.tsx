@@ -22,13 +22,6 @@ interface ServiceData {
 }
 
 function AddServices() {
-  const [isAutoIncrement, setIsAutoIncrement] = useState<boolean>(false);
-
-  const handleAutoIncrementChange = (e: CheckboxChangeEvent) => {
-    setIsAutoIncrement(e.target.checked);
-  };
-
-  //------------
   //------------
   const [newService, setNewService] = useState<ServiceData>({
     id: "",
@@ -36,7 +29,6 @@ function AddServices() {
     nameService: "",
     description: "",
   });
-
   const addNoteToCollection = async (action: string) => {
     const noteUsersCollection = firebase.firestore().collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
@@ -60,7 +52,7 @@ function AddServices() {
       console.error(error);
     }
   };
-
+//--------------------------------
   const dispatch = useDispatch();
   const onFinish = async () => {
     message.success(`Thêm mới thiết bị ${newService.codeService} thành công!`);
@@ -68,8 +60,8 @@ function AddServices() {
     // Thêm ghi chú vào collection noteUsers
     await addNoteToCollection(`Thêm mới dịch vụ: ${newService.codeService}`);
   };
-
-  //------------
+  
+//--------------------------------
   const [form] = Form.useForm();
 
   const handleAddService = () => {
@@ -84,11 +76,17 @@ function AddServices() {
       });
   };
 
+  const [isAutoIncrement, setIsAutoIncrement] = useState<boolean>(false);
+
+  const handleAutoIncrementChange = (e: CheckboxChangeEvent) => {
+    setIsAutoIncrement(e.target.checked);
+  };
+
   return (
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Layout.Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -109,7 +107,7 @@ function AddServices() {
               <h4 style={{ color: "#FF7506" }}>Quản lý dịch vụ</h4>
             </div>
             <div className="mt-3">
-              <Card style={{ width: 1140 }}>
+              <Card style={{ width: "100%" }}>
                 <h6 style={{ color: "#FF7506" }}>Thông tin dịch vụ</h6>
                 <Form className="mt-3" form={form} onFinish={onFinish}>
                   <div className="row">
@@ -216,7 +214,6 @@ function AddServices() {
                           value={"0001"}
                           className="mb-2"
                           style={{ width: 58, height: 40 }}
-                          disabled
                         />
                       </td>
                       <td>
@@ -227,7 +224,6 @@ function AddServices() {
                           value={"9999"}
                           className="mb-2"
                           style={{ width: 58, height: 40 }}
-                          disabled
                         />
                       </td>
                     </tr>
@@ -241,6 +237,7 @@ function AddServices() {
                         <Input
                           className="mb-2"
                           style={{ width: 58, height: 40 }}
+                          value={"0001"}
                         />
                       </td>
                     </tr>
@@ -254,6 +251,7 @@ function AddServices() {
                         <Input
                           className="mb-2"
                           style={{ width: 58, height: 40 }}
+                          value={"0001"}
                         />
                       </td>
                     </tr>
@@ -266,12 +264,12 @@ function AddServices() {
                     </tr>
                   </tbody>
                 </table>
-                <div className="mt-4 text-right">
+                <div className="mt-3 text-right">
                   <span style={{ color: "#FF7506" }}>*</span>{" "}
                   <small>Là trường hợp thông tin bắt buộc</small>
                 </div>
               </Card>
-              <div className="col-6 text-center offset-3 mt-3">
+              <div className="col-6 text-center offset-3 mb-3 mt-2">
                 <Form.Item>
                   <Button
                     danger

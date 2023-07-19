@@ -87,9 +87,8 @@ function DetailServices() {
   useEffect(() => {
     dispatch(getProgressive());
   }, []);
-
+  //----------------------------------------
   const [searchKeyword, setSearchKeyword] = useState<string>("");
-
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
   };
@@ -120,7 +119,7 @@ function DetailServices() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Layout.Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -142,7 +141,7 @@ function DetailServices() {
             </div>
             <div className="row mt-3">
               <div className="col-4 mt-3">
-                <Card style={{ height: 530 }}>
+                <Card style={{ height: 520 }}>
                   <h6 style={{ color: "#FF7506" }}>Thông tin dịch vụ</h6>
                   <Form className="mt-3">
                     <table>
@@ -236,7 +235,7 @@ function DetailServices() {
                 </Card>
               </div>
               <div className="col-7 mt-3">
-                <Card style={{ height: 530 }}>
+                <Card style={{ height: 520 }}>
                   <div className="row">
                     <div className="col-3">
                       <label htmlFor="">Trạng thái</label>

@@ -193,7 +193,7 @@ function UpdateAuthManagements() {
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Content style={{ margin: "16px" }}>
+        <Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -381,7 +381,7 @@ function UpdateAuthManagements() {
                   </div>
                 </Form>
               </Card>
-              <div className="col-6 text-center offset-3 mt-3">
+              <div className="col-6 text-center offset-3 mt-1 pt-1">
                 <Form.Item>
                   <Button
                     danger

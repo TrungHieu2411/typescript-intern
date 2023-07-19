@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { getService } from "../../redux/service/serviceSlice";
 import { ThunkDispatch } from "redux-thunk";
+import dayjs from "dayjs";
 
 const renderIsActive = (status: string) => {
   let color = "";
@@ -47,11 +48,9 @@ interface ServiceData {
   codeService: string;
   nameService: string;
   description: string;
+  timeStamp: string;
 }
 function ListService() {
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
-  const [filterIsActive, setFilterIsActive] = useState<string>("all");
-
   //----------------------------------------
   const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const serviceData = useSelector(
@@ -62,30 +61,56 @@ function ListService() {
   }, [dispatch]);
 
   //----------------------------------------
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filterIsActive, setFilterIsActive] = useState<string>("all");
+  const [startTime, setStartTime] = useState<dayjs.Dayjs | null>(null);
+  const [endTime, setEndTime] = useState<dayjs.Dayjs | null>(null);
+
+  const handleStartTimeChange = (value: dayjs.Dayjs | null) => {
+    setStartTime(value);
+  };
+
+  const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
+    setEndTime(value);
+  };
+
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
   };
 
-  const filteredRoleManagementData = serviceData
-    .filter((service) =>
-      service.nameService.toLowerCase().includes(searchKeyword.toLowerCase())
-    )
-    .filter((auth) => {
-      if (filterIsActive === "all") {
-        return true;
-      } else {
-        return auth.isActive === filterIsActive;
-      }
-    });
-
   const handleFilterChange = (value: string) => {
     setFilterIsActive(value);
   };
+
+  const filteredServiceData = serviceData.filter((service) =>
+    service.nameService.toLowerCase().includes(searchKeyword.toLowerCase())
+  ).filter((service) => {
+    if (filterIsActive === "all") {
+      return true;
+    } else {
+      return service.isActive === filterIsActive;
+    }
+  }).filter((service) => {
+    if (!startTime && !endTime) {
+      return true;
+    }
+    if (!startTime) {
+      return dayjs(service.timeStamp).isBefore(endTime!);
+    }
+    if (!endTime) {
+      return dayjs(service.timeStamp).isAfter(startTime!);
+    }
+    return (
+      dayjs(service.timeStamp).isAfter(startTime!) &&
+      dayjs(service.timeStamp).isBefore(endTime!)
+    );
+  });
+
   return (
     <Layout className="layout">
       <SlideMain />
       <Layout>
-        <Layout.Content style={{ margin: "16px" }}>
+        <Layout.Content style={{ margin: "0px 16px" }}>
           <div className="container">
             <div className="row mt-2">
               <div className="col mt-2">
@@ -130,13 +155,23 @@ function ListService() {
                     <label htmlFor="">Chọn thời gian</label>
                   </div>
                   <div className="col">
-                    <DatePicker size="large" style={{ width: 130 }} />
+                    <DatePicker
+                      size="large"
+                      style={{ width: 130 }}
+                      value={startTime}
+                      onChange={handleStartTimeChange}
+                    />
                     <img
                       style={{ width: 15 }}
                       src="./assets/image/arrow-right.png"
                       alt=""
                     />
-                    <DatePicker size="large" style={{ width: 130 }} />
+                    <DatePicker
+                      size="large"
+                      style={{ width: 130 }}
+                      value={endTime}
+                      onChange={handleEndTimeChange}
+                    />
                   </div>
                 </div>
               </div>
@@ -168,7 +203,7 @@ function ListService() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={filteredRoleManagementData}
+                  dataSource={filteredServiceData}
                   pagination={{ pageSize: 3 }}
                   bordered
                   rowClassName={() => "table-row"}
