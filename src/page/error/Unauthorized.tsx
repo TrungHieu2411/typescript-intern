@@ -1,10 +1,10 @@
 import React from "react";
 import { Button, Result } from "antd";
 
-const NotFould: React.FC = () => (
+const Unauthorized: React.FC = () => (
   <Result
-    status="404"
-    title="404"
+  status={"403"}
+    title="403"
     subTitle="Sorry, the page you visited does not exist."
     extra={
       <Button type="primary" href="/">
@@ -14,4 +14,4 @@ const NotFould: React.FC = () => (
   />
 );
 
-export default NotFould;
+export default Unauthorized;

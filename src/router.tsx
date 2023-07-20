@@ -35,7 +35,7 @@ import UserLogManagements from "./page/management/user/UserLogManagements";
 import Admin from "./containers/Admin";
 import Dashboard from "./containers/Dashboard";
 import NotFould from "./page/error/NotFould";
-
+import Unauthorized from "./page/error/Unauthorized";
 const Router = () => {
   // Hàm kiểm tra trạng thái đăng nhập
   const isLoggedIn = () => {
@@ -97,7 +97,7 @@ const Router = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/quenmatkhau" element={<ForgotPassword />} />
           <Route path="/xacnhanmatkhau/:id" element={<ConfilmPassword />} />
-          <Route path="/*" element={<NotFould />} />
+          <Route path="/*" element={<Unauthorized />} />
         </>
       )}
     </Routes>
