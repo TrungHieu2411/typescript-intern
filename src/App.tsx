@@ -17,13 +17,13 @@ import "firebase/compat/storage";
 // };
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDSqLvXi8FU9x8ePSboYQ-bP7ZJCOHu2rc",
-  authDomain: "queingsystem-6397d.firebaseapp.com",
-  projectId: "queingsystem-6397d",
-  storageBucket: "queingsystem-6397d.appspot.com",
-  messagingSenderId: "983226810451",
-  appId: "1:983226810451:web:0610506483491b1b9106a6",
-  measurementId: "G-Y4EK3PV8WH"
+  apiKey: "AIzaSyC-W2yXlCkE_gdvGQJPTfxx11Mwi25_v2E",
+  authDomain: "qeuingsystem.firebaseapp.com",
+  projectId: "qeuingsystem",
+  storageBucket: "qeuingsystem.appspot.com",
+  messagingSenderId: "376592044161",
+  appId: "1:376592044161:web:f293f8c7aa06c3bce8bd80",
+  measurementId: "G-35DPS4BG70"
 };
 
 // Initialize Firebase

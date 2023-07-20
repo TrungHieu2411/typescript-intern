@@ -48,7 +48,6 @@ interface ServiceData {
   codeService: string;
   nameService: string;
   description: string;
-  timeStamp: string;
 }
 function ListService() {
   //----------------------------------------
@@ -63,17 +62,6 @@ function ListService() {
   //----------------------------------------
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [filterIsActive, setFilterIsActive] = useState<string>("all");
-  const [startTime, setStartTime] = useState<dayjs.Dayjs | null>(null);
-  const [endTime, setEndTime] = useState<dayjs.Dayjs | null>(null);
-
-  const handleStartTimeChange = (value: dayjs.Dayjs | null) => {
-    setStartTime(value);
-  };
-
-  const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
-    setEndTime(value);
-  };
-
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
   };
@@ -90,20 +78,6 @@ function ListService() {
     } else {
       return service.isActive === filterIsActive;
     }
-  }).filter((service) => {
-    if (!startTime && !endTime) {
-      return true;
-    }
-    if (!startTime) {
-      return dayjs(service.timeStamp).isBefore(endTime!);
-    }
-    if (!endTime) {
-      return dayjs(service.timeStamp).isAfter(startTime!);
-    }
-    return (
-      dayjs(service.timeStamp).isAfter(startTime!) &&
-      dayjs(service.timeStamp).isBefore(endTime!)
-    );
   });
 
   return (
@@ -158,8 +132,6 @@ function ListService() {
                     <DatePicker
                       size="large"
                       style={{ width: 130 }}
-                      value={startTime}
-                      onChange={handleStartTimeChange}
                     />
                     <img
                       style={{ width: 15 }}
@@ -169,8 +141,6 @@ function ListService() {
                     <DatePicker
                       size="large"
                       style={{ width: 130 }}
-                      value={endTime}
-                      onChange={handleEndTimeChange}
                     />
                   </div>
                 </div>

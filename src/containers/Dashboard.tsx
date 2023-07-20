@@ -21,6 +21,7 @@ import { Area } from "@ant-design/charts";
 
 import firebase from "firebase/compat/app";
 import Link from "antd/es/typography/Link";
+
 // Sử dụng WaveChart trong component của bạn
 
 const { Content } = Layout;

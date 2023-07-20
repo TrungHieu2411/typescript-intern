@@ -25,10 +25,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { getService } from "../../redux/service/serviceSlice";
 import { ThunkDispatch } from "redux-thunk";
-import { countProgressive, getProgressive } from "../../redux/progressive/progressiveSlice";
+import {
+  countProgressive,
+  getProgressive,
+} from "../../redux/progressive/progressiveSlice";
 import { getDevice } from "../../redux/device/deviceSlice";
 import moment from "moment";
 import "moment/locale/vi"; // Thay 'vi' bằng mã ngôn ngữ tương ứng nếu bạn muốn sử dụng ngôn ngữ khác
+import dayjs from "dayjs";
 moment.locale("vi"); // Thay 'vi' bằng mã ngôn ngữ tương ứng nếu bạn muốn sử dụng ngôn ngữ khác
 
 const { Content } = Layout;
@@ -65,6 +69,7 @@ interface ProgressiveData {
   nameService:
     | firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
     | string;
+  timeStamp: string;
 }
 
 interface ServiceData {
@@ -114,48 +119,34 @@ function ListProgressives() {
     setSearchKeyword(value);
   };
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const filteredAuthManagementData = progressiveData
-    .filter((progressive) =>
-      progressive.nameService
-        .toString()
-        .toLowerCase()
-        .includes(searchKeyword.toLowerCase())
-    )
-    .filter((progressive) => {
-      if (filterNameService === "all") {
-        return true;
-      } else {
-        return progressive.nameService === filterNameService;
-      }
-    })
-    .filter((progressive) => {
-      if (filterStatus === "all") {
-        return true;
-      } else {
-        return progressive.status === filterStatus;
-      }
-    })
-    .filter((progressive) => {
-      if (filterTypeDevice === "all") {
-        return true;
-      } else {
-        return progressive.typeDevice === filterTypeDevice;
-      }
-    })
-    .filter((progressive) => {
-      if (selectedDate === null) {
-        return true;
-      } else {
-        // Lọc theo ngày đã chọn
-        const selectedDateTime = selectedDate.getTime();
-        const progressiveTime = new Date(progressive.timeCreate).getTime();
-        return (
-          progressiveTime >= selectedDateTime &&
-          progressiveTime < selectedDateTime + 24 * 60 * 60 * 1000
-        );
-      }
-    });
+  .filter((progressive) =>
+    progressive.nameService
+      .toString()
+      .toLowerCase()
+      .includes(searchKeyword.toLowerCase())
+  )
+  .filter((progressive) => {
+    if (filterNameService === "all") {
+      return true;
+    } else {
+      return progressive.nameService === filterNameService;
+    }
+  })
+  .filter((progressive) => {
+    if (filterStatus === "all") {
+      return true;
+    } else {
+      return progressive.status === filterStatus;
+    }
+  })
+  .filter((progressive) => {
+    if (filterTypeDevice === "all") {
+      return true;
+    } else {
+      return progressive.typeDevice === filterTypeDevice;
+    }
+  });
 
   const handleFilterChangeNameService = (value: string) => {
     setFilterNameService(value);
@@ -168,7 +159,6 @@ function ListProgressives() {
   const handleFilterChangeTypeDevice = (value: string) => {
     setFilterTypeDevice(value);
   };
-  
 
   return (
     <Layout className="layout">
@@ -276,13 +266,7 @@ function ListProgressives() {
                     <DatePicker
                       size="large"
                       style={{ width: 130 }}
-                      // value={selectedDate ? moment(selectedDate) : null}
-                      onChange={(date) =>
-                        setSelectedDate(date ? date.toDate() : null)
-                      }
-                      format="DD/MM/YYYY" // Định dạng ngày tháng năm
                     />
-
                     <img
                       style={{ width: 15 }}
                       src="../assets/image/arrow-right.png"
@@ -291,11 +275,6 @@ function ListProgressives() {
                     <DatePicker
                       size="large"
                       style={{ width: 130 }}
-                      // value={selectedDate ? moment(selectedDate) : null}
-                      onChange={(date) =>
-                        setSelectedDate(date ? date.toDate() : null)
-                      }
-                      format="DD/MM/YYYY" // Định dạng ngày tháng năm
                     />
                   </div>
                 </div>

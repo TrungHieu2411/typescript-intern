@@ -124,9 +124,11 @@ function Admin() {
         handleUpdateAuthManagement();
       }
     };
-
+  
     updateAuthManagement();
-  }, [handleUpdateAuthManagement, imageUrl]);
+  }, [imageUrl]);
+  
+  
 
   const dispatch = useDispatch<ThunkDispatch<RootState, null, any>>();
   const authManagementData = useSelector(

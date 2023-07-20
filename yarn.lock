@@ -14334,6 +14334,67 @@ react-app-polyfill@^3.0.0:
     regenerator-runtime "^0.13.9"
     whatwg-fetch "^3.6.2"
 
+react-aria-components@^1.0.0-alpha.5:
+  version "1.0.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/react-aria-components/-/react-aria-components-1.0.0-alpha.5.tgz#0c71d66074c129ea542b3e8e858d5b0ff0de8fc5"
+  integrity sha512-cEi3u0Sb1LkXxuB+9MRZ5IrFa3runRwQ72klxiTWVT8CiAaj8t8H+7n5/Mi/jR8po68yTU/Dd2aAn8AaGQpxvA==
+  dependencies:
+    "@internationalized/date" "^3.3.0"
+    "@react-aria/focus" "^3.13.0"
+    "@react-aria/interactions" "^3.16.0"
+    "@react-aria/utils" "^3.18.0"
+    "@react-stately/table" "^3.10.0"
+    "@react-types/calendar" "^3.3.0"
+    "@react-types/grid" "^3.1.8"
+    "@react-types/shared" "^3.18.1"
+    "@react-types/table" "^3.7.0"
+    "@swc/helpers" "^0.5.0"
+    react-aria "^3.26.0"
+    react-stately "^3.24.0"
+    use-sync-external-store "^1.2.0"
+
+react-aria@^3.26.0:
+  version "3.26.0"
+  resolved "https://registry.yarnpkg.com/react-aria/-/react-aria-3.26.0.tgz#55bae48c7443c6ed16ac5a52715272070c0d6b04"
+  integrity sha512-G+dh25hEdDLfAGbKyahzasnyxXhd99y6xlMZjNtHoWB7wXod/9M3P3W6mdANvCEogxU28ATRdV1bv6A2JbuSYg==
+  dependencies:
+    "@react-aria/breadcrumbs" "^3.5.3"
+    "@react-aria/button" "^3.8.0"
+    "@react-aria/calendar" "^3.4.0"
+    "@react-aria/checkbox" "^3.9.2"
+    "@react-aria/combobox" "^3.6.2"
+    "@react-aria/datepicker" "^3.5.0"
+    "@react-aria/dialog" "^3.5.3"
+    "@react-aria/dnd" "^3.3.0"
+    "@react-aria/focus" "^3.13.0"
+    "@react-aria/gridlist" "^3.5.0"
+    "@react-aria/i18n" "^3.8.0"
+    "@react-aria/interactions" "^3.16.0"
+    "@react-aria/label" "^3.6.0"
+    "@react-aria/link" "^3.5.2"
+    "@react-aria/listbox" "^3.10.0"
+    "@react-aria/menu" "^3.10.0"
+    "@react-aria/meter" "^3.4.3"
+    "@react-aria/numberfield" "^3.6.0"
+    "@react-aria/overlays" "^3.15.0"
+    "@react-aria/progress" "^3.4.3"
+    "@react-aria/radio" "^3.6.2"
+    "@react-aria/searchfield" "^3.5.3"
+    "@react-aria/select" "^3.11.0"
+    "@react-aria/selection" "^3.16.0"
+    "@react-aria/separator" "^3.3.3"
+    "@react-aria/slider" "^3.5.0"
+    "@react-aria/ssr" "^3.7.0"
+    "@react-aria/switch" "^3.5.2"
+    "@react-aria/table" "^3.10.0"
+    "@react-aria/tabs" "^3.6.1"
+    "@react-aria/tag" "^3.1.0"
+    "@react-aria/textfield" "^3.10.0"
+    "@react-aria/tooltip" "^3.6.0"
+    "@react-aria/utils" "^3.18.0"
+    "@react-aria/visually-hidden" "^3.8.2"
+    "@react-types/shared" "^3.18.1"
+
 react-color@2.17.1:
   version "2.17.1"
   resolved "https://registry.yarnpkg.com/react-color/-/react-color-2.17.1.tgz#f114811c83f5d80a1bd1b80466c2f7ddcc58da9d"
@@ -14534,6 +14595,34 @@ react-smooth@^2.0.2:
   dependencies:
     fast-equals "^5.0.0"
     react-transition-group "2.9.0"
+
+react-stately@^3.24.0:
+  version "3.24.0"
+  resolved "https://registry.yarnpkg.com/react-stately/-/react-stately-3.24.0.tgz#87a3ac6fee7c9480970a595bc3e2e97675b00d25"
+  integrity sha512-4jNCR7rQBqvV8aKxm8giUWms/Wxlo9MMLUDDKfg75LEiCaqLcnxSC99HsEVKSao3RI0JCCj2ihewh6grRW/AgQ==
+  dependencies:
+    "@react-stately/calendar" "^3.3.0"
+    "@react-stately/checkbox" "^3.4.3"
+    "@react-stately/collections" "^3.9.0"
+    "@react-stately/combobox" "^3.5.2"
+    "@react-stately/data" "^3.10.0"
+    "@react-stately/datepicker" "^3.5.0"
+    "@react-stately/dnd" "^3.2.2"
+    "@react-stately/list" "^3.9.0"
+    "@react-stately/menu" "^3.5.3"
+    "@react-stately/numberfield" "^3.5.0"
+    "@react-stately/overlays" "^3.6.0"
+    "@react-stately/radio" "^3.8.2"
+    "@react-stately/searchfield" "^3.4.3"
+    "@react-stately/select" "^3.5.2"
+    "@react-stately/selection" "^3.13.2"
+    "@react-stately/slider" "^3.4.0"
+    "@react-stately/table" "^3.10.0"
+    "@react-stately/tabs" "^3.5.0"
+    "@react-stately/toggle" "^3.6.0"
+    "@react-stately/tooltip" "^3.4.2"
+    "@react-stately/tree" "^3.7.0"
+    "@react-types/shared" "^3.18.1"
 
 react-transition-group@2.9.0:
   version "2.9.0"
@@ -16533,7 +16622,7 @@ url-parse@^1.5.3:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
 
-use-sync-external-store@^1.0.0:
+use-sync-external-store@^1.0.0, use-sync-external-store@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
