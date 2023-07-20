@@ -33,11 +33,15 @@ const Login: React.FC = () => {
 
         setShowError(false);
 
+         // Cập nhật trường "isActive" thành "Hoạt động"
+         await authManagementsCollection.doc(userId).update({
+          isActive: "Hoạt động",
+        });
+        
         // Lưu trạng thái đăng nhập vào Local Storage
         localStorage.setItem("userId", userId);
         localStorage.setItem("userName", userName);
         localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userStatus", "Hoạt động"); // Cập nhật trạng thái người dùng
 
         // Thực hiện các hành động tiếp theo sau khi đăng nhập thành công
         // Ví dụ: chuyển đến trang admin

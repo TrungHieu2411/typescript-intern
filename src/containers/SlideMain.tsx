@@ -11,13 +11,40 @@ import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import SubMenu from "antd/es/menu/SubMenu";
 import Link from "antd/es/typography/Link";
+import firebase from "firebase/compat/app";
 
 function SlideMain() {
-  const handleLogoutClick = () => {
-    console.log("Bấm nút Đăng xuất");
-    localStorage.removeItem("userId");
-    localStorage.setItem("isLoggedIn", "false"); // Cập nhật giá trị isLoggedIn thành false
-    localStorage.setItem("userStatus", "Ngưng hoạt động"); // Cập nhật trạng thái người dùng
+  const handleLogoutClick = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+
+      if (userId !== null) {
+        const authManagementsCollection = firebase.firestore().collection("authManagements");
+
+        await Promise.all([
+          authManagementsCollection.doc(userId).update({
+            isActive: "Ngưng hoạt động",
+          }),
+          new Promise<void>((resolve) => {
+            localStorage.setItem("isLoggedIn", "false");
+            resolve();
+          }),
+        ]);
+        console.log("Đã cập nhật trạng thái thành Ngưng hoạt động");
+
+        // Xóa thông tin người dùng khỏi Local Storage khi đăng xuất
+        localStorage.removeItem("userId");
+
+        // Có thể thực hiện các hành động tiếp theo sau khi cập nhật và đăng xuất thành công
+
+        // Sau khi đăng xuất thành công, chuyển đến trang đăng nhập bằng cách sử dụng window.location.href
+        window.location.href = "/login"; // Thay "/login" bằng đường dẫn của trang đăng nhập của bạn
+      } else {
+        console.log("Không tìm thấy userId trong Local Storage.");
+      }
+    } catch (error) {
+      console.log("Lỗi khi cập nhật trạng thái:", error);
+    }
   };
 
   return (
@@ -92,7 +119,7 @@ function SlideMain() {
               icon={<LogoutOutlined />}
               className="menu-item mb-4"
             >
-              <Link href="/" onClick={handleLogoutClick}>
+              <Link onClick={handleLogoutClick}>
                 Đăng xuất
               </Link>
             </Menu.Item>

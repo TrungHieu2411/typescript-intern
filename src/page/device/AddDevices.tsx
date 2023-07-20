@@ -237,8 +237,8 @@ function AddDevices() {
                           placeholder="Chọn loại thiết bị"
                         >
                           <Select.Option value="Kiosk">Kiosk</Select.Option>
-                          <Select.Option value="Display counter">
-                            Display counter
+                          <Select.Option value="Hệ thống">
+                            Hệ thống
                           </Select.Option>
                         </Select>
                       </Form.Item>

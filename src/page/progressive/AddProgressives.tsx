@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Form, Layout, Select, Modal, message } from "antd";
+import {
+  Button,
+  Card,
+  Form,
+  Layout,
+  Select,
+  Modal,
+  message,
+  Input,
+} from "antd";
 import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
@@ -10,12 +19,6 @@ import { useParams } from "react-router-dom";
 import moment from "moment";
 
 const { Content } = Layout;
-
-interface UserData {
-  fullName: string;
-  phone: string;
-  email: string;
-}
 
 interface ServiceData {
   id: string;
@@ -58,11 +61,6 @@ function AddProgressives() {
   }, []);
 
   const { id } = useParams<{ id: string }>();
-  const [user, setUser] = useState<UserData>({
-    fullName: "",
-    phone: "",
-    email: "",
-  });
 
   const userId = localStorage.getItem("userId");
   useEffect(() => {
@@ -71,13 +69,6 @@ function AddProgressives() {
         .firestore()
         .collection("authManagements")
         .doc(userId || id);
-
-      const userSnapshot = await userRef.get();
-
-      if (userSnapshot.exists) {
-        const userData = userSnapshot.data() as UserData;
-        setUser(userData);
-      }
     };
     fetchUser();
   }, [userId, id]);
@@ -91,11 +82,6 @@ function AddProgressives() {
     setSelectedService(value);
     const service = nameService.find((service) => service.id === value);
     setSelectedServiceData(service || null);
-  };
-
-  const handlePrintButtonClick = () => {
-    setShowPopup(true);
-    handleAddProgressive();
   };
 
   const handlePopupClose = () => {
@@ -172,11 +158,12 @@ function AddProgressives() {
         nameService: serviceRef,
         timeCreate: getCurrentTime(),
         deadLineUsed: getExpirationTime(),
-        fullName: user.fullName,
-        phone: user.phone,
-        email: user.email,
+        fullName: customerInfo.fullName,
+        phone: customerInfo.phone,
+        email: customerInfo.email,
         authManagementId: userId,
         status: "Đang chờ",
+        timeStamp: moment().format("DD/MM/YYYY"),
       });
       message.success(`Thêm mới cấp số ${newProgressiveNumber} thành công!`);
       // Thêm ghi chú vào collection noteUsers
@@ -189,6 +176,37 @@ function AddProgressives() {
     } catch (error) {
       console.log(`Error adding document: ${error}`);
     }
+  };
+  //----------------------------------------
+  const [isAddInfoModalVisible, setAddInfoModalVisible] = useState(false);
+  const [isPrintModalVisible, setPrintModalVisible] = useState(false);
+
+  const [customerInfo, setCustomerInfo] = useState({
+    fullName: "",
+    phone: "",
+    email: "",
+  });
+
+  const showAddInfoModal = () => {
+    setAddInfoModalVisible(true);
+  };
+
+  const handleAddInfoModalCancel = () => {
+    setAddInfoModalVisible(false);
+  };
+
+  const handlePrintButtonClick = () => {
+    showAddInfoModal();
+  };
+
+  const handlePrintConfirmButtonClick = () => {
+    handleAddProgressive();
+    setAddInfoModalVisible(false); // Hide the customer info modal
+    setPrintModalVisible(true); // Show the print modal
+  };
+
+  const handlePrintModalCancel = () => {
+    setPrintModalVisible(false);
   };
 
   //----------------------------------------
@@ -270,47 +288,159 @@ function AddProgressives() {
                         >
                           In số
                         </Button>
-                        <Modal
-                          visible={showPopup}
-                          onCancel={handlePopupClose}
-                          style={{
-                            marginTop: 100,
-                          }}
-                          className="w-25"
-                          footer={
-                            <h6
-                              style={{ background: "#FF9138" }}
-                              className="py-2 text-center text-white"
-                            >
-                              Thời gian cấp: {getCurrentTime()}
-                              <br />
-                              Hạn sử dụng: {getExpirationTime()}
-                            </h6>
-                          }
-                        >
-                          <h4 className="text-center mt-4">
-                            Số thứ tự được cấp
-                          </h4>
-                          <h1
-                            className="text-center my-4 fw-bold"
-                            style={{ color: "#FF9138" }}
-                          >
-                            {progressiveNumber}
-                          </h1>
-
-                          <p className="text-center">
-                            DV: {selectedServiceData?.nameService}{" "}
-                            <span className="fw-bold">
-                              (tại quầy số {determineCounter(selectedService)})
-                            </span>
-                          </p>
-                        </Modal>
                       </Form.Item>
                     </div>
                   </Form>
                 </p>
               </Card>
             </div>
+            <Modal
+              visible={isAddInfoModalVisible}
+              onCancel={handleAddInfoModalCancel}
+              footer={null} // Removed the footer and added buttons directly inside the content
+            >
+              <h5 className="text-center mb-4" style={{ color: "#FF9138" }}>
+                Điền thông tin khách hàng
+              </h5>
+              <Form className="mx-5" onFinish={handlePrintConfirmButtonClick}>
+                <label htmlFor="" className="mb-1">
+                  Tên khách hàng
+                  <span style={{ color: "#FF7506" }}>*</span>
+                </label>
+                <Form.Item
+                  name={"fullName"}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập tên khách hàng!",
+                    },
+                  ]}
+                >
+                  <Input
+                    value={customerInfo.fullName}
+                    onChange={(e) =>
+                      setCustomerInfo({
+                        ...customerInfo,
+                        fullName: e.target.value,
+                      })
+                    }
+                    placeholder="Nhập tên khách hàng"
+                  />
+                </Form.Item>
+                <label htmlFor="" className="mb-1">
+                  Số điện thoại
+                  <span style={{ color: "#FF7506" }}>*</span>
+                </label>
+                <Form.Item
+                  name={"phone"}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập số điện thoại!",
+                    },
+                  ]}
+                >
+                  <Input
+                    value={customerInfo.phone}
+                    onChange={(e) =>
+                      setCustomerInfo({
+                        ...customerInfo,
+                        phone: e.target.value,
+                      })
+                    }
+                    placeholder="Nhập số điện thoại"
+                  />
+                </Form.Item>
+                <label htmlFor="" className="mb-1">
+                  Email
+                  <span style={{ color: "#FF7506" }}>*</span>
+                </label>
+                <Form.Item
+                  name={"email"}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập email!",
+                    },
+                  ]}
+                >
+                  <Input
+                    value={customerInfo.email}
+                    onChange={(e) =>
+                      setCustomerInfo({
+                        ...customerInfo,
+                        email: e.target.value,
+                      })
+                    }
+                    placeholder="Nhập email"
+                  />
+                </Form.Item>
+
+                <div className="text-center mt-3">
+                  <Button
+                    danger
+                    className="mx-3 pt-2"
+                    style={{
+                      background: "#FFF2E7",
+                      color: "#FF9138",
+                      height: 38,
+                      width: 115,
+                    }}
+                    onClick={handleAddInfoModalCancel}
+                  >
+                    Hủy bỏ
+                  </Button>
+                  <Button
+                    type="link"
+                    htmlType="submit"
+                    style={{
+                      background: "#FF9138",
+                      color: "white",
+                      height: 38,
+                      width: 115,
+                    }}
+                    className="mx-3 pt-2"
+                  >
+                    In số
+                  </Button>
+                </div>
+              </Form>
+            </Modal>
+
+            {/* Second Modal for Displaying Progressive Number and Details */}
+            <Modal
+              visible={isPrintModalVisible}
+              onCancel={handlePrintModalCancel}
+              style={{
+                marginTop: 100,
+              }}
+              className="w-25"
+              footer={
+                <h6
+                  style={{ background: "#FF9138" }}
+                  className="py-2 text-center text-white"
+                >
+                  Thời gian cấp: {getCurrentTime()}
+                  <br />
+                  Hạn sử dụng: {getExpirationTime()}
+                </h6>
+              }
+            >
+              <h4 className="text-center mt-4">Số thứ tự được cấp</h4>
+              <h1
+                className="text-center my-4 fw-bold"
+                style={{ color: "#FF9138" }}
+              >
+                {progressiveNumber}
+              </h1>
+
+              <p className="text-center">
+                DV: {selectedServiceData?.nameService}{" "}
+                <span className="fw-bold">
+                  (tại quầy số {determineCounter(selectedService)})
+                </span>
+              </p>
+            </Modal>
           </div>
         </Content>
       </Layout>

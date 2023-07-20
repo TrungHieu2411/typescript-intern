@@ -97,15 +97,6 @@ function ListProgressives() {
     dispatch(getService());
   }, [dispatch]);
   //------------
-
-  const deviceData = useSelector(
-    (state: RootState) => state.firestoreDeviceData.data
-  ) as DeviceData[];
-  useEffect(() => {
-    dispatch(getDevice());
-  }, []);
-  //------------
-
   const progressiveData = useSelector(
     (state: RootState) => state.firestoreProgressiveData.data
   ) as ProgressiveData[];
@@ -117,6 +108,27 @@ function ListProgressives() {
 
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
+  };
+
+  const parseDate = (dateStr: any) => {
+    const [day, month, year] = dateStr.split("/");
+    const paddedDay = day.padStart(2, "0"); // Add leading zero if day has only one digit
+    const paddedMonth = month.padStart(2, "0"); // Add leading zero if month has only one digit
+    return dayjs(`${year}-${paddedMonth}-${paddedDay}`);
+  };
+
+  // State và hàm xử lý thay đổi thời gian
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
+
+  const handleStartDateChange = (value: any) => {
+    // Xử lý sự kiện khi người dùng chọn từ ngày
+    setStartDate(value);
+  };
+    
+  const handleEndDateChange = (value: any) => {
+    // Xử lý sự kiện khi người dùng chọn tới ngày
+    setEndDate(value);
   };
 
   const filteredAuthManagementData = progressiveData
@@ -146,6 +158,22 @@ function ListProgressives() {
     } else {
       return progressive.typeDevice === filterTypeDevice;
     }
+  })
+  .filter((service) => {
+    // Custom filter function for timeStamp column
+    const currentDate = parseDate(service.timeStamp); // Parse the timeStamp to dayjs object
+    const start = startDate ? parseDate(startDate.format("DD/MM/YYYY")) : null;
+    const end = endDate ? parseDate(endDate.format("DD/MM/YYYY")) : null;
+
+    if (start && end) {
+      return currentDate.isAfter(start) && currentDate.isBefore(end);
+    } else if (start) {
+      return currentDate.isAfter(start);
+    } else if (end) {
+      return currentDate.isBefore(end);
+    }
+
+    return true;
   });
 
   const handleFilterChangeNameService = (value: string) => {
@@ -245,14 +273,12 @@ function ListProgressives() {
                       value={filterTypeDevice} // Thêm giá trị value để đồng bộ giá trị hiển thị
                     >
                       <Select.Option value="all">Tất cả</Select.Option>
-                      {deviceData.map((device) => (
-                        <Select.Option
-                          key={device.id}
-                          value={device.typeDevice}
-                        >
-                          {device.typeDevice}
-                        </Select.Option>
-                      ))}
+                     <Select.Option value="Kiosk">
+                        Kiosk
+                     </Select.Option>
+                      <Select.Option value="Hệ thống">
+                        Hệ thống
+                     </Select.Option>
                     </Select>
                   </div>
                 </div>
@@ -266,6 +292,8 @@ function ListProgressives() {
                     <DatePicker
                       size="large"
                       style={{ width: 130 }}
+                      value={startDate}
+                      onChange={handleStartDateChange}
                     />
                     <img
                       style={{ width: 15 }}
@@ -275,6 +303,8 @@ function ListProgressives() {
                     <DatePicker
                       size="large"
                       style={{ width: 130 }}
+                      value={endDate}
+                      onChange={handleEndDateChange}
                     />
                   </div>
                 </div>

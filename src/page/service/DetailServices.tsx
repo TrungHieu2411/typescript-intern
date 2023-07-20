@@ -25,6 +25,7 @@ import { getProgressive } from "../../redux/progressive/progressiveSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../redux/store";
+import dayjs from "dayjs";
 
 interface ServiceData {
   codeService: string;
@@ -52,6 +53,8 @@ const renderIsActive = (status: string) => {
 };
 
 interface ProgressiveData {
+  timeStamp: any;
+  progressive: any;
   id: string;
   number: string;
   status: string;
@@ -93,6 +96,29 @@ function DetailServices() {
     setSearchKeyword(value);
   };
 
+   //----------------------------------------
+   const parseDate = (dateStr: any) => {
+    const [day, month, year] = dateStr.split("/");
+    const paddedDay = day.padStart(2, "0"); // Add leading zero if day has only one digit
+    const paddedMonth = month.padStart(2, "0"); // Add leading zero if month has only one digit
+    return dayjs(`${year}-${paddedMonth}-${paddedDay}`);
+  };
+
+  // State và hàm xử lý thay đổi thời gian
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
+
+  const handleStartDateChange = (value: any) => {
+    // Xử lý sự kiện khi người dùng chọn từ ngày
+    setStartDate(value);
+  };
+    
+  const handleEndDateChange = (value: any) => {
+    // Xử lý sự kiện khi người dùng chọn tới ngày
+    setEndDate(value);
+  };
+
+
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const filteredRoleManagementData = progressiveData
     .filter((progressive) => {
@@ -110,6 +136,21 @@ function DetailServices() {
       } else {
         return renderIsActive(progressive.status).props.text === filterStatus;
       }
+    }).filter((progressive) => {
+      // Custom filter function for timeStamp column
+      const currentDate = parseDate(progressive.timeStamp); // Parse the timeStamp to dayjs object
+      const start = startDate ? parseDate(startDate.format("DD/MM/YYYY")) : null;
+      const end = endDate ? parseDate(endDate.format("DD/MM/YYYY")) : null;
+
+      if (start && end) {
+        return currentDate.isAfter(start) && currentDate.isBefore(end);
+      } else if (start) {
+        return currentDate.isAfter(start);
+      } else if (end) {
+        return currentDate.isBefore(end);
+      }
+
+      return true;
     });
 
   const handleFilterChangeStatus = (value: string) => {
@@ -147,11 +188,10 @@ function DetailServices() {
                     <table>
                       <tr>
                         <td>
-                          <label htmlFor="" className="mb-2 me-2">
+                          <label htmlFor="" className="mb-2 me-4">
                             Mã dịch vụ:
                           </label>
-                        </td>
-                        <td>
+                       
                           <label className="mb-2">
                             <small>{service.codeService}</small>
                           </label>
@@ -159,11 +199,10 @@ function DetailServices() {
                       </tr>
                       <tr>
                         <td>
-                          <label htmlFor="" className="mb-2">
+                          <label htmlFor="" className="mb-2 me-3 pe-1">
                             Tên dịch vụ:
                           </label>
-                        </td>
-                        <td>
+                       
                           <label className="mb-2">
                             <small>{service.nameService}</small>
                           </label>
@@ -174,8 +213,7 @@ function DetailServices() {
                           <label htmlFor="" className="mb-2">
                             Mô tả:
                           </label>
-                        </td>
-                        <td>
+                        
                           <label className="mb-2">
                             <small>{service.description}</small>
                           </label>
@@ -201,7 +239,7 @@ function DetailServices() {
                       </td>
                       <td>
                         <Input
-                          value="0009"
+                          value="9999"
                           className="mb-2"
                           style={{ width: 58, height: 40 }}
                         />
@@ -260,13 +298,19 @@ function DetailServices() {
                       <label htmlFor="">Chọn thời gian</label>
 
                       <div className="col-12">
-                        <DatePicker style={{ width: 125 }} />
+                        <DatePicker style={{ width: 125 }} 
+                         value={startDate}
+                         onChange={handleStartDateChange}
+                        />
                         <img
                           style={{ width: 15 }}
                           src="../assets/image/arrow-right.png"
                           alt=""
                         />
-                        <DatePicker style={{ width: 125 }} />
+                        <DatePicker style={{ width: 125 }} 
+                         value={endDate}
+                         onChange={handleEndDateChange}
+                        />
                       </div>
                     </div>
 

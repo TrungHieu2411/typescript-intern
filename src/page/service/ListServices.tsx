@@ -40,6 +40,7 @@ const renderIsActive = (status: string) => {
 };
 
 interface ServiceData {
+  timeStamp: string | number | Date | null | undefined;
   number: string;
   progressiveId: string;
   isActive: string;
@@ -60,6 +61,27 @@ function ListService() {
   }, [dispatch]);
 
   //----------------------------------------
+  const parseDate = (dateStr: any) => {
+    const [day, month, year] = dateStr.split("/");
+    const paddedDay = day.padStart(2, "0"); // Add leading zero if day has only one digit
+    const paddedMonth = month.padStart(2, "0"); // Add leading zero if month has only one digit
+    return dayjs(`${year}-${paddedMonth}-${paddedDay}`);
+  };
+
+  // State và hàm xử lý thay đổi thời gian
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
+
+  const handleStartDateChange = (value: any) => {
+    // Xử lý sự kiện khi người dùng chọn từ ngày
+    setStartDate(value);
+  };
+    
+  const handleEndDateChange = (value: any) => {
+    // Xử lý sự kiện khi người dùng chọn tới ngày
+    setEndDate(value);
+  };
+
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [filterIsActive, setFilterIsActive] = useState<string>("all");
   const handleSearch = (value: string) => {
@@ -70,15 +92,33 @@ function ListService() {
     setFilterIsActive(value);
   };
 
-  const filteredServiceData = serviceData.filter((service) =>
-    service.nameService.toLowerCase().includes(searchKeyword.toLowerCase())
-  ).filter((service) => {
-    if (filterIsActive === "all") {
+  const filteredServiceData = serviceData
+    .filter((service) =>
+      service.nameService.toLowerCase().includes(searchKeyword.toLowerCase())
+    )
+    .filter((service) => {
+      if (filterIsActive === "all") {
+        return true;
+      } else {
+        return service.isActive === filterIsActive;
+      }
+    })
+    .filter((service) => {
+      // Custom filter function for timeStamp column
+      const currentDate = parseDate(service.timeStamp); // Parse the timeStamp to dayjs object
+      const start = startDate ? parseDate(startDate.format("DD/MM/YYYY")) : null;
+      const end = endDate ? parseDate(endDate.format("DD/MM/YYYY")) : null;
+
+      if (start && end) {
+        return currentDate.isAfter(start) && currentDate.isBefore(end);
+      } else if (start) {
+        return currentDate.isAfter(start);
+      } else if (end) {
+        return currentDate.isBefore(end);
+      }
+
       return true;
-    } else {
-      return service.isActive === filterIsActive;
-    }
-  });
+    });
 
   return (
     <Layout className="layout">
@@ -132,6 +172,8 @@ function ListService() {
                     <DatePicker
                       size="large"
                       style={{ width: 130 }}
+                      value={startDate}
+                      onChange={handleStartDateChange}
                     />
                     <img
                       style={{ width: 15 }}
@@ -141,6 +183,8 @@ function ListService() {
                     <DatePicker
                       size="large"
                       style={{ width: 130 }}
+                      value={endDate}
+                      onChange={handleEndDateChange}
                     />
                   </div>
                 </div>

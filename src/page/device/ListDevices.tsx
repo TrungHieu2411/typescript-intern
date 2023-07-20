@@ -199,7 +199,7 @@ function ListDevices() {
               <div className="col-11 mt-3">
                 <Table
                   dataSource={filteredDeviceData}
-                  pagination={{ pageSize: 3 }}
+                  pagination={{ pageSize: 5 }}
                   bordered
                   className="mb-3"
                   rowClassName={() => "table-row"}

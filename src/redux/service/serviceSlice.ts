@@ -60,7 +60,7 @@ export const createService =
         nameService: newService.nameService,
         description: newService.description,
         isActive: "Hoạt động",
-        
+        timeStamp: moment().format("DD/MM/YYYY"),
       });
       window.location.href = "/service"
       dispatch(getService());

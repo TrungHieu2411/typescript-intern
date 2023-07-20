@@ -15,6 +15,7 @@ import { RootState } from "../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { getProgressive } from "../../redux/progressive/progressiveSlice";
 import tableExport from "antd-table-export";
+import dayjs from "dayjs";
 const { Content } = Layout;
 const { Column } = Table;
 
@@ -65,6 +66,7 @@ const renderStatus = (status: string) => {
 };
 
 interface ProgressiveData {
+  timeStamp: any;
   typeDevice: string;
   id: string;
   number: string;
@@ -133,6 +135,46 @@ function ListReport() {
     const exportInstance = new tableExport(filteredData, columns);
     exportInstance.download("Báo cáo", "xlsx");
   };
+
+   //----------------------------------------
+  const parseDate = (dateStr: any) => {
+    const [day, month, year] = dateStr.split("/");
+    const paddedDay = day.padStart(2, "0"); // Add leading zero if day has only one digit
+    const paddedMonth = month.padStart(2, "0"); // Add leading zero if month has only one digit
+    return dayjs(`${year}-${paddedMonth}-${paddedDay}`);
+  };
+
+  // State và hàm xử lý thay đổi thời gian
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
+
+  const handleStartDateChange = (value: any) => {
+    // Xử lý sự kiện khi người dùng chọn từ ngày
+    setStartDate(value);
+  };
+    
+  const handleEndDateChange = (value: any) => {
+    // Xử lý sự kiện khi người dùng chọn tới ngày
+    setEndDate(value);
+  };
+
+   const filteredServiceData = progressiveData
+    .filter((progressive) => {
+      // Custom filter function for timeStamp column
+      const currentDate = parseDate(progressive.timeStamp); // Parse the timeStamp to dayjs object
+      const start = startDate ? parseDate(startDate.format("DD/MM/YYYY")) : null;
+      const end = endDate ? parseDate(endDate.format("DD/MM/YYYY")) : null;
+
+      if (start && end) {
+        return currentDate.isAfter(start) && currentDate.isBefore(end);
+      } else if (start) {
+        return currentDate.isAfter(start);
+      } else if (end) {
+        return currentDate.isBefore(end);
+      }
+
+      return true;
+    });
   return (
     <Layout className="layout">
       <SlideMain />
@@ -156,13 +198,19 @@ function ListReport() {
                     <label htmlFor="">Chọn thời gian</label>
                   </div>
                   <div className="col">
-                    <DatePicker size="large" style={{ width: 130 }} />
+                    <DatePicker size="large" style={{ width: 130 }} 
+                    value={startDate}
+                      onChange={handleStartDateChange}
+                    />
                     <img
                       style={{ width: 15 }}
                       src="../assets/image/arrow-right.png"
                       alt=""
                     />
-                    <DatePicker size="large" style={{ width: 130 }} />
+                    <DatePicker size="large" style={{ width: 130 }} 
+                     value={endDate}
+                      onChange={handleEndDateChange}
+                    />
                   </div>
                 </div>
               </div>
@@ -170,7 +218,7 @@ function ListReport() {
             <div className="row">
               <div className="col-11 mt-3">
                 <Table
-                  dataSource={filteredData}
+                  dataSource={filteredServiceData}
                   pagination={{ pageSize: 6 }}
                   bordered
                   rowClassName={() => "table-row"}
