@@ -78,7 +78,7 @@ const Account = () => {
         marginLeft: -20,
         marginRight: -12,
         borderRadius: 5,
-        maxHeight: 400, // Đặt chiều cao tối đa của phần tử
+        maxHeight: 300, // Đặt chiều cao tối đa của phần tử
         overflowY: "auto", // Kích hoạt cuộn theo chiều dọc khi danh sách vượt quá chiều cao tối đa
       }}
     >
