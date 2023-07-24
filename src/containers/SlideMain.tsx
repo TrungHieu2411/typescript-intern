@@ -38,7 +38,7 @@ function SlideMain() {
         // Có thể thực hiện các hành động tiếp theo sau khi cập nhật và đăng xuất thành công
 
         // Sau khi đăng xuất thành công, chuyển đến trang đăng nhập bằng cách sử dụng window.location.href
-        window.location.href = "/login"; // Thay "/login" bằng đường dẫn của trang đăng nhập của bạn
+        window.location.href = "/"; // Thay "/login" bằng đường dẫn của trang đăng nhập của bạn
       } else {
         console.log("Không tìm thấy userId trong Local Storage.");
       }

@@ -18,6 +18,7 @@ import DetailServices from "./page/service/DetailServices";
 import UpdateServices from "./page/service/UpdateServices";
 //Cấp số
 import ListProgressives from "./page/progressive/ListProgressives";
+import AddProgressive from "./page/progressive-2/AddProgressives";
 import AddProgressives from "./page/progressive/AddProgressives";
 import DetailProgressives from "./page/progressive/DetailProgressives";
 //Báo cáo
@@ -93,7 +94,7 @@ const Router = () => {
         </>
       ) : (
         <>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<AddProgressive />} />
           <Route path="/login" element={<Login />} />
           <Route path="/quenmatkhau" element={<ForgotPassword />} />
           <Route path="/xacnhanmatkhau/:id" element={<ConfilmPassword />} />
