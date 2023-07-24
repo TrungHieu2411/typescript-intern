@@ -98,6 +98,7 @@ const Router = () => {
           <Route path="/quenmatkhau" element={<ForgotPassword />} />
           <Route path="/xacnhanmatkhau/:id" element={<ConfilmPassword />} />
           <Route path="/*" element={<Unauthorized />} />
+          <Route path="/admin" element={<Admin />} />
         </>
       )}
     </Routes>
