@@ -1,7 +1,8 @@
 import React from "react";
 import { Button, Input, Form, message } from "antd";
 import { FormInstance } from "antd/lib/form";
-import firebase from "firebase/compat/app";
+import { firestore } from "../../firebase/firebaseConfig";
+
 
 const ForgotPassword: React.FC = () => {
   const formRef = React.useRef<FormInstance>(null);
@@ -29,8 +30,7 @@ const ForgotPassword: React.FC = () => {
   //------------
   const getAccountIdByEmail = async (email: string) => {
     try {
-      const authManagementCollection = firebase
-        .firestore()
+      const authManagementCollection = firestore
         .collection("authManagements");
       const snapshot = await authManagementCollection
         .where("email", "==", email)

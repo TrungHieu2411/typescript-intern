@@ -6,10 +6,9 @@ import {
 } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { message } from "antd";
+import { firestore } from "../../firebase/firebaseConfig";
 
-//firebase
-import firebase from "firebase/compat/app";
-import { DocumentData } from "@firebase/firestore";
+
 
 export const roleManagementSlice = createSlice({
   name: "role",
@@ -37,7 +36,7 @@ export const getRoleManagement =
   (): ThunkAction<void, RootState, null, Action<string>> =>
   async (dispatch: ThunkDispatch<RootState, null, Action<string>>) => {
     try {
-      const roleManagementRef = firebase.firestore().collection("roles");
+      const roleManagementRef = firestore.collection("roles");
 
       const roleManagementSnapshot = await roleManagementRef.get();
 
@@ -58,7 +57,7 @@ export const createRoleManagement =
   (role: RoleManagementData): ThunkAction<void, RootState, null, any> =>
   async (dispatch) => {
     try {
-      await firebase.firestore().collection("roles").add({
+      await firestore.collection("roles").add({
         nameRole: role.nameRole,
         description: role.description,
        
@@ -79,8 +78,7 @@ export const updateRoleManagement =
   ): ThunkAction<void, RootState, null, Action<string>> =>
   async (dispatch) => {
     try {
-      await firebase
-        .firestore()
+      await firestore
         .collection("roles")
         .doc(id)
         .update({

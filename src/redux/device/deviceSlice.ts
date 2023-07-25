@@ -3,9 +3,11 @@ import {
   ThunkAction,
   createSlice,
 } from "@reduxjs/toolkit";
-import firebase from "firebase/compat/app";
+
+
 import { message } from "antd";
 import { RootState } from "../store";
+import { firestore } from "../../firebase/firebaseConfig";
 
 export const deviceSlice = createSlice({
   name: "device",
@@ -49,7 +51,7 @@ export const getDevice =
   > =>
   async (dispatch) => {
     try {
-      const deviceRef = firebase.firestore().collection("devices");
+      const deviceRef = firestore.collection("devices");
       const snapshot = await deviceRef.get();
 
       const deviceData = await Promise.all(
@@ -59,8 +61,7 @@ export const getDevice =
 
           const authManagementId = device.authManagementId;
           if (authManagementId) {
-            const authManagementRef = firebase
-              .firestore()
+            const authManagementRef = firestore
               .collection("authManagements")
               .where("authManagementId", "==", authManagementId);
             const authManagementSnapshot = await authManagementRef.get();
@@ -88,8 +89,7 @@ export const createDevice =
       let password: string;
       let userName: string;
       // Kiểm tra thông tin đăng nhập
-      const authManagementCollection = firebase
-        .firestore()
+      const authManagementCollection = firestore
         .collection("authManagements");
       const snapshot = await authManagementCollection.get();
       const matchingData = snapshot.docs.find((doc) => {
@@ -101,7 +101,7 @@ export const createDevice =
         const authManagementId = matchingData.id;
 
         // Thực hiện thêm thiết bị và lưu trữ authManagementId
-        await firebase.firestore().collection("devices").add({
+        await firestore.collection("devices").add({
           codeDevice: newDevice.codeDevice,
           nameDevice: newDevice.nameDevice,
           ipAddress: newDevice.ipAddress,
@@ -131,8 +131,7 @@ export const updateDevice =
   async (dispatch) => {
     try {
       // Cập nhật thiết bị
-      await firebase
-        .firestore()
+      await firestore
         .collection("devices")
         .doc(id)
         .update({

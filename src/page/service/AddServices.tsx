@@ -6,13 +6,13 @@ import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import SlideMain from "../../containers/SlideMain";
 import "../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
+
 import Account from "../../components/User/Account";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import moment from "moment";
 import { createService } from "../../redux/service/serviceSlice";
 import { useDispatch } from "react-redux";
+import { firestore } from "../../firebase/firebaseConfig";
 
 interface ServiceData {
   id: string;
@@ -30,7 +30,7 @@ function AddServices() {
     description: "",
   });
   const addNoteToCollection = async (action: string) => {
-    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const noteUsersCollection = firestore.collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => data.ip)
@@ -107,7 +107,7 @@ function AddServices() {
               <h4 style={{ color: "#FF7506" }}>Quản lý dịch vụ</h4>
             </div>
             <div className="mt-3">
-              <Card style={{ width: "100%" }}>
+              <Card style={{ width: 1140 }}>
                 <h6 style={{ color: "#FF7506" }}>Thông tin dịch vụ</h6>
                 <Form className="mt-3" form={form} onFinish={onFinish}>
                   <div className="row">
@@ -264,12 +264,12 @@ function AddServices() {
                     </tr>
                   </tbody>
                 </table>
-                <div className="mt-3 text-right">
+                <div className="mt-3 mb-3 text-right">
                   <span style={{ color: "#FF7506" }}>*</span>{" "}
                   <small>Là trường hợp thông tin bắt buộc</small>
                 </div>
               </Card>
-              <div className="col-6 text-center offset-3 mb-3 mt-2">
+              <div className="col-6 text-center offset-3 mb-3 mt-3">
                 <Form.Item>
                   <Button
                     danger

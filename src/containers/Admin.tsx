@@ -14,13 +14,16 @@ import {
 import { CameraOutlined } from "@ant-design/icons";
 import SlideMain from "./SlideMain";
 import "../assets/css/style.css";
-import firebase from "firebase/compat/app";
+
+
 import { useParams } from "react-router-dom";
 import Account from "../components/User/Account";
 import { getAuthMangement } from "../redux/authManagement/authManagementSlice";
 import { RootState } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
+
+import { firestore, storage } from "../firebase/firebaseConfig";
 
 const { Content } = Layout;
 
@@ -29,7 +32,7 @@ interface UserData {
   fullName: string;
   phone: string;
   email: string;
-  role: firebase.firestore.DocumentReference | null;
+  role: any;
   isActive: string;
   image: string; // Thêm trường image vào đây
   userName: string;
@@ -55,7 +58,7 @@ function Admin() {
   const [imageFile, setImageFile] = useState<any>(null);
 
   const handleUpdateAuthManagement = () => {
-    const userRef = firebase.firestore().collection("authManagements").doc(id);
+    const userRef = firestore.collection("authManagements").doc(id);
     const updatedUser = {
       fullName: user.fullName,
       phone: user.phone,
@@ -81,7 +84,7 @@ function Admin() {
     setImageFile(file);
     message.loading("Đang tải ảnh...");
     try {
-      const storageRef = firebase.storage().ref();
+      const storageRef = storage.ref();
       const imageRef = storageRef.child(`authManagements/${file.name}`);
       const uploadTaskSnapshot = await imageRef.put(file);
       const imageUrl = await uploadTaskSnapshot.ref.getDownloadURL();
@@ -103,8 +106,7 @@ function Admin() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userRef = firebase
-        .firestore()
+      const userRef = firestore
         .collection("authManagements")
         .doc(id);
       const userSnapshot = await userRef.get();
@@ -142,7 +144,7 @@ function Admin() {
   useEffect(() => {
     const fetchRoleData = async () => {
       if (user.role) {
-        const roleRef = user.role;
+        const roleRef = firestore.doc(user.role.path); // Assuming the path is valid
         const roleSnapshot = await roleRef.get();
         if (roleSnapshot.exists) {
           const roleData = roleSnapshot.data();
@@ -155,7 +157,7 @@ function Admin() {
     };
 
     fetchRoleData();
-  }, [user]);
+  }, [user.role]);
 
   return (
     <Layout className="layout">

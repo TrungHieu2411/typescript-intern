@@ -13,10 +13,11 @@ import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import "../../assets/css/style.css";
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
+
+
 import { useParams } from "react-router-dom";
 import moment from "moment";
+import { firestore } from "../../firebase/firebaseConfig";
 
 const { Content } = Layout;
 
@@ -40,8 +41,7 @@ function AddProgressives() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const serviceSnapshot = await firebase
-          .firestore()
+        const serviceSnapshot = await firestore
           .collection("services")
           .get();
         const serviceData: ServiceData[] = serviceSnapshot.docs.map((doc) => {
@@ -65,8 +65,7 @@ function AddProgressives() {
   const userId = localStorage.getItem("userId");
   useEffect(() => {
     const fetchUser = async () => {
-      const userRef = firebase
-        .firestore()
+      const userRef = firestore
         .collection("authManagements")
         .doc(userId || id);
     };
@@ -110,7 +109,7 @@ function AddProgressives() {
   };
 
   const addNoteToCollection = async (action: string) => {
-    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const noteUsersCollection = firestore.collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => data.ip)
@@ -137,10 +136,9 @@ function AddProgressives() {
   const [progressiveNumber, setProgressiveNumber] = useState<number>(0);
 
   const handleAddProgressive = async () => {
-    const progressiveCollection = firebase
-      .firestore()
+    const progressiveCollection = firestore
       .collection("progressives");
-    const serviceRef = firebase.firestore().doc(`services/${selectedService}`);
+    const serviceRef = firestore.doc(`services/${selectedService}`);
     try {
       const lastProgressiveSnapshot = await progressiveCollection
         .orderBy("number", "desc")

@@ -7,9 +7,8 @@ import BreadCrumbTwo from "../../components/BreadCrumb/BreadCrumbTwo";
 import Account from "../../components/User/Account";
 import "../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
+
+
 import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -70,7 +69,7 @@ interface ProgressiveData {
   typeDevice: string;
   id: string;
   number: string;
-  nameService: firebase.firestore.DocumentReference | null;
+  nameService: any;
   timeCreate: string;
   status: string;
   authManagementId: "";

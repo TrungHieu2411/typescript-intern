@@ -17,8 +17,8 @@ import { Link, useParams } from "react-router-dom";
 import SlideMain from "../../containers/SlideMain";
 import "../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
+
+
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import Account from "../../components/User/Account";
 import { getProgressive } from "../../redux/progressive/progressiveSlice";
@@ -26,6 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../redux/store";
 import dayjs from "dayjs";
+import { firestore } from "../../firebase/firebaseConfig";
 
 interface ServiceData {
   codeService: string;
@@ -71,7 +72,7 @@ function DetailServices() {
 
   useEffect(() => {
     const fetchService = async () => {
-      const serviceRef = firebase.firestore().collection("services").doc(id);
+      const serviceRef = firestore.collection("services").doc(id);
       const serviceSnapshot = await serviceRef.get();
 
       if (serviceSnapshot.exists) {
@@ -182,7 +183,7 @@ function DetailServices() {
             </div>
             <div className="row mt-3">
               <div className="col-4 mt-3">
-                <Card style={{ height: 520 }}>
+                <Card style={{ height: 500 }}>
                   <h6 style={{ color: "#FF7506" }}>Thông tin dịch vụ</h6>
                   <Form className="mt-3">
                     <table>
@@ -273,7 +274,7 @@ function DetailServices() {
                 </Card>
               </div>
               <div className="col-7 mt-3">
-                <Card style={{ height: 520 }}>
+                <Card style={{ height: 500 }}>
                   <div className="row">
                     <div className="col-3">
                       <label htmlFor="">Trạng thái</label>

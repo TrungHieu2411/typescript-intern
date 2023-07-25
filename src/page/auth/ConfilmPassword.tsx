@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { Button, Input, Form, message } from "antd";
 import { FormInstance } from "antd/lib/form";
-import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
-import "firebase/compat/firestore";
+
+
 import { useParams } from "react-router-dom";
+import { firestore } from "../../firebase/firebaseConfig";
 
 const ConfirmPassword = () => {
   //Lấy id trên params
@@ -14,8 +14,7 @@ const ConfirmPassword = () => {
     const fetchAuthManagement = async () => {
       try {
         if (id) {
-          const authManagementRef = firebase
-            .firestore()
+          const authManagementRef = firestore
             .collection("authManagements")
             .doc(id);
           const authManagementSnapshot = await authManagementRef.get();
@@ -48,8 +47,7 @@ const ConfirmPassword = () => {
         return;
       }
 
-      const authManagementRef = firebase
-        .firestore()
+      const authManagementRef = firestore
         .collection("authManagements")
         .doc(id);
 

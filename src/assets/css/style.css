@@ -33,7 +33,7 @@ body,
 
 /* -------------------------------------------------------------- */
 #logout {
-  margin-top: 180px;
+  margin-top: 220px;
 }
 
 /* Thiết lập margin-top là 200px cho phần tử có id "logout" */
@@ -222,7 +222,7 @@ a:hover {
 /* -------------------------------------------------------------- */
 .card-container canvas {
   width: 720px !important;
-  height: 290px !important;
+  height: 325px !important;
 }
 
 /* Thiết lập kích thước cho phần tử <canvas> trong phần tử có class "card-container", và sử dụng !important để ghi đè các giá trị mặc định */

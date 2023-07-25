@@ -4,10 +4,13 @@ import Account from "../../components/User/Account";
 import SlideMain from "../../containers/SlideMain";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import "../../assets/css/style.css";
-import firebase from "firebase/compat/app";
+
+
+
 import { useDispatch } from "react-redux";
 import { createDevice } from "../../redux/device/deviceSlice";
 import moment from "moment";
+import { firestore } from "../../firebase/firebaseConfig";
 
 interface DeviceData {
   id: string;
@@ -35,8 +38,7 @@ function AddDevices() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const serviceSnapshot = await firebase
-          .firestore()
+        const serviceSnapshot = await firestore
           .collection("services")
           .get();
         const serviceData = serviceSnapshot.docs.map((doc) => {
@@ -73,7 +75,7 @@ function AddDevices() {
 
   //------------
   const addNoteToCollection = async (action: string) => {
-    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const noteUsersCollection = firestore.collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => data.ip)
@@ -114,8 +116,7 @@ function AddDevices() {
       const { username, password } = form.getFieldsValue();
 
       // Lấy thông tin authManagement từ Firebase Firestore
-      const authManagementCollection = firebase
-        .firestore()
+      const authManagementCollection = firestore
         .collection("authManagements");
       const snapshot = await authManagementCollection.get();
       const matchingData = snapshot.docs.find((doc) => {
@@ -127,7 +128,7 @@ function AddDevices() {
         const authManagementId = matchingData.id;
 
         // Thực hiện thêm thiết bị và lưu trữ authManagementId
-        const deviceCollection = firebase.firestore().collection("devices");
+        const deviceCollection = firestore.collection("devices");
         await deviceCollection.add({
           codeDevice: newDevice.codeDevice,
           nameDevice: newDevice.nameDevice,
@@ -392,7 +393,7 @@ function AddDevices() {
                         </Select>
                       </Form.Item>
                     </div>
-                    <div className="col-4 mb-4 text-right">
+                    <div className="col-4 mb-5 text-right">
                       <span style={{ color: "#FF7506" }}>*</span>{" "}
                       <small>Là trường hợp bắt buộc</small>
                     </div>
@@ -404,7 +405,7 @@ function AddDevices() {
                   <Button
                     danger
                     htmlType="submit"
-                    href="/service"
+                    href="/device"
                     className="mx-3 pt-2"
                     style={{
                       background: "#FFF2E7",

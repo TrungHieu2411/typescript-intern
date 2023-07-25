@@ -1,9 +1,11 @@
 import { Action, ThunkAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { message } from "antd";
+import { firestore } from "../../firebase/firebaseConfig";
 
-//firebase
-import firebase from "firebase/compat/app";
+
+
+
 export const progressiveSlice = createSlice({
   name: "progressive",
   initialState: { data: [] },
@@ -28,9 +30,7 @@ interface ProgressiveData {
   fullName: string;
   authManagementId: string;
   typeDevice: string;
-  nameService:
-    | firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
-    | string;
+  nameService: any;
 }
 
 export const { setData } = progressiveSlice.actions;
@@ -39,7 +39,7 @@ export const getProgressive =
   (): ThunkAction<void, RootState, null, Action<string>> =>
   async (dispatch) => {
     try {
-      const progressiveRef = firebase.firestore().collection("progressives");
+      const progressiveRef = firestore.collection("progressives");
       const snapshot = await progressiveRef.get();
 
       const progressiveData = (
@@ -50,8 +50,7 @@ export const getProgressive =
 
             const serviceRef = progressive.nameService;
             if (
-              serviceRef !== null &&
-              serviceRef instanceof firebase.firestore.DocumentReference
+              serviceRef 
             ) {
               const serviceDoc = await serviceRef.get();
               if (serviceDoc.exists) {
@@ -66,8 +65,7 @@ export const getProgressive =
             const authManagementId = progressive.authManagementId;
             if (authManagementId) {
               // Fetch the associated device document
-              const deviceRef = firebase
-                .firestore()
+              const deviceRef = firestore
                 .collection("devices")
                 .where("authManagementId", "==", authManagementId);
               const deviceSnapshot = await deviceRef.get();
@@ -95,7 +93,7 @@ export const countProgressive =
   (): ThunkAction<void, RootState, null, Action<string>> =>
   async (dispatch) => {
     try {
-      const progressiveRef = firebase.firestore().collection("progressives");
+      const progressiveRef = firestore.collection("progressives");
       const snapshot = await progressiveRef.get();
 
       const progressiveData = (
@@ -106,8 +104,7 @@ export const countProgressive =
 
             const serviceRef = progressive.nameService;
             if (
-              serviceRef !== null &&
-              serviceRef instanceof firebase.firestore.DocumentReference
+              serviceRef 
             ) {
               const serviceDoc = await serviceRef.get();
               if (serviceDoc.exists) {
@@ -122,8 +119,7 @@ export const countProgressive =
             const authManagementId = progressive.authManagementId;
             if (authManagementId) {
               // Fetch the associated device document
-              const deviceRef = firebase
-                .firestore()
+              const deviceRef = firestore
                 .collection("devices")
                 .where("authManagementId", "==", authManagementId);
               const deviceSnapshot = await deviceRef.get();

@@ -19,8 +19,8 @@ import Account from "../components/User/Account";
 import "../assets/css/style.css";
 import { Area } from "@ant-design/charts";
 
-import firebase from "firebase/compat/app";
 import Link from "antd/es/typography/Link";
+import { firestore } from "../firebase/firebaseConfig";
 
 // Sử dụng WaveChart trong component của bạn
 
@@ -60,7 +60,7 @@ function Dashboard() {
 
   useEffect(() => {
     // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("progressives");
+    const collectionRef = firestore.collection("progressives");
 
     // Lấy dữ liệu từ Firestore và đếm số lượng cột
     collectionRef.get().then((snapshot) => {
@@ -135,7 +135,7 @@ function Dashboard() {
 
   useEffect(() => {
     // Lấy tham chiếu đến collection "progressives"
-    const collectionRef = firebase.firestore().collection("devices");
+    const collectionRef = firestore.collection("devices");
 
     // Lấy dữ liệu từ Firestore và đếm số lượng cột
     collectionRef.get().then((snapshot) => {
@@ -205,7 +205,7 @@ function Dashboard() {
   const [isNotActiveService, setIsNotActiveService] = useState(0);
 
   useEffect(() => {
-    const serviceCollectionRef = firebase.firestore().collection("services");
+    const serviceCollectionRef = firestore.collection("services");
 
     // Lấy dữ liệu từ Firestore và đếm số lượng cột
     // Đếm số lượng cột trong bảng "services"
@@ -397,7 +397,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const progressiveRef = firebase.firestore().collection("progressives");
+        const progressiveRef = firestore.collection("progressives");
         const snapshot = await progressiveRef.get();
 
         const fetchedProgressiveData = await Promise.all(
@@ -744,7 +744,7 @@ function Dashboard() {
               <div className="col-12 mt-1">
                 <Card
                   className="shadow card-container"
-                  style={{ width: 775, height: 405 }}
+                  style={{ width: 775, height: 435 }}
                 >
                   <div className="row">
                     <div className="col">

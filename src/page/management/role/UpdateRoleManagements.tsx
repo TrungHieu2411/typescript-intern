@@ -7,14 +7,14 @@ import SlideMain from "../../../containers/SlideMain";
 import BreadCrumbThree from "../../../components/BreadCrumb/BreadCrumbThree";
 import "../../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
+
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import { useDispatch } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../../redux/store";
 import { updateRoleManagement } from "../../../redux/roleManagement/roleManagementSlice";
+import { firestore } from "../../../firebase/firebaseConfig";
 
 const { Content } = Layout;
 
@@ -36,8 +36,7 @@ function UpdateRoleManagements() {
 
   useEffect(() => {
     const fetchRoleManagement = async () => {
-      const roleManagementRef = firebase
-        .firestore()
+      const roleManagementRef = firestore
         .collection("roles")
         .doc(id);
       const roleManagementSnapshot = await roleManagementRef.get();
@@ -55,7 +54,7 @@ function UpdateRoleManagements() {
   //-------------
 
   const addNoteToCollection = async (action: string) => {
-    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const noteUsersCollection = firestore.collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => data.ip)
@@ -127,7 +126,7 @@ function UpdateRoleManagements() {
               <h4 style={{ color: "#FF7506" }}>Danh sách vai trò</h4>
             </div>
             <div className="mt-4 pt-2">
-              <Card>
+              <Card style={{width: 1140}}>
                 <h6 style={{ color: "#FF7506" }}>Thông tin vai trò</h6>
                 <Form className="mt-3 mb-2">
                   <div className="row">
@@ -332,7 +331,7 @@ function UpdateRoleManagements() {
                   </div>
                 </Form>
               </Card>
-              <div className="col-6 text-center offset-3 mt-1">
+              <div className="col-6 text-center offset-3 mt-3">
                 <Form.Item>
                   <Button
                     danger

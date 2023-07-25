@@ -5,9 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { message } from "antd";
-
-//firebase
-import firebase from "firebase/compat/app";
+import { firestore } from "../../firebase/firebaseConfig";
 
 export const noteUserManagementSlice = createSlice({
   name: "noteUser",
@@ -35,7 +33,7 @@ export const getNoteUser =
   (): ThunkAction<void, RootState, null, Action<string>> =>
   async (dispatch) => {
     try {
-      const serviceRef = firebase.firestore().collection("noteUsers");
+      const serviceRef = firestore.collection("noteUsers");
       const snapshot = await serviceRef.get();
 
       const serviceData = snapshot.docs.map(async (doc) => {

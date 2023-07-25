@@ -7,12 +7,10 @@ import Account from "../../../components/User/Account";
 import BreadCrumbThree from "../../../components/BreadCrumb/BreadCrumbThree";
 import "../../../assets/css/style.css";
 
-// firebase
-import firebase from "firebase/compat/app";
-import "firebase/compat/storage";
 import moment from "moment";
 import { useDispatch } from "react-redux";
 import { createAuthManagement } from "../../../redux/authManagement/authManagementSlice";
+import { firestore } from "../../../firebase/firebaseConfig";
 
 const { Content } = Layout;
 
@@ -35,10 +33,7 @@ function AddAuthManagements() {
     // Fetch roles from Firestore and set the roles state
     const fetchRoles = async () => {
       try {
-        const rolesSnapshot = await firebase
-          .firestore()
-          .collection("roles")
-          .get();
+        const rolesSnapshot = await firestore.collection("roles").get();
         const rolesData = rolesSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
@@ -71,7 +66,7 @@ function AddAuthManagements() {
     });
 
   const addNoteToCollection = async (action: string) => {
-    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const noteUsersCollection = firestore.collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => data.ip)
@@ -289,11 +284,6 @@ function AddAuthManagements() {
                           </Form.Item>
                         </div>
                       </div>
-
-                      <div className="mb-5 text-right">
-                        <span style={{ color: "#FF7506" }}>*</span>{" "}
-                        <small>Là trường hợp thông tin bắt buộc</small>
-                      </div>
                     </div>
                     <div className="col-6">
                       <div className="row">
@@ -405,10 +395,14 @@ function AddAuthManagements() {
                         </div>
                       </div>
                     </div>
+                    <div className="mb-5 pb-4 text-right">
+                      <span style={{ color: "#FF7506" }}>*</span>{" "}
+                      <small>Là trường hợp thông tin bắt buộc</small>
+                    </div>
                   </div>
                 </Form>
               </Card>
-              <div className="col-6 text-center offset-3 pt-2 mt-1">
+              <div className="col-6 text-center offset-3 mt-3">
                 <Form.Item>
                   <Button
                     danger

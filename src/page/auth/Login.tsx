@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Button, Input, Typography, Form } from "antd";
 import { FormInstance } from "antd/lib/form";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
+import { firestore } from "../../firebase/firebaseConfig";
+
 
 const { Link } = Typography;
 
@@ -17,8 +17,7 @@ const Login: React.FC = () => {
   const onFinish = async (values: any) => {
     const { userName, password } = values;
     try {
-      const authManagementsCollection = firebase
-        .firestore()
+      const authManagementsCollection = firestore
         .collection("authManagements");
       const querySnapshot = await authManagementsCollection
         .where("userName", "==", userName)

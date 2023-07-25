@@ -6,17 +6,17 @@ import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import "../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
+
 import { useParams } from "react-router-dom";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
+import { firestore } from "../../firebase/firebaseConfig";
 
 const { Content } = Layout;
 
 interface ProgressiveData {
   id: string;
   number: string;
-  nameService: firebase.firestore.DocumentReference | null;
+  nameService: any;
   timeCreate: string;
   deadLineUsed: string;
   fullName: string;
@@ -51,8 +51,7 @@ function DetailProgressives() {
   const [typeDevice, setTypeDevice] = useState<string>("");
   useEffect(() => {
     const fetchProgressive = async () => {
-      const progressiveRef = firebase
-        .firestore()
+      const progressiveRef = firestore
         .collection("progressives")
         .doc(id);
       const progressiveSnapshot = await progressiveRef.get();
@@ -66,8 +65,7 @@ function DetailProgressives() {
 
         if (progressiveData.authManagementId) {
           // Fetch the associated device document
-          const deviceRef = firebase
-            .firestore()
+          const deviceRef = firestore
             .collection("devices")
             .where("authManagementId", "==", progressiveData.authManagementId);
           const deviceSnapshot = await deviceRef.get();
@@ -87,7 +85,7 @@ function DetailProgressives() {
   const [nameServiceValue, setNameServiceValue] = useState<string | null>(null);
   useEffect(() => {
     const fetchProgressive = async () => {
-      const progressiveRef = firebase.firestore().collection("progressives");
+      const progressiveRef = firestore.collection("progressives");
       const snapshot = await progressiveRef.get();
       await Promise.all(
         snapshot.docs.map(async (doc) => {
@@ -97,8 +95,7 @@ function DetailProgressives() {
           const nameServiceRef = progressive.nameService;
 
           if (
-            nameServiceRef &&
-            nameServiceRef instanceof firebase.firestore.DocumentReference
+            nameServiceRef 
           ) {
             const nameServiceDoc = await nameServiceRef.get();
             if (nameServiceDoc.exists) {

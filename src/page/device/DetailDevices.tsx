@@ -7,9 +7,8 @@ import { Link, useParams } from "react-router-dom";
 import Account from "../../components/User/Account";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 import "../../assets/css/style.css";
+import { firestore } from "../../firebase/firebaseConfig";
 
-//firebase
-import firebase from "firebase/compat/app";
 
 interface DeviceData {
   codeDevice: string;
@@ -45,7 +44,7 @@ function DetailDevices() {
 
   useEffect(() => {
     const fetchDevice = async () => {
-      const deviceRef = firebase.firestore().collection("devices").doc(id);
+      const deviceRef = firestore.collection("devices").doc(id);
       const deviceSnapshot = await deviceRef.get();
 
       if (deviceSnapshot.exists) {
@@ -53,8 +52,7 @@ function DetailDevices() {
         setDevice(deviceData);
 
         if (deviceData.authManagementId) {
-          const authManagementRef = firebase
-            .firestore()
+          const authManagementRef = firestore
             .collection("authManagements")
             .doc(deviceData.authManagementId);
           const authManagementSnapshot = await authManagementRef.get();

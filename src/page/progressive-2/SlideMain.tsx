@@ -11,7 +11,6 @@ import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import SubMenu from "antd/es/menu/SubMenu";
 import Link from "antd/es/typography/Link";
-import firebase from "firebase/compat/app";
 
 function SlideMain() {
   const handleLogoutClick = async () => {

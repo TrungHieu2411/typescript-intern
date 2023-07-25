@@ -289,11 +289,6 @@ function UpdateAuthManagements() {
                           </Form.Item>
                         </div>
                       </div>
-
-                      <div className="mb-5 text-right">
-                        <span style={{ color: "#FF7506" }}>*</span>{" "}
-                        <small>Là trường hợp thông tin bắt buộc</small>
-                      </div>
                     </div>
                     <div className="col-6">
                       <div className="row">
@@ -378,10 +373,15 @@ function UpdateAuthManagements() {
                         </div>
                       </div>
                     </div>
+
+                    <div className="mb-5 pb-3 text-right">
+                      <span style={{ color: "#FF7506" }}>*</span>{" "}
+                      <small>Là trường hợp thông tin bắt buộc</small>
+                    </div>
                   </div>
                 </Form>
               </Card>
-              <div className="col-6 text-center offset-3 mt-1 pt-1">
+              <div className="col-6 text-center offset-3 mt-3">
                 <Form.Item>
                   <Button
                     danger

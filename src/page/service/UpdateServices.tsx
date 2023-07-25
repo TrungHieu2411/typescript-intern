@@ -6,8 +6,7 @@ import Account from "../../components/User/Account";
 import SlideMain from "../../containers/SlideMain";
 import "../../assets/css/style.css";
 
-//firebase
-import firebase from "firebase/compat/app";
+
 
 import { useParams } from "react-router-dom";
 import BreadCrumbFour from "../../components/BreadCrumb/BreadCrumbFour";
@@ -16,6 +15,7 @@ import { useDispatch } from "react-redux";
 import { updateService } from "../../redux/service/serviceSlice";
 import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../redux/store";
+import { firestore } from "../../firebase/firebaseConfig";
 
 interface ServiceData {
   codeService: string;
@@ -35,7 +35,7 @@ function UpdateServices() {
 
   useEffect(() => {
     const fetchService = async () => {
-      const serviceRef = firebase.firestore().collection("services").doc(id);
+      const serviceRef = firestore.collection("services").doc(id);
       const serviceSnapshot = await serviceRef.get();
 
       if (serviceSnapshot.exists) {
@@ -49,7 +49,7 @@ function UpdateServices() {
   //------------
 
   const addNoteToCollection = async (action: string) => {
-    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const noteUsersCollection = firestore.collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => data.ip)
@@ -122,7 +122,7 @@ function UpdateServices() {
               <h4 style={{ color: "#FF7506" }}>Quản lý dịch vụ</h4>
             </div>
             <div className="mt-3">
-              <Card style={{ width: "100%" }}>
+              <Card style={{ width: 1140 }}>
                 <h6 style={{ color: "#FF7506" }}>Thông tin dịch vụ</h6>
                 <Form className="mt-3">
                   <div className="row">
@@ -248,12 +248,12 @@ function UpdateServices() {
                     </td>
                   </tr>
                 </table>
-                <div className="mt-1 text-right">
+                <div className="mt-1 mb-4 text-right">
                   <span style={{ color: "#FF7506" }}>*</span>{" "}
                   <small>Là trường hợp thông tin bắt buộc</small>
                 </div>
               </Card>
-              <div className="col-6 text-center offset-3 mt-2 mb-3">
+              <div className="col-6 text-center offset-3 mt-3">
                 <Form.Item>
                   <Button
                     danger

@@ -11,7 +11,8 @@ import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import SubMenu from "antd/es/menu/SubMenu";
 import Link from "antd/es/typography/Link";
-import firebase from "firebase/compat/app";
+import { firestore } from "../firebase/firebaseConfig";
+
 
 function SlideMain() {
   const handleLogoutClick = async () => {
@@ -19,7 +20,7 @@ function SlideMain() {
       const userId = localStorage.getItem("userId");
 
       if (userId !== null) {
-        const authManagementsCollection = firebase.firestore().collection("authManagements");
+        const authManagementsCollection = firestore.collection("authManagements");
 
         await Promise.all([
           authManagementsCollection.doc(userId).update({
@@ -117,7 +118,7 @@ function SlideMain() {
               style={{ background: "#FFF2E7", color: "#FF7506" }}
               id="logout"
               icon={<LogoutOutlined />}
-              className="menu-item mb-4"
+              className="menu-item mb-2"
             >
               <Link onClick={handleLogoutClick}>
                 Đăng xuất

@@ -7,8 +7,9 @@ import SlideMain from "../../../containers/SlideMain";
 import BreadCrumbTwo from "../../../components/BreadCrumb/BreadCrumbTwo";
 import Account from "../../../components/User/Account";
 import "../../../assets/css/style.css";
-import firebase from "firebase/compat/app";
-import { DocumentData } from "@firebase/firestore";
+
+
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { ThunkDispatch } from "redux-thunk";
@@ -30,7 +31,7 @@ interface AuthManagementData {
   fullName: string;
   phone: string;
   email: string;
-  role: string | firebase.firestore.DocumentReference<DocumentData> | null;
+  role: any;
   isActive: string;
 }
 function RoleManagement() {

@@ -4,14 +4,14 @@ import SlideMain from "../../containers/SlideMain";
 import Account from "../../components/User/Account";
 import BreadCrumbThree from "../../components/BreadCrumb/BreadCrumbThree";
 
-//firebase
-import firebase from "firebase/compat/app";
+
 import { useParams } from "react-router-dom";
 import { updateDevice } from "../../redux/device/deviceSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
 import { ThunkDispatch } from "redux-thunk";
 import { RootState } from "../../redux/store";
+import { firestore } from "../../firebase/firebaseConfig";
 
 const tags = [
   "",
@@ -51,7 +51,7 @@ function UpdateDevices() {
 
   useEffect(() => {
     const fetchDevice = async () => {
-      const deviceRef = firebase.firestore().collection("devices").doc(id);
+      const deviceRef = firestore.collection("devices").doc(id);
       const deviceSnapshot = await deviceRef.get();
 
       if (deviceSnapshot.exists) {
@@ -59,8 +59,7 @@ function UpdateDevices() {
         setDevice(deviceData);
 
         if (deviceData.authManagementId) {
-          const authManagementRef = firebase
-            .firestore()
+          const authManagementRef = firestore
             .collection("authManagements")
             .doc(deviceData.authManagementId);
           const authManagementSnapshot = await authManagementRef.get();
@@ -78,7 +77,7 @@ function UpdateDevices() {
   }, [id]);
 
   const addNoteToCollection = async (action: string) => {
-    const noteUsersCollection = firebase.firestore().collection("noteUsers");
+    const noteUsersCollection = firestore.collection("noteUsers");
     const ipAddress = await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => data.ip)
@@ -135,8 +134,7 @@ function UpdateDevices() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const serviceSnapshot = await firebase
-          .firestore()
+        const serviceSnapshot = await firestore
           .collection("services")
           .get();
         const serviceData = serviceSnapshot.docs.map((doc) => {
@@ -179,7 +177,7 @@ function UpdateDevices() {
               <h4 style={{ color: "#FF7506" }}>Quản lý thiết bị</h4>
             </div>
             <div className="mt-3">
-              <Card style={{ width: 1140, height: 480 }}>
+              <Card style={{ width: 1140 }}>
                 <h6 style={{ color: "#FF7506" }}>Thông tin thiết bị</h6>
                 <Form className="mt-3">
                   <div className="row">
@@ -332,7 +330,7 @@ function UpdateDevices() {
                         </Select>
                       </div>
                     </div>
-                    <div className="col-4 pb-1 text-right">
+                    <div className="col-4 mb-5 pb-4 mt-2 text-right">
                       <span style={{ color: "#FF7506" }}>*</span>{" "}
                       <small>Là trường hợp thông tin bắt buộc</small>
                     </div>

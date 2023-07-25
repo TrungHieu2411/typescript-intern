@@ -1,7 +1,8 @@
 import { Action, ThunkAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+import { firestore } from "../../firebase/firebaseConfig";
 //firebase
-import firebase from "firebase/compat/app";
+
 
 export const authManagementSlice = createSlice({
   name: "authManagement",
@@ -24,7 +25,7 @@ interface AuthManagementData {
   fullName: string;
   phone: string;
   email: string;
-  role: firebase.firestore.DocumentReference | null;
+  role: any;
   isActive: string;
   password: string;
 }
@@ -51,8 +52,7 @@ export const getAuthMangement =
   > =>
   async (dispatch) => {
     try {
-      const authManagementRef = firebase
-        .firestore()
+      const authManagementRef = firestore
         .collection("authManagements");
       const snapshot = await authManagementRef.get();
       const authManagmentData = await Promise.all(
@@ -63,8 +63,7 @@ export const getAuthMangement =
           const roleRef = authManagement.role;
 
           if (
-            roleRef &&
-            roleRef instanceof firebase.firestore.DocumentReference
+            roleRef 
           ) {
             const roleDoc = await roleRef.get();
             if (roleDoc.exists) {
@@ -92,12 +91,11 @@ export const createAuthManagement =
   ): ThunkAction<void, RootState, null, any> =>
   async (dispatch) => {
     try {
-      const authManagementCollection = firebase
-        .firestore()
+      const authManagementCollection = firestore
         .collection("authManagements");
 
       // Lấy DocumentReference của vai trò (role)
-      const roleRef = firebase.firestore().doc(`roles/${authManagement.role}`);
+      const roleRef = firestore.doc(`roles/${authManagement.role}`);
 
       await authManagementCollection.doc().set({
         fullName: authManagement.fullName,
@@ -121,8 +119,7 @@ export const updateAuthManagement =
   (id: string, auth: any): ThunkAction<void, RootState, null, Action<string>> =>
   async (dispatch) => {
     try {
-      await firebase
-        .firestore()
+      await firestore
         .collection("authManagements")
         .doc(id)
         .update({

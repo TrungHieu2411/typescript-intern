@@ -4,9 +4,10 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-//firebase
-import firebase from "firebase/compat/app";
+
+
 import moment from "moment";
+import { firestore } from "../../firebase/firebaseConfig";
 
 export const serviceSlice = createSlice({
   name: "service",
@@ -34,7 +35,7 @@ export const getService =
   (): ThunkAction<void, RootState, null, Action<string>> =>
   async (dispatch) => {
     try {
-      const serviceRef = firebase.firestore().collection("services");
+      const serviceRef = firestore.collection("services");
       const snapshot = await serviceRef.get();
 
       const serviceData = await Promise.all(
@@ -55,7 +56,7 @@ export const createService =
   (newService: ServiceData): ThunkAction<void, RootState, null, any> =>
   async (dispatch) => {
     try {
-      await firebase.firestore().collection("services").add({
+      await firestore.collection("services").add({
         codeService: newService.codeService,
         nameService: newService.nameService,
         description: newService.description,
@@ -77,8 +78,7 @@ export const updateService =
   ): ThunkAction<void, RootState, null, Action<string>> =>
   async (dispatch) => {
     try {
-      await firebase
-        .firestore()
+      await firestore
         .collection("services")
         .doc(id)
         .update({
